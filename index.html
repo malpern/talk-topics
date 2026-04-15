@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Talk Topics</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg:         #0a0a0a;
+    --bg-soft:    #141414;
+    --bg-raised:  #1e1c1a;
+    --fg:         #f5f5f3;
+    --muted:      #8a8780;
+    --accent:     #7dd3c0;
+    --accent-dim: #3f8a7a;
+    --rule:       #2a2825;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    min-height: 100vh;
+  }
+
+  .deck {
+    min-height: 100vh;
+    padding: 6vh 8vw;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .venue {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-bottom: 2.5em;
+    align-self: flex-start;
+  }
+  .venue img {
+    width: 42px;
+    height: 42px;
+    border-radius: 4px;
+    display: block;
+  }
+  .venue .lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15em;
+    font-family: 'JetBrains Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.22em;
+    line-height: 1.1;
+  }
+  .venue .lines .top {
+    font-size: 0.95rem;
+    color: var(--fg);
+    font-weight: 500;
+  }
+  .venue .lines .bot {
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  h1 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3.5rem, 8vw, 7rem);
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    margin: 0 0 0.3em 0;
+  }
+
+  h1 .accent { color: var(--accent); }
+
+  .subtitle {
+    font-size: 1.3rem;
+    color: var(--muted);
+    margin-bottom: 3em;
+    max-width: 60ch;
+    line-height: 1.5;
+  }
+
+  ol.topics {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule);
+  }
+
+  ol.topics li {
+    border-bottom: 1px solid var(--rule);
+  }
+  ol.topics li a {
+    display: grid;
+    grid-template-columns: 5rem 1fr auto;
+    align-items: baseline;
+    gap: 1.5rem;
+    padding: 1.6rem 0;
+    color: inherit;
+    text-decoration: none;
+    transition: background 120ms ease, padding 120ms ease;
+  }
+  ol.topics li a:hover {
+    background: var(--bg-soft);
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  ol.topics li a:hover .title { color: var(--accent); }
+  ol.topics li a::after {
+    content: "↗";
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    font-size: 1rem;
+    align-self: center;
+    opacity: 0;
+    transition: opacity 120ms ease;
+  }
+  ol.topics li a:hover::after { opacity: 1; color: var(--accent); }
+
+  ol.topics .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.1rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+  }
+
+  ol.topics .title {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 3vw, 2.6rem);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  ol.topics .blurb {
+    display: block;
+    font-weight: 400;
+    font-size: 1.05rem;
+    color: var(--muted);
+    margin-top: 0.35em;
+    letter-spacing: 0;
+  }
+
+  ol.topics .meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  footer {
+    margin-top: 4em;
+    padding-top: 1.5em;
+    border-top: 1px solid var(--rule);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.25em;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+  }
+
+  @media (max-width: 700px) {
+    ol.topics li a {
+      grid-template-columns: 3rem 1fr;
+    }
+    ol.topics .meta { grid-column: 2; color: var(--accent); }
+    ol.topics li a::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<main class="deck">
+  <div class="venue">
+    <img src="hackerdojo-logo.png" alt="Hacker Dojo">
+    <span class="lines">
+      <span class="top">Hacker Dojo</span>
+      <span class="bot">Python Meetup · Talk Topics</span>
+    </span>
+  </div>
+
+  <h1>Pick a <span class="accent">thread</span>.</h1>
+
+  <p class="subtitle">
+    Four projects, four talks. Each one is a different angle on
+    building at the edge of what the tools can do.
+  </p>
+
+  <ol class="topics">
+    <li>
+      <a href="https://cotypist.app/" target="_blank" rel="noopener">
+        <span class="num">01</span>
+        <span class="title">
+          Cotypist
+          <span class="blurb">Autocomplete everywhere on macOS — a system-wide typing assistant.</span>
+        </span>
+        <span class="meta">macOS · Swift</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://malpern.github.io/be-kind-rewind/" target="_blank" rel="noopener">
+        <span class="num">02</span>
+        <span class="title">
+          Be Kind, Rewind
+          <span class="blurb">Reclaiming YouTube: a local app that curates what you actually want to watch.</span>
+        </span>
+        <span class="meta">SwiftUI · SQLite</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://malpern.github.io/knob-to-eleven/" target="_blank" rel="noopener">
+        <span class="num">03</span>
+        <span class="title">
+          Knob to Eleven
+          <span class="blurb">Turning a hardware knob into a rich, extensible desktop controller.</span>
+        </span>
+        <span class="meta">Hardware · Python</span>
+      </a>
+    </li>
+    <li>
+      <a href="https://malpern.github.io/extending-the-knob/index.html" target="_blank" rel="noopener">
+        <span class="num">04</span>
+        <span class="title">
+          What Lies Beneath the Knob
+          <span class="blurb">Reverse-engineering the firmware — extending a closed device on your own terms.</span>
+        </span>
+        <span class="meta">Firmware · RE</span>
+      </a>
+    </li>
+  </ol>
+
+  <footer>
+    <span>Hacker Dojo · Python Meetup</span>
+    <span>Malpern · 2026</span>
+  </footer>
+</main>
+
+</body>
+</html>

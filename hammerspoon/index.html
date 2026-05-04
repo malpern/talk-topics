@@ -712,6 +712,7 @@
   <pre><code class="language-lua">hs.hotkey.bind({"ctrl"}, "h", function()
     hs.alert.show("Hello from Hammerspoon!")
 end)</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — Your first Hammerspoon script: a global hotkey</p>
 
   <p>Three lines. A global hotkey that works in every app. Try doing that in Python.</p>
 </div>
@@ -732,6 +733,7 @@ hs.application.watcher.new(function(name, event, app)
         hs.alert.show(name .. " just launched")
     end
 end):start()</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — Same event-driven pattern in Neovim and Hammerspoon</p>
 
   <p>The mental model is identical: <em>when this event happens, run this function.</em> Neovim gives you buffers and keymaps. Hammerspoon gives you the entire Mac.</p>
 </div>
@@ -913,6 +915,7 @@ filter:subscribe(hs.window.filter.windowTitleChanged, function(win)
         moveCurrentTabToProfile(url, target)
     end)
 end)</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — Watching for page loads and auto-routing by domain</p>
 
   <p>Files reload via <code>hs.pathwatcher</code> &mdash; no restart needed:</p>
 
@@ -920,6 +923,7 @@ end)</code></pre>
     smirkRules = loadRules("smirk.txt")
     personalRules = loadRules("personal.txt")
 end):start()</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — Live-reload route files when saved</p>
 </div>
 
 <hr class="section-rule">
@@ -963,6 +967,7 @@ local function isOnCooldown(url)
     end
     return true
 end</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — 10-minute cooldown prevents the auto-router from fighting manual moves</p>
 
   <p>Notifications with action buttons use <code>hs.notify</code>:</p>
 
@@ -978,6 +983,7 @@ end, {
     hasActionButton = true,
     withdrawAfter = 5,
 }):send()</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Lua — Notification with an actionable "Undo Cooldown" button</p>
 </div>
 
 <hr class="section-rule">
@@ -1058,6 +1064,7 @@ else
         --enable-applescript-javascript &amp;
     disown
 fi</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;font-style:italic;">Bash — Raycast script to launch Dia with the JavaScript flag</p>
 </div>
 
 <hr class="section-rule">

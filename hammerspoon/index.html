@@ -502,6 +502,20 @@
   .idea strong { display: block; margin-bottom: 4px; }
   .idea span { color: var(--fg-muted); font-size: 13px; }
 
+  /* ---- Screenshots ---- */
+  figure.screenshot {
+    margin: 32px -16px 24px;
+  }
+  figure.screenshot img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    border: 1px solid var(--rule);
+    box-shadow: 0 24px 50px rgba(11,11,26,0.18), 0 2px 6px rgba(11,11,26,0.06);
+    background: #0b0b1a;
+  }
+
   /* ---- Cheatsheet ---- */
   .cheatsheet table {
     width: 100%;
@@ -621,6 +635,7 @@
   <li><span class="num">05</span><div><a href="#ch5">Don't Be Annoying</a><span class="blurb">Cooldowns, overrides, and an undo button. The user always wins.</span></div></li>
   <li><span class="num">06</span><div><a href="#ch6">Be Kind, Rewind</a><span class="blurb">Preserving YouTube playback position and play state across profiles.</span></div></li>
   <li><span class="num">07</span><div><a href="#ch7">The Full Picture</a><span class="blurb">How it all connects &mdash; and what else you can automate.</span></div></li>
+  <li><span class="num">08</span><div><a href="#ch8">The Three Languages</a><span class="blurb">Lua, AppleScript, and JavaScript &mdash; what each does and why they need each other.</span></div></li>
 </ol>
 
 <!-- ==================== CHAPTER 1 ==================== -->
@@ -738,6 +753,10 @@ end):start()</code></pre>
     <div class="notif-body">https://www.youtube.com/watch?v=dQw4w9...</div>
   </div>
 
+  <figure class="screenshot">
+    <img src="assets/tab-teleport.png" loading="lazy" alt="Tab teleporting between browser profiles">
+  </figure>
+
   <p>Behind the scenes, the script asks the browser three questions: <em>What profile am I in?</em> (reads the window title). <em>What's the URL?</em> (asks the browser directly through its API). <em>Where should I put it?</em> (finds the other profile's window). Then it closes the tab, opens it in the other window, and focuses that window. Under a second.</p>
 </section>
 
@@ -852,7 +871,15 @@ end)</code></pre>
     </div>
   </div>
 
+  <figure class="screenshot">
+    <img src="assets/url-router.png" loading="lazy" alt="URL routing diagram showing domains flowing to Personal or Work profiles">
+  </figure>
+
   <p>Notice the <code>path:</code> prefix on the GitHub lines. Plain domains match the domain and all subdomains. <code>path:</code> matches the URL path &mdash; so <code>github.com/Smirk-Health/monorepo</code> routes to Work, but <code>github.com/malpern/dotfiles</code> routes to Personal. Same website, different destinations based on who owns the repo.</p>
+
+  <figure class="screenshot">
+    <img src="assets/github-fork.png" loading="lazy" alt="GitHub forking to personal and work profiles">
+  </figure>
 
   <p>Now when I open YouTube in my Work profile, the Mac watches, sees the page load, checks the rules, and quietly moves it to Personal. No button press needed. And the rules reload live &mdash; save the file, the Mac picks it up instantly.</p>
 </section>
@@ -958,6 +985,10 @@ end, {
 
   <p>Before moving the tab, the script reaches <em>inside the web page</em> and asks the video player: "Where are you? Are you playing?" It captures the timestamp, adds it to the URL, and opens the video at exactly the right spot. If the video was playing, it presses spacebar after the page loads to resume playback.</p>
 
+  <figure class="screenshot">
+    <img src="assets/youtube-reach-in.png" loading="lazy" alt="Hand reaching into video player to grab the timestamp">
+  </figure>
+
   <p>You're watching a video. You press Ctrl+S. The video disappears from one window, reappears in the other, at the same moment, still playing.</p>
 
   <p>It's dumb. It's beautiful. It's The Clapper.</p>
@@ -1014,7 +1045,7 @@ fi</code></pre>
 
 <!-- ==================== CHAPTER 7 ==================== -->
 <section class="chapter" id="ch7">
-  <img class="chapter-illustration" src="assets/operators.svg" loading="lazy" alt="Operators are standing by" style="background:#0a0612;">
+  <img class="chapter-illustration" src="assets/operators-photo.png" loading="lazy" alt="Operators are standing by">
   <p class="chapter-eyebrow">Chapter seven</p>
   <h2>The Full Picture</h2>
   <p class="infomercial-quote">"Operators are standing by."</p>
@@ -1031,6 +1062,31 @@ fi</code></pre>
   </ul>
 
   <p>I built all of this in one afternoon, with Claude writing most of the code. The total: about 300 lines of Lua across two script files, plus two plain text config files.</p>
+</section>
+
+<hr class="section-rule">
+
+<!-- ==================== THREE LANGUAGES ==================== -->
+<section id="ch8">
+  <h2>The Three Languages</h2>
+  <p>This system works because three languages, each with different superpowers, nest inside each other like Russian dolls.</p>
+
+  <figure class="screenshot">
+    <img src="assets/code-colored.png" loading="lazy" alt="Code with colored bars showing Lua, AppleScript, and JavaScript">
+  </figure>
+
+  <h3 style="color:var(--neon-cyan);">Lua &middot; Hammerspoon</h3>
+  <p><strong>The orchestrator.</strong> Lua is the outer shell &mdash; it's what's always running, always listening. It can intercept any key combination globally, watch for apps launching or windows changing, fire native macOS notifications with action buttons, monitor file changes on disk, and react to WiFi, USB, screen, and battery events. What it <em>can't</em> do: talk to apps directly or see inside web pages.</p>
+
+  <h3 style="color:var(--neon-pink);">AppleScript</h3>
+  <p><strong>The universal translator.</strong> Every Mac app speaks AppleScript to some degree. Through it, Hammerspoon can ask Dia for the current tab's URL, close a tab, open a URL in a specific window, or send keystrokes that feel "real" to the browser. It bridges the gap between Lua's event system and the apps you want to control. What it <em>can't</em> do: listen for events or bind hotkeys on its own.</p>
+
+  <h3 style="color:var(--neon-yellow);">JavaScript</h3>
+  <p><strong>The inside agent.</strong> Via AppleScript, Hammerspoon can execute JavaScript inside a browser tab &mdash; reaching into the DOM to read <code>video.currentTime</code>, check if a video is paused, click buttons, extract page data, or modify the page itself. What it <em>can't</em> do: anything outside the browser tab it's running in.</p>
+
+  <aside class="concept" style="border-left:3px solid var(--neon-yellow);padding-left:20px;margin:32px 0;font-family:var(--sans);font-size:16px;color:var(--fg-muted);">
+    <strong style="color:var(--fg);">Better together.</strong> Each language can't do what the others can. Lua calls AppleScript calls JavaScript &mdash; and suddenly you can do anything. A hotkey that reaches inside a web page to grab a video's position, closes the tab, opens it in another browser profile at the same timestamp, and sends a spacebar to resume playback. Three languages, one script, one keystroke.
+  </aside>
 </section>
 
 <hr class="section-rule">
@@ -1103,6 +1159,9 @@ fi</code></pre>
 
 <!-- ==================== FINALE ==================== -->
 <section class="finale">
+  <figure class="screenshot">
+    <img src="assets/clapper-meets-mac.png" loading="lazy" alt="The Clapper meets the Mac — warm lamp on the left, cool laptop on the right">
+  </figure>
   <p>The Clapper gave people control over their lamps.<br>Hammerspoon gives you control over your Mac.<br>The only difference is you don't have to clap.</p>
 
   <blockquote>"Clap on! Clap off! The Clapper!"</blockquote>

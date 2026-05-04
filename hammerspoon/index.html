@@ -341,11 +341,13 @@
   /* ---- Tech track sections ---- */
   .tech-track {
     background: var(--tech-bg);
-    color: var(--tech-fg);
     margin: 48px -28px;
     padding: 48px 28px;
     border-left: 4px solid var(--tech-accent);
     position: relative;
+  }
+  .tech-track h3, .tech-track p, .tech-track li, .tech-track td, .tech-track th {
+    color: var(--tech-fg);
   }
   .tech-track::before {
     content: "🔧 FOR THE PROGRAMMERS";
@@ -373,9 +375,6 @@
   }
   .tech-track code:not(pre code) {
     background: rgba(36,212,255,0.1);
-  }
-  .tech-track pre code.hljs {
-    background: var(--code-bg);
   }
 
   /* Neovim sidebar */

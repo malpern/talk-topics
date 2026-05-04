@@ -371,8 +371,11 @@
   .tech-track pre {
     border-color: #3a2f5a;
   }
-  .tech-track code {
+  .tech-track code:not(pre code) {
     background: rgba(36,212,255,0.1);
+  }
+  .tech-track pre code.hljs {
+    background: var(--code-bg);
   }
 
   /* Neovim sidebar */

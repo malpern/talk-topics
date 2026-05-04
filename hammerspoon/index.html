@@ -349,6 +349,10 @@
   .tech-track h3, .tech-track p, .tech-track li, .tech-track td, .tech-track th {
     color: var(--tech-fg);
   }
+  .tech-track code:not(pre code) {
+    background: rgba(36,212,255,0.1);
+    color: var(--tech-fg);
+  }
   .tech-track::before {
     content: "🔧 FOR THE PROGRAMMERS";
     position: absolute;
@@ -1102,6 +1106,11 @@ fi</code></pre>
   <figure class="screenshot">
     <img src="assets/code-colored.png" loading="lazy" alt="Code with colored bars showing Lua, AppleScript, and JavaScript">
   </figure>
+  <p style="font-family:var(--sans);font-size:14px;color:var(--fg-quiet);margin-top:8px;text-align:center;">
+    <span style="color:#24d4ff;">&#9632;</span> Lua &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+    <span style="color:#ff3ba5;">&#9632;</span> AppleScript &nbsp;&nbsp;&middot;&nbsp;&nbsp;
+    <span style="color:#ffd93c;">&#9632;</span> JavaScript
+  </p>
 
   <h3 style="color:var(--neon-cyan);">Lua &middot; Hammerspoon</h3>
   <p><strong>The orchestrator.</strong> Lua is the outer shell &mdash; it's what's always running, always listening. It can intercept any key combination globally, watch for apps launching or windows changing, fire native macOS notifications with action buttons, monitor file changes on disk, and react to WiFi, USB, screen, and battery events. What it <em>can't</em> do: talk to apps directly or see inside web pages.</p>

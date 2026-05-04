@@ -780,49 +780,58 @@ end):start()</code></pre>
     <span style="color:#ff3ba5;">'tell application "Dia" to make new tab in window 2 '</span>
     .. <span style="color:#ff3ba5;">'with properties {URL:"%s"}'</span>, url
 ))</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;">
+    <span style="color:#24d4ff;">&#9632;</span> Lua &nbsp;&middot;&nbsp;
+    <span style="color:#ff3ba5;">&#9632;</span> AppleScript
+  </p>
 
   <p>Three API calls. No timing hacks. No simulated keystrokes. The browser cooperates because you're speaking its language.</p>
 
   <p>The full handler detects which profile you're in, moves the tab, focuses the target window, and fires a native notification:</p>
 
-  <pre><code class="language-lua">hs.hotkey.bind({"ctrl"}, "s", nil, function()
-    local app = hs.application.frontmostApplication()
-    if not app or app:bundleID() ~= "company.thebrowser.dia" then
-        return  -- not Dia, do nothing
-    end
+  <pre><code class="nohl"><span style="color:#24d4ff;">hs.hotkey.bind</span>({"ctrl"}, "s", <span style="color:#24d4ff;">nil</span>, <span style="color:#24d4ff;">function</span>()
+    <span style="color:#24d4ff;">local</span> app = <span style="color:#24d4ff;">hs.application.frontmostApplication</span>()
+    <span style="color:#24d4ff;">if not</span> app <span style="color:#24d4ff;">or</span> app:bundleID() ~= <span style="color:#a8e6a0;">"company.thebrowser.dia"</span> <span style="color:#24d4ff;">then</span>
+        <span style="color:#24d4ff;">return</span>  <span style="color:#6a6280;">-- not Dia, do nothing</span>
+    <span style="color:#24d4ff;">end</span>
 
-    -- Personal has no prefix; Smirk windows say "Smirk: Page Title"
-    local win = hs.window.focusedWindow()
-    local isSmirk = win:title():find("Smirk:") ~= nil
-    local targetLabel = isSmirk and "Personal" or "Smirk"
+    <span style="color:#6a6280;">-- Personal has no prefix; Smirk windows say "Smirk: Page Title"</span>
+    <span style="color:#24d4ff;">local</span> win = <span style="color:#24d4ff;">hs.window.focusedWindow</span>()
+    <span style="color:#24d4ff;">local</span> isSmirk = win:title():find(<span style="color:#a8e6a0;">"Smirk:"</span>) ~= <span style="color:#24d4ff;">nil</span>
+    <span style="color:#24d4ff;">local</span> targetLabel = isSmirk <span style="color:#24d4ff;">and</span> <span style="color:#a8e6a0;">"Personal"</span> <span style="color:#24d4ff;">or</span> <span style="color:#a8e6a0;">"Smirk"</span>
 
-    local ok, url = hs.osascript.applescript(
-        'tell application "Dia" to return URL of active tab of window 1'
+    <span style="color:#24d4ff;">local</span> ok, url = <span style="color:#24d4ff;">hs.osascript.applescript</span>(
+        <span style="color:#ff3ba5;">'tell application "Dia" to return URL of active tab of window 1'</span>
     )
-    hs.osascript.applescript(
-        'tell application "Dia" to close active tab of window 1'
+    <span style="color:#24d4ff;">hs.osascript.applescript</span>(
+        <span style="color:#ff3ba5;">'tell application "Dia" to close active tab of window 1'</span>
     )
-    hs.osascript.applescript(string.format(
-        'tell application "Dia" to make new tab in window 2 '
-        .. 'with properties {URL:"%s"}', url
+    <span style="color:#24d4ff;">hs.osascript.applescript</span>(<span style="color:#24d4ff;">string.format</span>(
+        <span style="color:#ff3ba5;">'tell application "Dia" to make new tab in window 2 '</span>
+        .. <span style="color:#ff3ba5;">'with properties {URL:"%s"}'</span>, url
     ))
 
-    -- Find and focus the target window
-    for _, w in ipairs(app:allWindows()) do
-        local wIsSmirk = w:title():find("Smirk:") ~= nil
-        if (targetLabel == "Smirk" and wIsSmirk)
-        or (targetLabel == "Personal" and not wIsSmirk) then
-            w:focus(); break
-        end
-    end
+    <span style="color:#6a6280;">-- Find and focus the target window</span>
+    <span style="color:#24d4ff;">for</span> _, w <span style="color:#24d4ff;">in</span> <span style="color:#24d4ff;">ipairs</span>(app:allWindows()) <span style="color:#24d4ff;">do</span>
+        <span style="color:#24d4ff;">local</span> wIsSmirk = w:title():find(<span style="color:#a8e6a0;">"Smirk:"</span>) ~= <span style="color:#24d4ff;">nil</span>
+        <span style="color:#24d4ff;">if</span> (targetLabel == <span style="color:#a8e6a0;">"Smirk"</span> <span style="color:#24d4ff;">and</span> wIsSmirk)
+        <span style="color:#24d4ff;">or</span> (targetLabel == <span style="color:#a8e6a0;">"Personal"</span> <span style="color:#24d4ff;">and not</span> wIsSmirk) <span style="color:#24d4ff;">then</span>
+            w:focus(); <span style="color:#24d4ff;">break</span>
+        <span style="color:#24d4ff;">end</span>
+    <span style="color:#24d4ff;">end</span>
 
-    local icon = isSmirk and "🏠" or "💼"
-    hs.notify.new(nil, {
-        title = icon .. "  Moved to " .. targetLabel,
+    <span style="color:#24d4ff;">local</span> icon = isSmirk <span style="color:#24d4ff;">and</span> <span style="color:#a8e6a0;">"🏠"</span> <span style="color:#24d4ff;">or</span> <span style="color:#a8e6a0;">"💼"</span>
+    <span style="color:#24d4ff;">hs.notify.new</span>(<span style="color:#24d4ff;">nil</span>, {
+        title = icon .. <span style="color:#a8e6a0;">"  Moved to "</span> .. targetLabel,
         informativeText = url,
         withdrawAfter = 2,
     }):send()
-end)</code></pre>
+<span style="color:#24d4ff;">end</span>)</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;">
+    <span style="color:#24d4ff;">&#9632;</span> Lua &nbsp;&middot;&nbsp;
+    <span style="color:#ff3ba5;">&#9632;</span> AppleScript &nbsp;&middot;&nbsp;
+    <span style="color:#a8e6a0;">&#9632;</span> strings
+  </p>
 </div>
 
 <hr class="section-rule">
@@ -1016,6 +1025,11 @@ end, {
         <span style="color:#ff3ba5;">end tell</span>
     <span style="color:#ff3ba5;">end tell</span>
 <span style="color:#ff3ba5;">]]</span>)</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;">
+    <span style="color:#24d4ff;">&#9632;</span> Lua &nbsp;&middot;&nbsp;
+    <span style="color:#ff3ba5;">&#9632;</span> AppleScript &nbsp;&middot;&nbsp;
+    <span style="color:#ffd93c;">&#9632;</span> JavaScript
+  </p>
 
   <p><strong>Layer 3 &mdash; AppleScript &rarr; System Events:</strong> Send a spacebar keystroke after the page loads. YouTube's autoplay policy requires a "user gesture" &mdash; a simulated keystroke through the accessibility layer counts.</p>
 
@@ -1026,6 +1040,10 @@ end, {
         <span style="color:#ff3ba5;">end tell</span>
     <span style="color:#ff3ba5;">end tell</span>
 <span style="color:#ff3ba5;">]]</span>)</code></pre>
+  <p style="font-family:var(--sans);font-size:13px;color:var(--fg-quiet);margin-top:8px;">
+    <span style="color:#24d4ff;">&#9632;</span> Lua &nbsp;&middot;&nbsp;
+    <span style="color:#ff3ba5;">&#9632;</span> AppleScript
+  </p>
 
   <p>The JavaScript layer requires a launch flag (<code>--enable-applescript-javascript</code>). I built a Raycast script that launches the browser with the flag &mdash; search "Dia" in Raycast and it just works:</p>
 

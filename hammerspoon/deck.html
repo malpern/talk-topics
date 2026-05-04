@@ -1,0 +1,1506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Clap On, Clap Off — Hacker Dojo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&family=Monoton&family=Righteous&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0a0612;
+    --bg-soft: #140e20;
+    --fg: #f5f1e8;
+    --muted: #8a8280;
+    --accent: #ffd93c;
+    --accent-dim: #c9a020;
+    --pink: #ff3ba5;
+    --cyan: #24d4ff;
+    --orange: #ff8a3c;
+    --rule: #2a2535;
+    --tech-accent: #24d4ff;
+  }
+
+  .reveal {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-weight: 400;
+    color: var(--fg);
+    letter-spacing: -0.01em;
+  }
+
+  .reveal .slides { text-align: left; }
+  .reveal .slides section {
+    height: 100%;
+    padding: 4vh 6vw;
+    box-sizing: border-box;
+  }
+
+  body, .reveal-viewport { background: var(--bg) !important; }
+
+  .reveal h1, .reveal h2, .reveal h3 {
+    font-family: 'Righteous', cursive;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    color: var(--fg);
+    margin: 0 0 0.4em 0;
+    line-height: 1.05;
+  }
+  .reveal h1 { font-size: 5.5rem; }
+  .reveal h2 { font-size: 3.4rem; }
+  .reveal h3 { font-size: 2.2rem; }
+  .reveal p  { font-size: 1.6rem; line-height: 1.45; color: var(--fg); }
+  .reveal li { font-size: 1.45rem; line-height: 1.5; margin: 0.3em 0; }
+  .reveal em { font-style: normal; color: var(--accent); }
+  .reveal strong { color: var(--accent); font-weight: 700; }
+  .reveal a { color: var(--cyan); text-decoration: none; border-bottom: 1px solid rgba(36,212,255,0.4); }
+
+  .reveal code, .reveal pre { font-family: 'JetBrains Mono', monospace; }
+  .reveal pre {
+    width: 100%;
+    box-shadow: none;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    background: #000;
+  }
+  .reveal pre code {
+    font-size: 1.05rem;
+    line-height: 1.5;
+    padding: 1.4em;
+    max-height: none;
+  }
+  .reveal code:not(pre code) {
+    color: var(--accent);
+    background: var(--bg-soft);
+    padding: 0.1em 0.4em;
+    border-radius: 3px;
+    font-size: 0.95em;
+  }
+
+  .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 0.3em 0.8em;
+    border-radius: 2px;
+    margin-bottom: 1.5em;
+  }
+
+  .muted { color: var(--muted); }
+  .accent { color: var(--accent); }
+  .pink { color: var(--pink); }
+  .cyan { color: var(--cyan); }
+
+  /* Title slide */
+  .title-slide {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .title-slide h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 10rem;
+    line-height: 0.95;
+    margin-bottom: 0.2em;
+    letter-spacing: 0.04em;
+  }
+  .title-slide .subtitle {
+    font-size: 1.5rem;
+    color: var(--muted);
+    margin-top: 0.5em;
+    max-width: 75%;
+  }
+  .title-slide .byline {
+    position: absolute;
+    bottom: 6vh;
+    left: 6vw;
+    font-size: 1rem;
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--muted);
+    letter-spacing: 0.1em;
+  }
+
+  /* Divider slide */
+  .divider {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  .divider .act-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem;
+    letter-spacing: 0.4em;
+    color: var(--accent);
+    margin-bottom: 1em;
+  }
+  .divider h2 { font-size: 5.5rem; line-height: 1; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.03em; }
+  .divider .sub { color: var(--muted); font-size: 1.8rem; margin-top: 0.8em; max-width: 70%; }
+
+  /* Infomercial quote slide */
+  .infomercial-slide {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center !important;
+  }
+  .infomercial-slide img {
+    max-height: 45vh;
+    max-width: 70vw;
+    object-fit: contain;
+    border-radius: 8px;
+    border: 2px solid var(--rule);
+    margin-bottom: 1em;
+  }
+  .infomercial-slide .quote {
+    font-family: 'Monoton', cursive;
+    font-size: 2.6rem;
+    font-weight: 400;
+    color: var(--accent);
+    text-shadow: 0 0 20px rgba(255,217,60,0.4);
+    margin: 0;
+  }
+
+  /* Split layout */
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 4vw; align-items: center; height: 100%; }
+  .split.left-heavy { grid-template-columns: 1.3fr 1fr; }
+  .split.right-heavy { grid-template-columns: 1fr 1.3fr; }
+  .split > div { min-width: 0; }
+  .split img { max-height: 70vh; max-width: 100%; object-fit: contain; border-radius: 4px; }
+
+  /* Big word slide */
+  .bigword {
+    display: flex !important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center !important;
+  }
+  .bigword h1 { font-size: 9rem; margin: 0; font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.04em; }
+  .bigword p { color: var(--muted); font-size: 1.5rem; margin-top: 1.5em; max-width: 60%; text-align: center; }
+
+  /* Quote block */
+  .pullquote {
+    font-size: 2.4rem;
+    line-height: 1.3;
+    font-weight: 300;
+    color: var(--fg);
+    border-left: 3px solid var(--accent);
+    padding-left: 1em;
+    max-width: 80%;
+    margin: 1em 0;
+  }
+
+  /* Steps list */
+  .steps { list-style: none; padding: 0; margin: 1em 0; }
+  .steps li {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.2rem;
+    color: var(--muted);
+    padding: 0.4em 0 0.4em 2em;
+    position: relative;
+    border-bottom: 1px solid var(--rule);
+  }
+  .steps li::before {
+    content: attr(data-n);
+    position: absolute;
+    left: 0;
+    color: var(--pink);
+    font-weight: 700;
+  }
+  .steps li strong { color: var(--fg); font-weight: 500; }
+
+  /* Route files side by side */
+  .route-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2vw;
+    margin-top: 1em;
+  }
+  .route-compare pre { font-size: 0.9rem !important; }
+  .route-compare pre code { font-size: 0.9rem !important; padding: 1em !important; }
+  .route-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 0.3em;
+  }
+  .route-label.personal { color: var(--cyan); }
+  .route-label.work { color: var(--orange); }
+  .route-file-styled {
+    background: #000;
+    border: 1px solid var(--rule);
+    border-radius: 6px;
+    padding: 1em 1.2em;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    color: var(--accent);
+    white-space: pre;
+  }
+  .route-file-styled .c { color: #555; }
+
+  /* Notification mockup */
+  .notif {
+    display: inline-block;
+    background: rgba(40,38,50,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    padding: 16px 22px;
+    font-family: 'Inter', sans-serif;
+    color: #fff;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    margin: 1em 0;
+    text-align: left;
+  }
+  .notif .n-title { font-weight: 600; font-size: 1.1rem; margin-bottom: 4px; }
+  .notif .n-body { font-size: 0.9rem; color: #b8b0a8; margin-bottom: 10px; }
+  .notif .n-action {
+    display: inline-block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--cyan);
+    background: rgba(36,212,255,0.15);
+    padding: 4px 14px;
+    border-radius: 6px;
+    border: 1px solid rgba(36,212,255,0.3);
+  }
+
+  /* Ideas grid */
+  .ideas { display: grid; grid-template-columns: 1fr 1fr; gap: 1em; margin-top: 1em; }
+  .idea-card {
+    background: var(--bg-soft);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0.8em 1em;
+    font-size: 1.1rem;
+  }
+  .idea-card .icon { font-size: 1.4rem; margin-right: 0.3em; }
+  .idea-card span { color: var(--muted); font-size: 0.9rem; display: block; margin-top: 0.2em; }
+
+  /* Tech track marker */
+  .tech-marker {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    position: absolute;
+    top: 3vh;
+    right: 6vw;
+    opacity: 0.6;
+  }
+
+  /* Slide number + progress */
+  .reveal .slide-number {
+    color: var(--muted);
+    background: transparent;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+  }
+  .reveal .progress { color: var(--accent); height: 2px; }
+
+  /* Footer */
+  .footer {
+    position: absolute;
+    bottom: 4vh;
+    left: 6vw;
+    right: 6vw;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+  }
+
+  /* Finale */
+  .finale-btn {
+    font-family: 'Bebas Neue', sans-serif;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: var(--bg);
+    background: var(--accent);
+    padding: 16px 40px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 30px rgba(255,217,60,0.3);
+    margin-top: 1em;
+    transition: transform 0.15s;
+  }
+  .finale-btn:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(255,217,60,0.5); }
+</style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- TITLE -->
+<!-- ============================================================ -->
+<section class="title-slide">
+  <div class="split" style="height:100%;align-items:center;">
+    <div>
+      <div class="tag">Hacker Dojo · Python Meetup · May 2026</div>
+      <h1>
+        CLAP <span class="accent">ON,</span><br>
+        CLAP <span class="accent">OFF.</span>
+      </h1>
+      <p class="subtitle">
+        Making your Mac do what you actually want &mdash;<br>
+        with Hammerspoon, AppleScript, and a little LLM magic.
+      </p>
+    </div>
+    <div style="display:flex;justify-content:center;">
+      <img src="assets/clap-hero-v3.png" alt="Two hands clapping with neon energy" style="max-height:65vh;border-radius:16px;box-shadow:0 20px 60px rgba(255,59,165,0.3),0 0 40px rgba(255,217,60,0.15);">
+    </div>
+  </div>
+  <div class="byline">
+    MICAH ALPERN · <span class="accent">github.com/malpern/hammerspoon</span>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE CLAPPER -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/clapper-alt.webp" alt="The Clapper product box from 1984">
+  <p class="quote">"Clap on! Clap off! The Clapper!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE CLAPPER — THE INSIGHT -->
+<!-- ============================================================ -->
+<section>
+  <div class="pullquote">
+    The Clapper shipped in 1984. It was a $19.99 device that let you turn your lamp on and off by clapping.<br><br>
+    It was dumb. It was beautiful. It gave ordinary people a superpower they didn't know they wanted: <em>control over their environment without getting up from the couch.</em>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- YOUR MAC HAS A CLAPPER -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <h1>Your Mac has a <span class="accent">Clapper.</span></h1>
+      <p class="muted" style="font-size:1.5rem;">You just don't know about it yet.</p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/jobs-mac.png" alt="Steve Jobs with the original Macintosh" style="max-height:60vh;max-width:100%;object-fit:contain;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,0.4);">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE REALIZATION -->
+<!-- ============================================================ -->
+<section>
+  <div class="split left-heavy">
+    <div>
+      <h2>The <span class="accent">barrier</span> changed.</h2>
+      <p style="font-size:1.6rem; margin-top:0.8em;">
+        Your Mac has had a hidden automation layer since 2014.
+        The APIs haven't changed. What changed is that you can <em>describe what you want</em>
+        to Claude or ChatGPT and get working code back.
+      </p>
+      <p class="muted" style="font-size:1.3rem; margin-top:1.2em;">
+        The barrier was never technical.<br>It was knowing that this was <em>possible</em>.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/chatgpt-hammerspoon.png" alt="ChatGPT writing Hammerspoon code" style="max-height:65vh;max-width:100%;object-fit:contain;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,0.4);">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH1 DIVIDER — THE ANNOYING THING -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="act-num" style="font-family:'JetBrains Mono',monospace;font-size:1rem;letter-spacing:0.4em;color:var(--accent);margin-bottom:1em;">CHAPTER · 01</div>
+      <h2 style="font-size:5.5rem;line-height:1;font-family:'Bebas Neue',sans-serif;letter-spacing:0.03em;">The <span class="accent">annoying</span><br>thing.</h2>
+      <p class="muted" style="font-size:1.8rem;margin-top:0.8em;">The problem nobody sells a solution for.</p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/drip.png" alt="Dripping faucet" style="max-height:55vh;max-width:100%;object-fit:contain;border-radius:12px;opacity:0.8;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- I'VE FALLEN -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/lifecall.jpg" alt="I've fallen and I can't get up — LifeCall commercial">
+  <p class="quote">"I've fallen and I can't get up!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE PROBLEM -->
+<!-- ============================================================ -->
+<section>
+  <h2>Two <span class="accent">profiles</span>.<br>Zero <span class="pink">routing</span>.</h2>
+  <p style="font-size:1.5rem; max-width:80%; margin-top:0.6em;">
+    I use Dia browser with two profiles &mdash; <em>Personal</em> and <em>Work</em>.
+    Two windows, two sets of logins, two cookie jars.
+  </p>
+  <p class="muted" style="font-size:1.3rem; margin-top:1em;">
+    Except links don't know where they belong.
+    YouTube opens in Work. GitHub opens in Personal.
+    Every day I do the shuffle:
+  </p>
+  <ul class="steps">
+    <li data-n="1.">Copy the URL</li>
+    <li data-n="2.">Close the tab</li>
+    <li data-n="3.">Click the other window</li>
+    <li data-n="4.">Open a new tab</li>
+    <li data-n="5.">Paste</li>
+    <li data-n="6.">Hit enter</li>
+  </ul>
+</section>
+
+<!-- ============================================================ -->
+<!-- SIX STEPS -->
+<!-- ============================================================ -->
+<section class="bigword">
+  <h1><span class="pink">6</span> steps.</h1>
+  <p>Every time. For the rest of my life.<br><br><em>Or... not.</em></p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH2 DIVIDER — THE TOOL -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="act-num" style="font-family:'JetBrains Mono',monospace;font-size:1rem;letter-spacing:0.4em;color:var(--accent);margin-bottom:1em;">CHAPTER · 02</div>
+      <h2 style="font-size:5.5rem;line-height:1;font-family:'Bebas Neue',sans-serif;letter-spacing:0.03em;">The <span class="accent">tool</span>.</h2>
+      <p class="muted" style="font-size:1.8rem;margin-top:0.8em;">Hammerspoon &mdash; The Clapper for your Mac.</p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/hammerspoon-logo.png" alt="Hammerspoon logo" style="max-height:40vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- GINSU -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/ginsu.jpg" alt="Ginsu knife infomercial — it slices, it dices">
+  <p class="quote">"It slices! It dices!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IS HAMMERSPOON -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="tag">The tool</div>
+      <h2><span class="accent">Hammerspoon</span></h2>
+      <p style="font-size:1.5rem;margin-top:0.6em;line-height:1.5;">
+        Free, open-source Mac app. Sits in your menu bar.
+        Runs Lua scripts that can talk to your entire operating system &mdash;
+        every window, every app, every keystroke.
+      </p>
+      <p class="muted" style="font-size:1.3rem;margin-top:1em;">
+        You don't even need to know the language. <em>Describe what you want</em> to an LLM and get working code back.
+      </p>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5em;">
+      <pre style="margin:0;width:100%;"><code>brew install hammerspoon</code></pre>
+      <p style="font-size:1rem;margin:0;color:#555;">Edit <code style="color:#6a6280;">~/.hammerspoon/init.lua</code> &rarr; Reload &rarr; done.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HELLO WORLD -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <div class="tag">Your first script</div>
+      <h3>Three lines. A global Mac hotkey.</h3>
+      <pre><code class="language-lua">hs.hotkey.bind({"ctrl"}, "h", function()
+    hs.alert.show("Hello from Hammerspoon!")
+end)</code></pre>
+      <p class="muted" style="font-size:1.2rem; margin-top:1em;">
+        Works in every app. Try doing that in Python.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/ctrl-h-keys.png" alt="Ctrl+H keyboard keys glowing neon" style="max-height:55vh;max-width:100%;object-fit:contain;border-radius:12px;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT CAN YOU TALK TO -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">What can Hammerspoon see?</div>
+  <h3>Your <span class="accent">entire</span> Mac.</h3>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0.8em;margin-top:0.8em;">
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><rect x="2" y="4" width="20" height="16" rx="2"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.window</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">local win = hs.window.focusedWindow()
+win:setFrame({x=0, y=0,
+  w=screen.w/2, h=screen.h})</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="12" cy="12" r="3"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.application</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">local app = hs.application.find("Dia")
+app:activate()
+app:allWindows()</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.osascript</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">hs.osascript.applescript([[
+  tell application "Dia"
+    return URL of active tab
+  end tell]])</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.notify</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">hs.notify.new(nil, {
+  title = "🏠 Moved to Personal",
+  hasActionButton = true
+}):send()</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><rect x="8" y="2" width="8" height="4" rx="1"/><rect x="4" y="4" width="16" height="18" rx="2"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.pasteboard</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">local url = hs.pasteboard.getContents()
+hs.pasteboard.setContents(newUrl)</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="#fff"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.wifi</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">local net = hs.wifi.currentNetwork()
+if net == "Office" then
+  -- launch work apps
+end</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.screen</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">local screen = hs.screen.mainScreen()
+local f = screen:frame()
+-- f.w, f.h, f.x, f.y</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><circle cx="12" cy="12" r="3"/><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.pathwatcher</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">hs.pathwatcher.new(dir, function()
+  rules = loadRules("routes.txt")
+end):start()</code></pre>
+    </div>
+    <div style="border:1px solid var(--rule);border-radius:8px;padding:0.7em 0.9em;position:relative;overflow:hidden;">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1" style="position:absolute;right:6px;top:6px;opacity:0.12;"><path d="M12 2v10"/><path d="M18.4 6.6L17 8"/><path d="M5.6 6.6L7 8"/><circle cx="12" cy="16" r="4"/><path d="M12 20v2"/></svg>
+      <p style="font-size:1.1rem;margin:0;"><span class="accent">hs.usb</span></p>
+      <pre style="margin:0.4em 0 0;border:none;background:transparent;padding:0;"><code style="font-size:0.8rem;color:var(--muted);background:none;">hs.usb.watcher.new(function(device)
+  if device.name == "Keyboard" then
+    -- rearrange windows
+  end
+end):start()</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- REAL EXAMPLE -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">A real example</div>
+  <h3>React when an app <span class="accent">launches</span>.</h3>
+  <div class="split left-heavy">
+    <div>
+      <pre><code class="language-lua">-- When Zoom opens, mute Slack
+hs.application.watcher.new(
+  function(name, event, app)
+    if name == "zoom.us" and event ==
+      hs.application.watcher.launched then
+
+      hs.notify.new(nil, {
+        title = "🔕 Meeting mode",
+        informativeText = "Slack muted",
+      }):send()
+
+      hs.applescript([[
+        tell application "Slack"
+          set do not disturb to true
+        end tell
+      ]])
+    end
+  end
+):start()</code></pre>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <p style="font-size:1.4rem;line-height:1.5;">
+        Zoom opens &rarr;<br>
+        Slack goes to <em>Do Not Disturb</em> &rarr;<br>
+        You get a notification confirming it.
+      </p>
+      <p class="muted" style="font-size:1.2rem;margin-top:1em;">
+        No cron job. No polling. The Mac <em>tells you</em> when something happens.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PYTHON vs HAMMERSPOON (tech track) -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker">🔧 FOR THE PROGRAMMERS</div>
+  <div class="tag">Python vs Hammerspoon</div>
+  <table style="width:100%;font-size:1.4rem;border-collapse:collapse;margin-top:0.8em;">
+    <tr style="border-bottom:2px solid var(--rule);">
+      <th style="text-align:left;padding:0.8em 1.2em;color:var(--muted);font-size:1.1rem;"></th>
+      <th style="text-align:left;padding:0.8em 1.2em;color:var(--pink);font-size:1.1rem;">Python</th>
+      <th style="text-align:left;padding:0.8em 1.2em;color:var(--accent);font-size:1.1rem;">Hammerspoon</th>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Mac integration</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);"><code style="font-size:0.85em;">subprocess.run(["osascript",...])</code></td>
+      <td style="padding:0.8em 1.2em;">Native &mdash; <code style="font-size:0.85em;">hs.application</code>, <code style="font-size:0.85em;">hs.window</code></td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Runs as</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);">A script you launch</td>
+      <td style="padding:0.8em 1.2em;">Always-on menu bar daemon</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Global hotkeys</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);">Can't intercept them</td>
+      <td style="padding:0.8em 1.2em;">First-class &mdash; any key combo, any app</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">App events</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);">You'd poll in a loop</td>
+      <td style="padding:0.8em 1.2em;">Event-driven watchers</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Notifications</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);"><code style="font-size:0.85em;">osascript</code> &mdash; no buttons</td>
+      <td style="padding:0.8em 1.2em;">Native with action buttons &amp; callbacks</td>
+    </tr>
+    <tr style="border-bottom:1px solid var(--rule);">
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Window control</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);">AppleScript subprocess</td>
+      <td style="padding:0.8em 1.2em;">Move, resize, snap &mdash; one line</td>
+    </tr>
+    <tr>
+      <td style="padding:0.8em 1.2em;color:var(--fg);font-weight:600;">Learning curve</td>
+      <td style="padding:0.8em 1.2em;color:var(--muted);">You know it already</td>
+      <td style="padding:0.8em 1.2em;">Lua &mdash; pick it up in an hour</td>
+    </tr>
+  </table>
+</section>
+
+<!-- ============================================================ -->
+<!-- NEOVIM SIDEBAR (tech track) -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker" style="color:#57a143;">🔧 FOR THE NEOVIM USERS</div>
+  <div class="tag" style="color:#57a143;border-color:#57a143;">You already know Lua</div>
+  <h3 style="color:#57a143;">Neovim &harr; Hammerspoon</h3>
+  <div class="route-compare" style="gap:3vw;">
+    <div>
+      <p class="route-label" style="color:#57a143;">NEOVIM</p>
+      <pre><code class="language-lua" style="font-size:1.15rem !important;line-height:1.6 !important;">vim.api.nvim_create_autocmd(
+  "BufWritePre", {
+    callback = function()
+      vim.lsp.buf.format()
+    end,
+})</code></pre>
+    </div>
+    <div>
+      <p class="route-label" style="color:var(--accent);">HAMMERSPOON</p>
+      <pre><code class="language-lua" style="font-size:1.15rem !important;line-height:1.6 !important;">hs.application.watcher.new(
+  function(name, event, app)
+    if event == hs.application
+      .watcher.launched then
+      hs.alert.show(name)
+    end
+end):start()</code></pre>
+    </div>
+  </div>
+  <p class="muted" style="font-size:1.3rem;margin-top:1em;">Same mental model: <em>when this event happens, run this function.</em></p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH3 DIVIDER — THE CLAPPER -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="act-num">CHAPTER · 03</div>
+  <h2>The <span class="accent">Clapper</span>.</h2>
+  <p class="sub">One keystroke to move a tab between profiles.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CLAPPER IMAGE -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/clapper-commercial.webp" alt="The Clapper">
+  <p class="quote">"Clap on! <em style="color:var(--pink)">clap clap</em> Clap off!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE FIX -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;text-align:center;">
+      <h1 style="font-family:'Bebas Neue',sans-serif;font-size:10rem;letter-spacing:0.04em;"><span class="accent">Ctrl+S</span></h1>
+      <p style="font-size:1.4rem;">Press it in the browser. The current tab<br>teleports to the other profile. Under a second.</p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/clapper-scene.webp" alt="The Clapper in action" style="max-height:55vh;max-width:100%;object-fit:contain;border-radius:12px;border:2px solid var(--rule);">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- NOTIFICATION -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2>One keystroke.<br><span class="accent">Zero</span> manual steps.</h2>
+      <p style="font-size:1.3rem;margin-top:0.6em;">
+        The tab closes in Work, opens in Personal &mdash; same URL.
+        A native macOS notification confirms where it went.
+      </p>
+      <div class="notif" style="margin-top:1.5em;">
+        <div class="n-title">🏠 &nbsp;Moved to Personal</div>
+        <div class="n-body">https://www.youtube.com/watch?v=dQw4w9...</div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/tab-teleport.png" alt="Tab teleporting between browser profiles" style="max-height:55vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- HOW IT WORKS (tech track) -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker">🔧 FOR THE PROGRAMMERS</div>
+  <div class="tag">The key insight</div>
+  <h3>Chromium <span class="pink">ignores</span> synthetic keystrokes.<br>AppleScript <span class="accent">works</span>.</h3>
+  <pre><code class="language-lua">-- Get the URL — no clipboard, just ask
+local ok, url = hs.osascript.applescript(
+    'tell application "Dia" to return URL of active tab of window 1'
+)
+
+-- Close the tab
+hs.osascript.applescript(
+    'tell application "Dia" to close active tab of window 1'
+)
+
+-- Open in the other profile's window
+hs.osascript.applescript(string.format(
+    'tell application "Dia" to make new tab in window 2 '
+    .. 'with properties {URL:"%s"}', url
+))</code></pre>
+  <p class="muted" style="font-size:1.1rem;">Three API calls. No timing hacks. The browser cooperates because you're speaking its language.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH4 DIVIDER — THE AUTOPILOT -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="act-num">CHAPTER · 04</div>
+  <h2>The <span class="accent">autopilot</span>.</h2>
+  <p class="sub">Auto-routing tabs by domain.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- RONCO -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/ronco.webp" alt="Ron Popeil — Set it and forget it — Ronco">
+  <p class="quote">"Set it and forget it!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT IF THE MAC JUST KNEW -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <h2>What if the Mac<br>just... <span class="accent">knew?</span></h2>
+      <p style="font-size:1.4rem;margin-top:0.6em;">
+        YouTube &rarr; <span class="cyan">Personal</span>.<br>
+        Slack &rarr; <span style="color:var(--orange);">Work</span>.<br>
+        Amazon &rarr; <span class="cyan">Personal</span>.<br>
+        GitHub &rarr; <em>depends on the repo</em>.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/url-router.png" alt="URL routing diagram" style="max-height:55vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- ROUTE FILES -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">Plain text config</div>
+  <h3>One domain per line. Live reload.</h3>
+  <div class="route-compare">
+    <div>
+      <p class="route-label personal">personal.txt</p>
+      <div class="route-file-styled"><span class="c"># Social</span>
+youtube.com
+reddit.com
+x.com
+
+<span class="c"># News</span>
+techmeme.com
+wsj.com
+
+<span class="c"># GitHub — personal</span>
+path:github.com/malpern</div>
+    </div>
+    <div>
+      <p class="route-label work">smirk.txt</p>
+      <div class="route-file-styled"><span class="c"># Smirk Health</span>
+smirkhealth.com
+
+<span class="c"># Tools</span>
+slack.com
+figma.com
+linear.app
+zoom.us
+
+<span class="c"># GitHub — work org</span>
+path:github.com/Smirk-Health</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- PATH RULES -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h3>Same domain.<br>Different <span class="accent">profiles</span>.</h3>
+      <p style="font-size:1.3rem;margin-top:0.6em;">
+        The <code>path:</code> prefix matches the URL path &mdash;
+      </p>
+      <p style="font-size:1.3rem;margin-top:0.5em;">
+        <code>github.com/Smirk-Health/monorepo</code><br>
+        &nbsp;&nbsp;&rarr; <span style="color:var(--orange);">Work</span>
+      </p>
+      <p style="font-size:1.3rem;margin-top:0.3em;">
+        <code>github.com/malpern/dotfiles</code><br>
+        &nbsp;&nbsp;&rarr; <span class="cyan">Personal</span>
+      </p>
+      <p class="muted" style="font-size:1.1rem;margin-top:1em;">
+        Save the file, Hammerspoon picks it up instantly.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/github-fork.png" alt="GitHub forking to personal and work" style="max-height:50vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH5 DIVIDER — DON'T BE ANNOYING -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="act-num">CHAPTER · 05</div>
+  <h2>Don't be <span class="accent">annoying</span><br>about it.</h2>
+  <p class="sub">Cooldowns, overrides, and an undo button.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- BILLY MAYS -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/billy-mays.jpg" alt="Billy Mays — But wait, there's more!">
+  <p class="quote">"But wait, there's more!"</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE FIGHT -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2>Autopilot vs. <span class="pink">you</span>.</h2>
+      <p style="font-size:1.3rem;margin-top:0.6em;">
+        You intentionally open YouTube in Work to watch a demo video.
+        The Mac grabs it, throws it to Personal.
+        You Ctrl+S it back. The Mac throws it again.
+      </p>
+      <p style="font-size:1.5rem;margin-top:1em;">
+        You're in an argument. <em>With your own computer.</em>
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/tab-fight.svg" alt="Tab bouncing back and forth in an infinite loop" style="max-height:55vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- COOLDOWN -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2><span class="accent">10-minute</span> cooldown.</h2>
+      <p style="font-size:1.2rem;margin-top:0.4em;">
+        When you Ctrl+S a tab, the Mac backs off that URL for 10 minutes.<br>
+        <em>"You clearly want this here. I'll leave it alone."</em>
+      </p>
+      <pre style="margin-top:0.6em;"><code class="language-lua" style="font-size:0.75rem !important;line-height:1.4 !important;">local COOLDOWN_SECONDS = 600
+local recentlyRouted = {}
+
+local function isOnCooldown(url)
+  local t = recentlyRouted[url]
+  if not t then return false end
+  if os.time() - t > COOLDOWN_SECONDS then
+    recentlyRouted[url] = nil
+    return false
+  end
+  return true
+end
+
+-- in the auto-router:
+if isOnCooldown(url) then return end
+
+-- when Ctrl+S moves a tab:
+markRouted(url)  -- starts 10m cooldown</code></pre>
+      <p class="muted" style="font-size:1rem;margin-top:0.5em;">
+        <em>Opinionated but not stubborn.</em> The user always wins.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/tv-cooldown.svg" alt="Please Stand By — TV test pattern" style="max-height:55vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH6 DIVIDER — BE KIND REWIND -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="act-num">CHAPTER · 06</div>
+  <h2>Be kind, <span class="accent">rewind</span>.</h2>
+  <p class="sub">Preserving YouTube playback position and play state.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- I'VE FALLEN — CALLBACK -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/lifecall.jpg" alt="I've fallen and I can't get up — the callback">
+  <p class="quote">"I've fallen... but I remember where I fell."</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE PROBLEM -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2>14 minutes in.<br>Ctrl+S. <span class="pink">Lost.</span></h2>
+      <p style="font-size:1.4rem;margin-top:0.6em;">
+        You're watching a YouTube video. You move it to the other profile.
+        The page reloads from scratch. Your place is gone.
+      </p>
+      <p style="font-size:1.6rem;margin-top:1em;">
+        <em>Not anymore.</em>
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/youtube-play.svg" alt="YouTube play button" style="max-height:40vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE FIX -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2>Same <span class="accent">moment</span>.<br>Still <span class="accent">playing</span>.</h2>
+      <p style="font-size:1.4rem;margin-top:0.6em;">
+        Before moving, the script reaches <em>inside the page</em>
+        and asks the video player: where are you? Are you playing?
+      </p>
+      <p style="font-size:1.4rem;margin-top:0.6em;">
+        Captures the timestamp, appends <code>&amp;t=855s</code> to the URL,
+        and presses spacebar after the page loads to resume.
+      </p>
+      <p class="muted" style="font-size:1.3rem;margin-top:0.8em;">
+        It's dumb. It's beautiful. It's <em>The Clapper</em>.
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/youtube-reach-in.png" alt="Hand reaching into video player to grab timestamp" style="max-height:55vh;max-width:100%;object-fit:contain;border-radius:12px;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FOR THE PROGRAMMERS — 80s COMPUTER -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/80s-programmer.svg" alt="80s programmer setup with CRT and modem" style="max-height:65vh;max-width:100%;object-fit:contain;">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="tech-marker" style="position:static;margin-bottom:1em;">🔧 FOR THE PROGRAMMERS</div>
+      <h2>Under the <span class="accent">hood</span>.</h2>
+      <p class="muted" style="font-size:1.3rem;">
+        Three automation layers, stitched together by a menu-bar daemon
+        and a language you can learn in an afternoon.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THREE LAYERS (tech track) -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker">🔧 FOR THE PROGRAMMERS</div>
+  <div class="split">
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/xray-mac.png" alt="X-ray view into a Mac showing three automation layers" style="max-height:65vh;max-width:100%;object-fit:contain;border-radius:12px;">
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div class="tag">X-ray into your Mac</div>
+      <h3>Three layers. <span class="accent">One script.</span></h3>
+
+      <div style="border-left:3px solid var(--cyan);padding-left:1em;margin:0.8em 0;">
+        <p style="font-size:1.3rem;margin:0;color:var(--cyan);font-weight:600;">Lua &middot; Hammerspoon</p>
+        <p style="font-size:1rem;margin:0.2em 0 0;color:#666;">Hotkeys, watchers, notifications, orchestration</p>
+      </div>
+
+      <div style="border-left:3px solid var(--pink);padding-left:1em;margin:0.8em 0;">
+        <p style="font-size:1.3rem;margin:0;color:var(--pink);font-weight:600;">AppleScript</p>
+        <p style="font-size:1rem;margin:0.2em 0 0;color:#666;">Talk to apps &mdash; get URLs, close tabs, open tabs, send keystrokes</p>
+      </div>
+
+      <div style="border-left:3px solid var(--accent);padding-left:1em;margin:0.8em 0;">
+        <p style="font-size:1.3rem;margin:0;color:var(--accent);font-weight:600;">JavaScript</p>
+        <p style="font-size:1rem;margin:0.2em 0 0;color:#666;">Reach inside the DOM &mdash; read video position, play state</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE CODE — THREE LANGUAGES (hand-drawn telestrator) -->
+<!-- ============================================================ -->
+<section data-background-image="assets/code-colored.png" data-background-size="contain" data-background-position="25% center" style="padding:2vh 3vw !important;">
+  <div style="position:absolute;right:5vw;top:0;bottom:0;width:33%;display:flex;flex-direction:column;justify-content:center;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--cyan);opacity:0.6;margin-bottom:1em;">🔧 FOR THE PROGRAMMERS</div>
+    <h3>The play, <span class="accent">broken down.</span></h3>
+    <div style="margin-top:2em;">
+      <p style="font-size:1.2rem;margin:0.8em 0;"><span style="color:var(--cyan);">&#9632;</span>&nbsp; <span style="color:var(--cyan);font-weight:600;">Lua</span> <span class="muted">&mdash; orchestrator</span></p>
+      <p style="font-size:1.2rem;margin:0.8em 0;"><span style="color:var(--pink);">&#9632;</span>&nbsp; <span style="color:var(--pink);font-weight:600;">AppleScript</span> <span class="muted">&mdash; talks to apps</span></p>
+      <p style="font-size:1.2rem;margin:0.8em 0;"><span style="color:var(--accent);">&#9632;</span>&nbsp; <span style="color:var(--accent);font-weight:600;">JavaScript</span> <span class="muted">&mdash; inside the DOM</span></p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE FLAG PROBLEM -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker">🔧 FOR THE PROGRAMMERS</div>
+  <h2>One <span class="pink">catch</span>.</h2>
+  <p style="font-size:1.5rem;max-width:80%;margin-top:0.6em;">
+    Chromium browsers lock down JavaScript execution via AppleScript by default.
+    Dia supports it &mdash; but only if you launch with a flag:
+  </p>
+  <pre style="margin-top:1em;"><code style="font-size:1.2rem !important;">--enable-applescript-javascript</code></pre>
+  <p style="font-size:1.4rem;margin-top:1em;">
+    The flag doesn't persist. Every time Dia launches from the Dock,
+    Spotlight, or Finder &mdash; <em>it's gone.</em>
+  </p>
+  <p class="muted" style="font-size:1.2rem;margin-top:1em;">
+    Without it, everything else still works. You just lose the YouTube timestamp.
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- RAYCAST LAUNCHER (tech track) -->
+<!-- ============================================================ -->
+<section>
+  <div class="tech-marker">🔧 FOR THE PROGRAMMERS</div>
+  <div class="split left-heavy">
+    <div>
+      <div class="tag">The launch flag</div>
+      <h3>Raycast to the rescue</h3>
+      <p class="muted" style="font-size:1rem;margin-top:0.3em;margin-bottom:0.8em;">
+        Dia's JavaScript-via-AppleScript requires a launch flag that doesn't persist. This Raycast script ensures it's always set.
+      </p>
+      <pre><code class="language-bash">#!/bin/bash
+# @raycast.title Dia (scriptable)
+# @raycast.mode silent
+
+if pgrep -x "Dia" > /dev/null; then
+    osascript -e 'tell application "Dia" to activate'
+else
+    /Applications/Dia.app/Contents/MacOS/Dia \
+        --enable-applescript-javascript &
+    disown
+fi</code></pre>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/raycast-logo.png" alt="Raycast" style="max-height:35vh;max-width:100%;object-fit:contain;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CH7 DIVIDER — THE FULL PICTURE -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="act-num">CHAPTER · 07</div>
+  <h2>The full <span class="accent">picture</span>.</h2>
+  <p class="sub">How it all connects &mdash; and what else you can automate.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- OPERATORS -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/operators-photo.png" alt="Operators are standing by" style="border-radius:8px;border:2px solid var(--rule);">
+  <p class="quote">"Operators are standing by."</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT'S RUNNING -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">What's running on my Mac right now</div>
+  <ul style="list-style:none;padding:0;margin:0.8em 0;">
+    <li style="font-size:1.35rem;padding:0.3em 0;border-bottom:1px solid var(--rule);">
+      <em>Ctrl+S</em> &mdash; moves any tab between profiles in under a second
+    </li>
+    <li style="font-size:1.35rem;padding:0.3em 0;border-bottom:1px solid var(--rule);">
+      <em>YouTube</em> &mdash; maintains position and keeps playing
+    </li>
+    <li style="font-size:1.35rem;padding:0.3em 0;border-bottom:1px solid var(--rule);">
+      <em>80+ domain rules</em> &mdash; auto-route tabs as I browse
+    </li>
+    <li style="font-size:1.35rem;padding:0.3em 0;border-bottom:1px solid var(--rule);">
+      <em>Cooldowns</em> &mdash; the system backs off when I override it
+    </li>
+    <li style="font-size:1.35rem;padding:0.3em 0;border-bottom:1px solid var(--rule);">
+      <em>Live config</em> &mdash; edit a text file, save, done
+    </li>
+    <li style="font-size:1.35rem;padding:0.3em 0;">
+      <em>Notifications</em> &mdash; confirm every action with an undo button
+    </li>
+  </ul>
+  <p class="muted" style="font-size:1.1rem;margin-top:1em;">
+    ~300 lines of Lua. Two script files. Two text configs. Built in one afternoon with Claude.
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- WHAT ELSE -->
+<!-- ============================================================ -->
+<section class="infomercial-slide">
+  <img src="assets/more-input.webp" alt="Johnny 5 from Short Circuit — More Input!" style="max-height:50vh;">
+  <p class="quote">"More input..."</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- HAMMERSPOON & LUA -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div style="border-left:4px solid var(--cyan);padding-left:1em;">
+        <h2 style="color:var(--cyan);margin-bottom:0.2em;">Hammerspoon <span style="color:var(--fg);">&amp; Lua</span></h2>
+        <p class="muted" style="font-size:1.1rem;margin:0;">The orchestrator &mdash; your Mac's nervous system</p>
+      </div>
+      <ul class="steps" style="margin-top:1.2em;">
+        <li data-n="⌨️" style="border-color:var(--rule);"><strong>Global hotkeys</strong> <span class="muted">&mdash; intercept any key combo, in any app</span></li>
+        <li data-n="👁" style="border-color:var(--rule);"><strong>App &amp; window watchers</strong> <span class="muted">&mdash; react to launch, quit, focus, title change</span></li>
+        <li data-n="📂" style="border-color:var(--rule);"><strong>File watchers</strong> <span class="muted">&mdash; live-reload config when you save</span></li>
+        <li data-n="🔔" style="border-color:var(--rule);"><strong>Native notifications</strong> <span class="muted">&mdash; with action buttons and callbacks</span></li>
+        <li data-n="📶" style="border-color:var(--rule);"><strong>System events</strong> <span class="muted">&mdash; WiFi, USB, screen, battery, sleep/wake</span></li>
+        <li data-n="🪟" style="border-color:var(--rule);"><strong>Window management</strong> <span class="muted">&mdash; move, resize, snap any window</span></li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5em;">
+      <img src="assets/hammerspoon-logo.png" alt="Hammerspoon" style="height:18vh;object-fit:contain;">
+      <pre style="width:100%;"><code class="language-lua" style="font-size:0.85rem !important;">-- React to WiFi changes
+hs.wifi.watcher.new(function()
+  local net = hs.wifi.currentNetwork()
+  if net == "Office" then
+    hs.application.open("Slack")
+    hs.notify.new(nil, {
+      title = "🏢 Welcome to work",
+    }):send()
+  end
+end):start()</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- APPLESCRIPT -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div style="border-left:4px solid var(--pink);padding-left:1em;">
+        <h2 style="color:var(--pink);margin-bottom:0.2em;">AppleScript</h2>
+        <p class="muted" style="font-size:1.1rem;margin:0;">The universal translator &mdash; every Mac app speaks it</p>
+      </div>
+      <ul class="steps" style="margin-top:1.2em;">
+        <li data-n="💬" style="border-color:var(--rule);"><strong>Talk to any app</strong> <span class="muted">&mdash; get URLs, titles, tab lists, window state</span></li>
+        <li data-n="🎯" style="border-color:var(--rule);"><strong>Control apps directly</strong> <span class="muted">&mdash; close tabs, open URLs, click menus</span></li>
+        <li data-n="⌨️" style="border-color:var(--rule);"><strong>System Events</strong> <span class="muted">&mdash; send keystrokes that feel "real" to apps</span></li>
+        <li data-n="📁" style="border-color:var(--rule);"><strong>Finder automation</strong> <span class="muted">&mdash; move files, rename, organize</span></li>
+        <li data-n="🔗" style="border-color:var(--rule);"><strong>App-to-app bridges</strong> <span class="muted">&mdash; pass data between apps that don't know each other</span></li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <pre style="width:100%;"><code style="font-size:0.85rem !important;">-- Get the URL of the current browser tab
+tell application "Dia"
+  return URL of active tab of window 1
+end tell
+
+-- Close the tab
+tell application "Dia"
+  close active tab of window 1
+end tell
+
+-- Open a URL in a specific window
+tell application "Dia"
+  make new tab in window 2 ¬
+    with properties {URL:"https://..."}
+end tell
+
+-- Send a keystroke (spacebar)
+tell application "System Events"
+  tell process "Dia"
+    keystroke " "
+  end tell
+end tell</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT IN THE BROWSER -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <div style="border-left:4px solid var(--accent);padding-left:1em;">
+        <h2 style="color:var(--accent);margin-bottom:0.2em;">JavaScript</h2>
+        <p class="muted" style="font-size:1.1rem;margin:0;">The inside agent &mdash; reach into any web page</p>
+      </div>
+      <ul class="steps" style="margin-top:1.2em;">
+        <li data-n="🎬" style="border-color:var(--rule);"><strong>Read video state</strong> <span class="muted">&mdash; currentTime, paused, duration</span></li>
+        <li data-n="📝" style="border-color:var(--rule);"><strong>Read page content</strong> <span class="muted">&mdash; titles, text, form values, DOM elements</span></li>
+        <li data-n="🖱️" style="border-color:var(--rule);"><strong>Click buttons</strong> <span class="muted">&mdash; simulate user interactions inside the page</span></li>
+        <li data-n="📊" style="border-color:var(--rule);"><strong>Extract data</strong> <span class="muted">&mdash; scrape structured info from any site</span></li>
+        <li data-n="🔄" style="border-color:var(--rule);"><strong>Modify pages</strong> <span class="muted">&mdash; inject CSS, hide elements, add features</span></li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <pre style="width:100%;"><code style="font-size:0.85rem !important;">-- Get YouTube video position
+execute javascript "
+  var v = document.querySelector('video');
+  JSON.stringify({
+    time: Math.floor(v.currentTime),
+    paused: v.paused,
+    duration: Math.floor(v.duration)
+  })
+"
+
+-- Click a button on a web page
+execute javascript "
+  document.querySelector('.submit-btn')
+    .click()
+"
+
+-- Extract the page title
+execute javascript "document.title"</code></pre>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- TOGETHER -->
+<!-- ============================================================ -->
+<section>
+  <h2>Better <span class="accent">together</span>.</h2>
+  <p style="font-size:1.4rem;max-width:80%;margin-top:0.4em;">
+    Each layer can't do what the others can. The magic is the nesting.
+  </p>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.5em;margin-top:1.5em;">
+    <div style="border-top:4px solid var(--cyan);padding-top:1em;">
+      <p style="font-size:1.3rem;color:var(--cyan);font-weight:600;margin:0;">Lua</p>
+      <p class="muted" style="font-size:1rem;margin:0.3em 0 0;">Can intercept keystrokes and watch events.<br><span style="color:var(--pink);">Can't</span> talk to apps or see inside pages.</p>
+    </div>
+    <div style="border-top:4px solid var(--pink);padding-top:1em;">
+      <p style="font-size:1.3rem;color:var(--pink);font-weight:600;margin:0;">AppleScript</p>
+      <p class="muted" style="font-size:1rem;margin:0.3em 0 0;">Can control any Mac app by name.<br><span style="color:var(--cyan);">Can't</span> listen for events or bind hotkeys.</p>
+    </div>
+    <div style="border-top:4px solid var(--accent);padding-top:1em;">
+      <p style="font-size:1.3rem;color:var(--accent);font-weight:600;margin:0;">JavaScript</p>
+      <p class="muted" style="font-size:1rem;margin:0.3em 0 0;">Can read and modify any web page.<br><span style="color:var(--pink);">Can't</span> reach outside the browser tab.</p>
+    </div>
+  </div>
+  <p style="font-size:1.5rem;margin-top:1.5em;text-align:center;">
+    <span style="color:var(--cyan);">Lua</span> calls
+    <span style="color:var(--pink);">AppleScript</span> calls
+    <span style="color:var(--accent);">JavaScript</span> &mdash;
+    <em>and suddenly you can do anything.</em>
+  </p>
+</section>
+
+<!-- ============================================================ -->
+<!-- GETTING STARTED -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div>
+      <h2>Getting <span class="accent">started</span>.</h2>
+      <p style="font-size:1.5rem;"><strong>Step 1:</strong> <code>brew install hammerspoon</code></p>
+      <p style="font-size:1.5rem;"><strong>Step 2:</strong> Grant Accessibility permission</p>
+      <p style="font-size:1.5rem;"><strong>Step 3:</strong> Edit <code>~/.hammerspoon/init.lua</code></p>
+      <p style="font-size:1.6rem;margin-top:1.2em;">
+        That's it. Your Mac is now <em>programmable</em>.
+      </p>
+      <p class="muted" style="font-size:1.1rem;margin-top:1.5em;">
+        This talk's code: <a href="https://github.com/malpern/hammerspoon">github.com/malpern/hammerspoon</a><br>
+        Getting started: <a href="https://www.hammerspoon.org/go/">hammerspoon.org/go</a>
+      </p>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/hammerspoon-logo.png" alt="Hammerspoon logo" style="max-height:30vh;max-width:100%;object-fit:contain;opacity:0.8;">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- FINALE -->
+<!-- ============================================================ -->
+<section>
+  <div class="split">
+    <div style="display:flex;flex-direction:column;justify-content:center;">
+      <h1 class="accent" style="font-family:'Bebas Neue',sans-serif;font-size:7rem;letter-spacing:0.04em;">Clap on.<br>Clap off.</h1>
+      <p style="font-size:1.4rem;margin-top:0.6em;max-width:90%;">
+        The Clapper gave people control over their lamps.<br>
+        Hammerspoon gives you control over your Mac.<br>
+        The only difference is you don't have to clap.
+      </p>
+      <div style="margin-top:1.5em;">
+        <button class="finale-btn" id="play-btn" onclick="playJingle()">
+          👏 &nbsp;Play the jingle &nbsp;👏
+        </button>
+        <button id="pause-btn" onclick="pauseJingle()" style="display:none;background:none;border:2px solid #fff;color:#fff;font-size:1.4rem;padding:10px 18px;border-radius:999px;cursor:pointer;margin-left:1em;vertical-align:middle;">⏸</button>
+      </div>
+      <audio id="jingle" src="assets/clapper-jingle-trimmed.mp3" preload="auto"></audio>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;">
+      <img src="assets/clapper-meets-mac.png" alt="The Clapper meets the Mac" style="max-height:60vh;max-width:100%;object-fit:contain;border-radius:12px;box-shadow:0 16px 40px rgba(0,0,0,0.4);">
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- Q&A -->
+<!-- ============================================================ -->
+<section class="bigword">
+  <h1 class="muted">Q <span class="accent">&</span> A</h1>
+  <p>
+    <a href="https://github.com/malpern/hammerspoon">github.com/malpern/hammerspoon</a>
+  </p>
+</section>
+
+</div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+Reveal.initialize({
+  hash: true,
+  slideNumber: 'c/t',
+  transition: 'fade',
+  transitionSpeed: 'fast',
+  backgroundTransition: 'fade',
+  controls: false,
+  progress: true,
+  center: false,
+  width: 1400,
+  height: 850,
+  margin: 0.02,
+  minScale: 0.3,
+  maxScale: 2.0,
+  plugins: [ RevealHighlight, RevealNotes ],
+});
+
+var jingleAudio = document.getElementById('jingle');
+var pauseBtn = document.getElementById('pause-btn');
+
+function playJingle() {
+  jingleAudio.currentTime = 0;
+  jingleAudio.play();
+  pauseBtn.style.display = 'inline-block';
+}
+function pauseJingle() {
+  jingleAudio.pause();
+  jingleAudio.currentTime = 0;
+  pauseBtn.style.display = 'none';
+}
+jingleAudio.addEventListener('ended', function() {
+  pauseBtn.style.display = 'none';
+});
+</script>
+</body>
+</html>

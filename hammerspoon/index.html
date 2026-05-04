@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Clap On, Clap Off — Making Your Mac Do What You Actually Want</title>
+<meta name="description" content="A Hacker Dojo talk about automating your Mac with Hammerspoon, featuring browser profile routing, YouTube state preservation, and 80s infomercial energy.">
+<meta name="author" content="Micah Alpern">
+
+<style>
+  :root {
+    --bg: #faf5e8;
+    --paper: #ffffff;
+    --fg: #1a1a1a;
+    --fg-muted: #5a5a5f;
+    --fg-quiet: #8f8f94;
+    --rule: #e8e0c8;
+
+    --neon-pink: #ff3ba5;
+    --neon-cyan: #24d4ff;
+    --neon-yellow: #ffd93c;
+    --neon-orange: #ff8a3c;
+    --neon-purple: #a86bff;
+    --sunset-top: #ff5fa2;
+    --sunset-bot: #3a1f6b;
+    --gold: #d4a017;
+    --infomercial-red: #cc2200;
+
+    --code-bg: #0b0b1a;
+    --code-fg: #f4f1ff;
+
+    --tech-bg: #1a1828;
+    --tech-paper: #231f30;
+    --tech-fg: #ece8e0;
+    --tech-muted: #b8b0a8;
+    --tech-accent: #24d4ff;
+
+    --serif: "New York", "Iowan Old Style", "Charter", Georgia, serif;
+    --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", sans-serif;
+    --display: "Orbitron", "SF Pro Display", -apple-system, sans-serif;
+    --mono: "SF Mono", "JetBrains Mono", ui-monospace, Menlo, monospace;
+    --infomercial: "Impact", "Haettenschweiler", "Arial Narrow Bold", sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1a1818;
+      --paper: #231f28;
+      --fg: #ece8e0;
+      --fg-muted: #b8b0a8;
+      --fg-quiet: #8a8288;
+      --rule: #3a3540;
+    }
+  }
+
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--serif);
+    font-size: 19px;
+    line-height: 1.72;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  main { display: block; }
+  article.page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 72px 28px 120px;
+    text-wrap: pretty;
+  }
+  article.page p { margin: 0 0 1.2em; }
+
+  /* ---- Hero ---- */
+  .hero {
+    position: relative;
+    margin: 0 -28px 72px;
+    padding: 96px 28px 72px;
+    background:
+      radial-gradient(ellipse at 22% 110%, var(--neon-orange) 0%, transparent 55%),
+      radial-gradient(ellipse at 78% 110%, var(--neon-yellow) 0%, transparent 50%),
+      linear-gradient(180deg, #0a0612 0%, #1a0a2e 38%, #2b1368 100%);
+    color: #fff5e0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hero::before {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 180px;
+    background:
+      repeating-linear-gradient(90deg, transparent 0 39px, rgba(255,217,60,0.4) 39px 40px),
+      repeating-linear-gradient(180deg, transparent 0 9px, rgba(255,217,60,0.4) 9px 10px);
+    transform: perspective(260px) rotateX(62deg);
+    transform-origin: center bottom;
+    opacity: 0.45;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .hero > * { position: relative; z-index: 1; }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 13px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 12px rgba(255,217,60,0.6);
+    margin: 0 0 16px;
+  }
+
+  h1.title {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(38px, 7vw, 72px);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    margin: 0 0 28px;
+    background: linear-gradient(180deg, #ffffff 0%, #fff5e0 42%, #ffd93c 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    text-shadow: 0 2px 0 rgba(11,11,26,0.4);
+  }
+
+  .subtitle {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 22px;
+    line-height: 1.55;
+    color: #ffe3d0;
+    max-width: 640px;
+    margin: 0 0 40px;
+  }
+  .subtitle b { font-style: normal; font-weight: 700; color: #fff; }
+
+  .hero-image {
+    display: block;
+    max-width: 360px;
+    margin: 0 auto 32px;
+    border-radius: 12px;
+    border: 3px solid rgba(255,217,60,0.4);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(255,217,60,0.15);
+  }
+
+  .start-cta {
+    display: inline-block;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 16px;
+    color: #0a0612;
+    background: var(--neon-yellow);
+    padding: 12px 28px;
+    border-radius: 999px;
+    text-decoration: none;
+    letter-spacing: 0.03em;
+    box-shadow: 0 0 20px rgba(255,217,60,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .start-cta:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,217,60,0.6); }
+  .start-cta .arrow { margin-left: 6px; }
+
+  /* ---- About strip ---- */
+  .about-strip {
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.65;
+    color: var(--fg-muted);
+    border-left: 3px solid var(--neon-yellow);
+    padding-left: 20px;
+    margin: 0 0 56px;
+  }
+
+  /* ---- TOC ---- */
+  .toc-heading {
+    font-family: var(--display);
+    font-size: 14px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--fg-quiet);
+    margin: 0 0 16px;
+  }
+  ol.toc {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 64px;
+    counter-reset: toc;
+  }
+  ol.toc li {
+    display: flex;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .num {
+    font-family: var(--display);
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--neon-yellow);
+    min-width: 28px;
+    padding-top: 2px;
+  }
+  ol.toc a {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 17px;
+    color: var(--fg);
+    text-decoration: none;
+  }
+  ol.toc a:hover { color: var(--neon-pink); }
+  .blurb {
+    display: block;
+    font-size: 14px;
+    color: var(--fg-muted);
+    margin-top: 4px;
+    font-family: var(--sans);
+  }
+
+  /* ---- Chapters ---- */
+  .chapter { margin: 0 0 48px; }
+  hr.section-rule {
+    border: none;
+    border-top: 1px solid var(--rule);
+    margin: 64px 0;
+  }
+
+  .chapter-illustration {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    border-radius: 12px;
+    border: 2px solid var(--rule);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+    margin: 0 0 24px;
+  }
+
+  .chapter-eyebrow {
+    font-family: var(--display);
+    font-size: 12px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--neon-yellow);
+    margin: 0 0 8px;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-weight: 900;
+    font-size: clamp(28px, 5vw, 42px);
+    line-height: 1.1;
+    letter-spacing: -0.01em;
+    margin: 0 0 8px;
+    color: var(--fg);
+  }
+
+  .infomercial-quote {
+    font-family: var(--infomercial);
+    font-size: 22px;
+    color: var(--infomercial-red);
+    letter-spacing: 0.02em;
+    margin: 0 0 24px;
+    font-style: italic;
+  }
+
+  blockquote.epigraph {
+    margin: 0 0 32px;
+    padding: 0;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--fg-muted);
+    border: none;
+  }
+  blockquote.epigraph cite {
+    display: block;
+    font-style: normal;
+    font-size: 13px;
+    color: var(--fg-quiet);
+    margin-top: 8px;
+    font-family: var(--sans);
+  }
+
+  .chapter-opener {
+    font-size: 20px;
+    line-height: 1.7;
+  }
+
+  /* ---- Steps list ---- */
+  ol.steps {
+    font-family: var(--sans);
+    font-size: 17px;
+    padding-left: 24px;
+    margin: 16px 0 24px;
+  }
+  ol.steps li {
+    margin-bottom: 6px;
+    color: var(--fg-muted);
+  }
+
+  /* ---- Code ---- */
+  pre {
+    background: var(--code-bg);
+    color: var(--code-fg);
+    padding: 20px 24px;
+    border-radius: 10px;
+    overflow-x: auto;
+    font-family: var(--mono);
+    font-size: 14px;
+    line-height: 1.6;
+    margin: 24px 0;
+    border: 1px solid #2a1f4a;
+  }
+  code {
+    font-family: var(--mono);
+    font-size: 0.88em;
+    background: rgba(168,107,255,0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  pre code {
+    background: none;
+    padding: 0;
+    font-size: inherit;
+  }
+  .code-caption {
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--fg-quiet);
+    margin: -16px 0 24px;
+    text-align: right;
+  }
+
+  /* ---- Tech track sections ---- */
+  .tech-track {
+    background: var(--tech-bg);
+    color: var(--tech-fg);
+    margin: 48px -28px;
+    padding: 48px 28px;
+    border-left: 4px solid var(--tech-accent);
+    position: relative;
+  }
+  .tech-track::before {
+    content: "🔧 FOR THE PROGRAMMERS";
+    position: absolute;
+    top: 16px;
+    right: 28px;
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    color: var(--tech-accent);
+    opacity: 0.7;
+  }
+  .tech-track h3 {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--tech-accent);
+    margin: 0 0 16px;
+  }
+  .tech-track p {
+    color: var(--tech-muted);
+  }
+  .tech-track pre {
+    border-color: #3a2f5a;
+  }
+  .tech-track code {
+    background: rgba(36,212,255,0.1);
+  }
+
+  /* Neovim sidebar */
+  .neovim-sidebar {
+    border-left-color: #57a143;
+  }
+  .neovim-sidebar::before {
+    content: "🔧 FOR THE NEOVIM USERS";
+    color: #57a143;
+  }
+  .neovim-sidebar h3 {
+    color: #57a143;
+  }
+
+  /* ---- Comparison table ---- */
+  table.compare {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    font-size: 15px;
+    margin: 24px 0;
+  }
+  table.compare th {
+    text-align: left;
+    padding: 10px 14px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--rule);
+  }
+  .tech-track table.compare th {
+    border-bottom-color: #3a2f5a;
+    color: var(--tech-accent);
+  }
+  table.compare td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .tech-track table.compare td {
+    border-bottom-color: #2a1f3a;
+    color: var(--tech-muted);
+  }
+
+  /* ---- Route files display ---- */
+  .route-files {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) {
+    .route-files { grid-template-columns: 1fr; }
+  }
+  .route-file {
+    background: var(--code-bg);
+    border-radius: 10px;
+    padding: 16px 20px;
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--code-fg);
+    border: 1px solid #2a1f4a;
+  }
+  .route-file .filename {
+    font-family: var(--sans);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--neon-yellow);
+    margin-bottom: 8px;
+    display: block;
+  }
+  .route-file .comment { color: #6a6280; }
+  .route-file .path-rule { color: var(--neon-cyan); }
+
+  /* ---- Notification mockup ---- */
+  .notification-mockup {
+    background: rgba(40,38,50,0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    padding: 14px 18px;
+    max-width: 340px;
+    margin: 24px auto;
+    font-family: var(--sans);
+    color: #fff;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .notification-mockup .notif-title {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .notification-mockup .notif-body {
+    font-size: 12px;
+    color: #b8b0a8;
+    margin-bottom: 10px;
+  }
+  .notification-mockup .notif-action {
+    display: inline-block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--neon-cyan);
+    background: rgba(36,212,255,0.15);
+    padding: 4px 12px;
+    border-radius: 6px;
+    border: 1px solid rgba(36,212,255,0.3);
+  }
+
+  /* ---- Ideas grid ---- */
+  .ideas-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 24px 0;
+  }
+  @media (max-width: 600px) {
+    .ideas-grid { grid-template-columns: 1fr; }
+  }
+  .idea {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 10px;
+    padding: 16px;
+    font-family: var(--sans);
+    font-size: 15px;
+  }
+  .idea .idea-icon { font-size: 24px; margin-bottom: 6px; display: block; }
+  .idea strong { display: block; margin-bottom: 4px; }
+  .idea span { color: var(--fg-muted); font-size: 13px; }
+
+  /* ---- Cheatsheet ---- */
+  .cheatsheet table {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: var(--sans);
+    font-size: 14px;
+    margin: 16px 0 32px;
+  }
+  .cheatsheet th {
+    text-align: left;
+    padding: 8px 12px;
+    font-weight: 600;
+    border-bottom: 2px solid var(--rule);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--fg-quiet);
+  }
+  .cheatsheet td {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--rule);
+    vertical-align: top;
+  }
+  .cheatsheet code {
+    font-size: 12px;
+  }
+
+  /* ---- Getting started ---- */
+  .getting-started {
+    background: linear-gradient(135deg, #1a0a2e 0%, #2b1368 100%);
+    color: #fff;
+    margin: 48px -28px;
+    padding: 48px 28px;
+    border-radius: 0;
+  }
+  .getting-started h2 { color: var(--neon-yellow); }
+  .getting-started p { color: #e0d8f0; }
+  .getting-started code { background: rgba(255,217,60,0.15); color: var(--neon-yellow); }
+  .getting-started a { color: var(--neon-cyan); }
+
+  /* ---- Finale ---- */
+  .finale {
+    text-align: center;
+    padding: 64px 0;
+  }
+  .finale blockquote {
+    font-family: var(--display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--neon-yellow);
+    border: none;
+    margin: 0 0 24px;
+    padding: 0;
+  }
+  .finale .play-jingle {
+    display: inline-block;
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 18px;
+    color: #0a0612;
+    background: var(--neon-yellow);
+    padding: 16px 36px;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 0 20px rgba(255,217,60,0.4);
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .finale .play-jingle:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(255,217,60,0.6); }
+
+  /* ---- Footer ---- */
+  footer {
+    text-align: center;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--fg-quiet);
+    padding: 32px 0 64px;
+  }
+  footer a { color: var(--neon-pink); }
+</style>
+</head>
+
+<body>
+<main>
+<article class="page">
+
+<!-- ==================== HERO ==================== -->
+<header class="hero">
+  <p class="eyebrow">A Hacker Dojo Talk</p>
+  <h1 class="title">Clap On, Clap Off.</h1>
+  <p class="subtitle">Making your Mac do what you <b>actually</b> want.</p>
+
+  <img class="hero-image" src="assets/clapper-commercial.webp" alt="The Clapper — Clap It On! Clap It Off! — product box from the 1984 commercial" loading="lazy">
+
+  <p style="max-width:640px;font-size:18px;color:#f4dbe0;line-height:1.7;margin:0 0 1em;">The Clapper shipped in 1984. It was a $19.99 device that let you turn your lamp on and off by clapping. It was dumb. It was beautiful. It gave ordinary people a superpower they didn't know they wanted: <em>control over their environment without getting up from the couch.</em></p>
+
+  <p style="max-width:640px;font-size:18px;color:#f4dbe0;line-height:1.7;margin:0 0 2em;">Your Mac has a Clapper. You just don't know about it yet.</p>
+
+  <a href="#ch1" class="start-cta">Roll the tape <span class="arrow">&rarr;</span></a>
+</header>
+
+<!-- ==================== About ==================== -->
+<section class="about-strip">
+  <p>Every day, you do things on your Mac that annoy you. Little things. You open a link and it goes to the wrong browser window. You copy a URL, close a tab, switch windows, open a new tab, paste, hit enter &mdash; six steps for what should be zero.</p>
+  <p>You don't fix these things because you assume they're unfixable. <em>That's just how computers work.</em></p>
+  <p>It's not. Your Mac has a hidden automation layer that's been sitting there for a decade, waiting for someone to tell it what to do. And now &mdash; with ChatGPT, Claude, and every other AI that can write code &mdash; <strong>you</strong> can be that someone. You don't need to be a programmer. You need to be annoyed enough to describe what you want.</p>
+  <p>This talk is about that moment of realization. The moment you stop adapting to your computer and start making your computer adapt to you.</p>
+</section>
+
+<!-- ==================== TOC ==================== -->
+<p class="toc-heading">The infomercial</p>
+<ol class="toc">
+  <li><span class="num">01</span><div><a href="#ch1">The Annoying Thing</a><span class="blurb">The real problem nobody sells a solution for.</span></div></li>
+  <li><span class="num">02</span><div><a href="#ch2">The Tool</a><span class="blurb">Hammerspoon &mdash; what it is, what it does, three lines to get started.</span></div></li>
+  <li><span class="num">03</span><div><a href="#ch3">The Clapper</a><span class="blurb">One keystroke to move a tab between browser profiles.</span></div></li>
+  <li><span class="num">04</span><div><a href="#ch4">The Autopilot</a><span class="blurb">Auto-routing tabs by domain, with path-based rules for GitHub.</span></div></li>
+  <li><span class="num">05</span><div><a href="#ch5">Don't Be Annoying</a><span class="blurb">Cooldowns, overrides, and an undo button. The user always wins.</span></div></li>
+  <li><span class="num">06</span><div><a href="#ch6">Be Kind, Rewind</a><span class="blurb">Preserving YouTube playback position and play state across profiles.</span></div></li>
+  <li><span class="num">07</span><div><a href="#ch7">The Full Picture</a><span class="blurb">How it all connects &mdash; and what else you can automate.</span></div></li>
+</ol>
+
+<!-- ==================== CHAPTER 1 ==================== -->
+<section class="chapter" id="ch1">
+  <img class="chapter-illustration" src="assets/lifecall.jpg" loading="lazy" alt="I've fallen and I can't get up — LifeCall commercial">
+  <p class="chapter-eyebrow">Chapter one</p>
+  <h2>The Annoying Thing</h2>
+  <p class="infomercial-quote">"I've fallen and I can't get up!"</p>
+
+  <p class="chapter-opener">Let me show you my annoying thing.</p>
+
+  <p>I use a browser called Dia with two profiles &mdash; <strong>Personal</strong> and <strong>Work</strong>. Two separate windows, two separate sets of logins. My personal Gmail in one, my work Gmail in the other. My personal YouTube algorithm in one, my work Slack in the other. Clean separation.</p>
+
+  <p>Except links don't know where they belong.</p>
+
+  <p>I click a YouTube link in Slack and it opens in my Work profile. Now YouTube thinks I want to watch insurance industry webinars. I open a GitHub link in my Personal profile and I can't see the private repos because I'm logged into the wrong account.</p>
+
+  <p>So I do the shuffle. Every day. Multiple times a day:</p>
+
+  <ol class="steps">
+    <li>Copy the URL</li>
+    <li>Close the tab</li>
+    <li>Click the other window</li>
+    <li>Open a new tab</li>
+    <li>Paste</li>
+    <li>Hit enter</li>
+  </ol>
+
+  <p>Six steps. Every time. For the rest of my life.</p>
+
+  <p>Or... not.</p>
+</section>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 2 ==================== -->
+<section class="chapter" id="ch2">
+  <img class="chapter-illustration" src="assets/ginsu.jpg" loading="lazy" alt="Ginsu knife infomercial — it slices, it dices">
+  <p class="chapter-eyebrow">Chapter two</p>
+  <h2>The Tool</h2>
+  <p class="infomercial-quote">"It slices! It dices!"</p>
+
+  <p class="chapter-opener">The tool is called <strong>Hammerspoon</strong>. It's free. It's been around since 2014. It sits in your menu bar and runs little scripts that can talk to your entire Mac &mdash; every window, every app, every keystroke.</p>
+
+  <p>You install it in one line:</p>
+
+  <pre><code>brew install hammerspoon</code></pre>
+
+  <p>You configure it by editing one file: <code>~/.hammerspoon/init.lua</code></p>
+
+  <p>And then your Mac starts doing what you tell it to.</p>
+
+  <p>Here's the thing: you don't even need to know the scripting language. You can describe what you want to ChatGPT or Claude and get working code back. The scripts are short &mdash; usually 10 to 30 lines. The language (Lua) is simple enough that you can read it even if you've never seen it before.</p>
+
+  <p>The real barrier was never technical. It was knowing that this was possible.</p>
+</section>
+
+<!-- ---- Tech track: Under the hood ---- -->
+<div class="tech-track">
+  <h3>What's Under the Hood</h3>
+  <p>Hammerspoon exposes the macOS accessibility and scripting APIs through Lua. Think of it as a long-running process with bindings to everything:</p>
+
+  <table class="compare">
+    <tr><th></th><th>Python</th><th>Hammerspoon</th></tr>
+    <tr><td>Mac integration</td><td><code>subprocess.run(["osascript", ...])</code></td><td>Native &mdash; <code>hs.application</code>, <code>hs.window</code></td></tr>
+    <tr><td>Runs as</td><td>A script you launch</td><td>Always-on daemon in the menu bar</td></tr>
+    <tr><td>Global hotkeys</td><td>Can't intercept them</td><td>First-class citizen</td></tr>
+    <tr><td>React to app events</td><td>You'd poll</td><td>Event-driven &mdash; watchers for launch, focus, title changes</td></tr>
+  </table>
+
+  <p>Your first script:</p>
+
+  <pre><code>hs.hotkey.bind({"ctrl"}, "h", function()
+    hs.alert.show("Hello from Hammerspoon!")
+end)</code></pre>
+
+  <p>Three lines. A global hotkey that works in every app. Try doing that in Python.</p>
+</div>
+
+<!-- ---- Neovim sidebar ---- -->
+<div class="tech-track neovim-sidebar">
+  <h3>Neovim Users: You Already Know This</h3>
+  <p>If you've written an <code>init.lua</code> for Neovim, you've been writing Lua for years. Same language. Same tables-and-functions philosophy.</p>
+
+  <pre><code>-- Neovim: react to an event
+vim.api.nvim_create_autocmd("BufWritePre", {
+    callback = function() vim.lsp.buf.format() end,
+})
+
+-- Hammerspoon: react to an event
+hs.application.watcher.new(function(name, event, app)
+    if event == hs.application.watcher.launched then
+        hs.alert.show(name .. " just launched")
+    end
+end):start()</code></pre>
+
+  <p>The mental model is identical: <em>when this event happens, run this function.</em> Neovim gives you buffers and keymaps. Hammerspoon gives you the entire Mac.</p>
+</div>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 3 ==================== -->
+<section class="chapter" id="ch3">
+  <img class="chapter-illustration" src="assets/clapper-commercial.webp" loading="lazy" alt="The Clapper — Clap On, Clap Off">
+  <p class="chapter-eyebrow">Chapter three</p>
+  <h2>The Clapper</h2>
+  <p class="infomercial-quote">"Clap on! <em>clap clap</em> Clap off! <em>clap clap</em>"</p>
+
+  <p class="chapter-opener">Here's what I built: <strong>press Ctrl+S in the browser, and the current tab teleports to the other profile.</strong></p>
+
+  <p>That's it. One keystroke replaces six manual steps. The tab closes in Work, opens in Personal &mdash; same URL, same everything. A little notification pops up confirming where it went.</p>
+
+  <div class="notification-mockup">
+    <div class="notif-title">🏠 &nbsp;Moved to Personal</div>
+    <div class="notif-body">https://www.youtube.com/watch?v=dQw4w9...</div>
+  </div>
+
+  <p>Behind the scenes, the script asks the browser three questions: <em>What profile am I in?</em> (reads the window title). <em>What's the URL?</em> (asks the browser directly through its API). <em>Where should I put it?</em> (finds the other profile's window). Then it closes the tab, opens it in the other window, and focuses that window. Under a second.</p>
+</section>
+
+<div class="tech-track">
+  <h3>How Ctrl+S Actually Works</h3>
+  <p>The key insight: Chromium browsers silently ignore synthetic keystrokes from automation tools. Simulating Cmd+C, Cmd+W, Cmd+V doesn't work. What does work: <strong>AppleScript</strong> &mdash; a decades-old Mac scripting language that apps actually listen to.</p>
+
+  <pre><code>-- Get the URL &mdash; no clipboard, no keystrokes, just ask
+local ok, url = hs.osascript.applescript(
+    'tell application "Dia" to return URL of active tab of window 1'
+)
+
+-- Close the tab
+hs.osascript.applescript(
+    'tell application "Dia" to close active tab of window 1'
+)
+
+-- Open in the other profile's window
+hs.osascript.applescript(string.format(
+    'tell application "Dia" to make new tab in window 2 '
+    .. 'with properties {URL:"%s"}', url
+))</code></pre>
+
+  <p>Three API calls. No timing hacks. No simulated keystrokes. The browser cooperates because you're speaking its language.</p>
+
+  <p>The full handler detects which profile you're in, moves the tab, focuses the target window, and fires a native notification:</p>
+
+  <pre><code>hs.hotkey.bind({"ctrl"}, "s", nil, function()
+    local app = hs.application.frontmostApplication()
+    if not app or app:bundleID() ~= "company.thebrowser.dia" then
+        return  -- not Dia, do nothing
+    end
+
+    -- Personal has no prefix; Smirk windows say "Smirk: Page Title"
+    local win = hs.window.focusedWindow()
+    local isSmirk = win:title():find("Smirk:") ~= nil
+    local targetLabel = isSmirk and "Personal" or "Smirk"
+
+    local ok, url = hs.osascript.applescript(
+        'tell application "Dia" to return URL of active tab of window 1'
+    )
+    hs.osascript.applescript(
+        'tell application "Dia" to close active tab of window 1'
+    )
+    hs.osascript.applescript(string.format(
+        'tell application "Dia" to make new tab in window 2 '
+        .. 'with properties {URL:"%s"}', url
+    ))
+
+    -- Find and focus the target window
+    for _, w in ipairs(app:allWindows()) do
+        local wIsSmirk = w:title():find("Smirk:") ~= nil
+        if (targetLabel == "Smirk" and wIsSmirk)
+        or (targetLabel == "Personal" and not wIsSmirk) then
+            w:focus(); break
+        end
+    end
+
+    local icon = isSmirk and "🏠" or "💼"
+    hs.notify.new(nil, {
+        title = icon .. "  Moved to " .. targetLabel,
+        informativeText = url,
+        withdrawAfter = 2,
+    }):send()
+end)</code></pre>
+</div>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 4 ==================== -->
+<section class="chapter" id="ch4">
+  <img class="chapter-illustration" src="assets/ronco.webp" loading="lazy" alt="Ron Popeil — Set it and forget it — Ronco Showtime Rotisserie">
+  <p class="chapter-eyebrow">Chapter four</p>
+  <h2>The Autopilot</h2>
+  <p class="infomercial-quote">"Set it and forget it!"</p>
+
+  <p class="chapter-opener">Ctrl+S is great, but I still have to remember to press it. What if the Mac just... knew?</p>
+
+  <p>YouTube &rarr; Personal. Slack &rarr; Work. Amazon &rarr; Personal. GitHub &rarr; depends on the repo.</p>
+
+  <p>I set up a list of rules &mdash; plain text files, one website per line:</p>
+
+  <div class="route-files">
+    <div class="route-file">
+      <span class="filename">personal.txt</span>
+      <span class="comment"># Social</span><br>
+      youtube.com<br>
+      reddit.com<br>
+      x.com<br>
+      instagram.com<br><br>
+      <span class="comment"># News</span><br>
+      techmeme.com<br>
+      wsj.com<br><br>
+      <span class="comment"># Shopping</span><br>
+      amazon.com<br><br>
+      <span class="comment"># GitHub &mdash; personal repos</span><br>
+      <span class="path-rule">path:github.com/malpern</span>
+    </div>
+    <div class="route-file">
+      <span class="filename">smirk.txt</span>
+      <span class="comment"># Smirk Health</span><br>
+      smirkhealth.com<br><br>
+      <span class="comment"># Tools</span><br>
+      slack.com<br>
+      figma.com<br>
+      linear.app<br>
+      zoom.us<br><br>
+      <span class="comment"># Analytics</span><br>
+      posthog.com<br><br>
+      <span class="comment"># GitHub &mdash; work org</span><br>
+      <span class="path-rule">path:github.com/Smirk-Health</span>
+    </div>
+  </div>
+
+  <p>Notice the <code>path:</code> prefix on the GitHub lines. Plain domains match the domain and all subdomains. <code>path:</code> matches the URL path &mdash; so <code>github.com/Smirk-Health/monorepo</code> routes to Work, but <code>github.com/malpern/dotfiles</code> routes to Personal. Same website, different destinations based on who owns the repo.</p>
+
+  <p>Now when I open YouTube in my Work profile, the Mac watches, sees the page load, checks the rules, and quietly moves it to Personal. No button press needed. And the rules reload live &mdash; save the file, the Mac picks it up instantly.</p>
+</section>
+
+<div class="tech-track">
+  <h3>How the Auto-Router Works</h3>
+  <p>Hammerspoon watches for window title changes (which signal a new page load), grabs the URL via AppleScript, and matches against the rule files:</p>
+
+  <pre><code>local filter = hs.window.filter.new(false):setAppFilter("Dia")
+filter:subscribe(hs.window.filter.windowTitleChanged, function(win)
+    hs.timer.doAfter(0.5, function()
+        local ok, url = hs.osascript.applescript(
+            'tell application "Dia" to return URL of active tab of window 1'
+        )
+        local target = profileForURL(url)  -- "Smirk", "Personal", or nil
+        if not target then return end       -- no rule, leave it alone
+
+        local current = win:title():find("Smirk:") and "Smirk" or "Personal"
+        if current == target then return end
+
+        moveCurrentTabToProfile(url, target)
+    end)
+end)</code></pre>
+
+  <p>Files reload via <code>hs.pathwatcher</code> &mdash; no restart needed:</p>
+
+  <pre><code>hs.pathwatcher.new(ROUTES_DIR, function()
+    smirkRules = loadRules("smirk.txt")
+    personalRules = loadRules("personal.txt")
+end):start()</code></pre>
+</div>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 5 ==================== -->
+<section class="chapter" id="ch5">
+  <img class="chapter-illustration" src="assets/billy-mays.jpg" loading="lazy" alt="Billy Mays — But wait, there's more!">
+  <p class="chapter-eyebrow">Chapter five</p>
+  <h2>Don't Be Annoying About It</h2>
+  <p class="infomercial-quote">"But wait, there's more!"</p>
+
+  <p class="chapter-opener">Autopilot is great until it fights you.</p>
+
+  <p>I intentionally open YouTube in my Work profile to watch a demo video from a coworker. The Mac sees YouTube, grabs it, throws it to Personal. I move it back. The Mac throws it again. We're in an argument. With my own computer.</p>
+
+  <p>The solution: <strong>a 10-minute cooldown.</strong> When I manually move a tab with Ctrl+S, the Mac backs off that URL for 10 minutes. <em>"You clearly want this here. I'll leave it alone."</em></p>
+
+  <p>And the notification has an <strong>Undo</strong> button &mdash; if I accidentally moved it and want the autopilot to take it back, I tap the button and the cooldown cancels.</p>
+
+  <div class="notification-mockup">
+    <div class="notif-title">💼 &nbsp;Moved to Smirk</div>
+    <div class="notif-body">https://www.youtube.com/watch?v=demo-video</div>
+    <span class="notif-action">Undo Cooldown</span>
+  </div>
+
+  <p>The design principle: <strong>opinionated but not stubborn.</strong> The system has opinions about where your tabs belong. But you always win.</p>
+</section>
+
+<div class="tech-track">
+  <h3>The Cooldown System</h3>
+
+  <pre><code>local COOLDOWN_SECONDS = 600
+local recentlyRouted = {}
+
+local function isOnCooldown(url)
+    local t = recentlyRouted[url]
+    if not t then return false end
+    if os.time() - t > COOLDOWN_SECONDS then
+        recentlyRouted[url] = nil
+        return false
+    end
+    return true
+end</code></pre>
+
+  <p>Notifications with action buttons use <code>hs.notify</code>:</p>
+
+  <pre><code>hs.notify.new(function(notification)
+    if notification:activationType()
+       == hs.notify.activationTypes.actionButtonClicked then
+        clearCooldown(url)
+    end
+end, {
+    title = "💼  Moved to Smirk",
+    informativeText = url,
+    actionButtonTitle = "Undo Cooldown",
+    hasActionButton = true,
+    withdrawAfter = 5,
+}):send()</code></pre>
+</div>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 6 ==================== -->
+<section class="chapter" id="ch6">
+  <img class="chapter-illustration" src="assets/lifecall.jpg" loading="lazy" alt="I've fallen and I can't get up — the callback">
+  <p class="chapter-eyebrow">Chapter six</p>
+  <h2>Be Kind, Rewind</h2>
+  <p class="infomercial-quote">"I've fallen and I can't get up... but I remember where I fell."</p>
+
+  <p class="chapter-opener">The final piece. You're 14 minutes into a YouTube video. You Ctrl+S it to the other profile. The page reloads from scratch. You've lost your place.</p>
+
+  <p>Not anymore.</p>
+
+  <p>Before moving the tab, the script reaches <em>inside the web page</em> and asks the video player: "Where are you? Are you playing?" It captures the timestamp, adds it to the URL, and opens the video at exactly the right spot. If the video was playing, it presses spacebar after the page loads to resume playback.</p>
+
+  <p>You're watching a video. You press Ctrl+S. The video disappears from one window, reappears in the other, at the same moment, still playing.</p>
+
+  <p>It's dumb. It's beautiful. It's The Clapper.</p>
+</section>
+
+<div class="tech-track">
+  <h3>Three Layers Deep</h3>
+  <p>This is where it gets interesting. The script crosses three automation boundaries:</p>
+
+  <p><strong>Layer 1 &mdash; AppleScript &rarr; Dia:</strong> Get the URL, close the tab, open a new tab.</p>
+
+  <p><strong>Layer 2 &mdash; AppleScript &rarr; Dia &rarr; JavaScript:</strong> Execute JS inside the page to read <code>video.currentTime</code>.</p>
+
+  <pre><code>hs.osascript.applescript([[
+    tell application "Dia"
+        tell active tab of window 1
+            execute javascript "
+                var v = document.querySelector('video');
+                v ? JSON.stringify({
+                    time: Math.floor(v.currentTime),
+                    paused: v.paused
+                }) : 'novideo'
+            "
+        end tell
+    end tell
+]])</code></pre>
+
+  <p><strong>Layer 3 &mdash; AppleScript &rarr; System Events:</strong> Send a spacebar keystroke after the page loads. YouTube's autoplay policy requires a "user gesture" &mdash; a simulated keystroke through the accessibility layer counts.</p>
+
+  <pre><code>hs.osascript.applescript([[
+    tell application "System Events"
+        tell process "Dia"
+            keystroke " "
+        end tell
+    end tell
+]])</code></pre>
+
+  <p>The JavaScript layer requires a launch flag (<code>--enable-applescript-javascript</code>). I built a Raycast script that launches the browser with the flag &mdash; search "Dia" in Raycast and it just works:</p>
+
+  <pre><code>#!/bin/bash
+# @raycast.title Dia (scriptable)
+# @raycast.mode silent
+
+if pgrep -x "Dia" > /dev/null; then
+    osascript -e 'tell application "Dia" to activate'
+else
+    /Applications/Dia.app/Contents/MacOS/Dia \
+        --enable-applescript-javascript &amp;
+    disown
+fi</code></pre>
+</div>
+
+<hr class="section-rule">
+
+<!-- ==================== CHAPTER 7 ==================== -->
+<section class="chapter" id="ch7">
+  <img class="chapter-illustration" src="assets/operators.svg" loading="lazy" alt="Operators are standing by" style="background:#0a0612;">
+  <p class="chapter-eyebrow">Chapter seven</p>
+  <h2>The Full Picture</h2>
+  <p class="infomercial-quote">"Operators are standing by."</p>
+
+  <p class="chapter-opener">Here's what's running on my Mac right now:</p>
+
+  <ul style="font-family:var(--sans);font-size:16px;line-height:1.8;color:var(--fg-muted);">
+    <li><strong>Ctrl+S</strong> moves any tab between Work and Personal in under a second</li>
+    <li><strong>YouTube videos</strong> maintain their position and keep playing after the move</li>
+    <li><strong>80+ domain rules</strong> automatically route tabs as I browse</li>
+    <li><strong>Cooldowns</strong> prevent the system from fighting me when I override it</li>
+    <li><strong>Live-reload config</strong> &mdash; add a domain to a text file, save, done</li>
+    <li><strong>Native notifications</strong> confirm every action with an undo button</li>
+  </ul>
+
+  <p>I built all of this in one afternoon, with Claude writing most of the code. The total: about 300 lines of Lua across two script files, plus two plain text config files.</p>
+</section>
+
+<hr class="section-rule">
+
+<!-- ==================== WHAT ELSE ==================== -->
+<section>
+  <h2>What Else Can You Clap For?</h2>
+  <p>Some ideas to take home &mdash; all doable in Hammerspoon, all under 30 lines:</p>
+
+  <div class="ideas-grid">
+    <div class="idea"><span class="idea-icon">🪟</span><strong>Window management</strong><span>Snap windows to halves, thirds, or corners with hotkeys</span></div>
+    <div class="idea"><span class="idea-icon">🔕</span><strong>Meeting mode</strong><span>One key to mute Slack, set your status, and open Zoom</span></div>
+    <div class="idea"><span class="idea-icon">📋</span><strong>Clipboard history</strong><span>Keep the last 20 things you copied and paste from a menu</span></div>
+    <div class="idea"><span class="idea-icon">📶</span><strong>WiFi triggers</strong><span>Run a script when you connect to your office network</span></div>
+    <div class="idea"><span class="idea-icon">🔌</span><strong>USB triggers</strong><span>Detect when you plug in a specific device</span></div>
+    <div class="idea"><span class="idea-icon">🖥️</span><strong>Monitor layout</strong><span>Arrange windows automatically when you connect a display</span></div>
+    <div class="idea"><span class="idea-icon">⏱️</span><strong>Focus timer</strong><span>Block distracting apps for 25 minutes, then unlock for 5</span></div>
+    <div class="idea"><span class="idea-icon">🌙</span><strong>Dark mode auto</strong><span>Switch themes based on time of day or ambient light</span></div>
+  </div>
+
+  <p>Every one of these is a text file and an idea. And if you can describe it to an LLM, you don't even need to write the text file yourself.</p>
+</section>
+
+<hr class="section-rule">
+
+<!-- ==================== GETTING STARTED ==================== -->
+<section class="getting-started">
+  <h2>Getting Started</h2>
+
+  <p><strong>Step 1:</strong> Install Hammerspoon</p>
+  <pre><code>brew install hammerspoon</code></pre>
+
+  <p><strong>Step 2:</strong> Open it, grant Accessibility permission when asked</p>
+
+  <p><strong>Step 3:</strong> Edit <code>~/.hammerspoon/init.lua</code> &mdash; paste in your first script, click Reload</p>
+
+  <p>That's it. Your Mac is now programmable.</p>
+
+  <p>The browser routing system from this talk: <a href="https://github.com/malpern/hammerspoon">github.com/malpern/hammerspoon</a></p>
+  <p>The official Getting Started guide: <a href="https://www.hammerspoon.org/go/">hammerspoon.org/go</a></p>
+  <p>Or just open Claude and type: <em>"Write me a Hammerspoon script that..."</em></p>
+</section>
+
+<!-- ==================== CHEATSHEET ==================== -->
+<section class="cheatsheet">
+  <h2>Cheatsheet</h2>
+
+  <table>
+    <tr><th>Piece</th><th>What it does</th></tr>
+    <tr><td><code>dia-move-tab.lua</code></td><td>Ctrl+S to move current tab between profiles</td></tr>
+    <tr><td><code>dia-url-router.lua</code></td><td>Auto-routes tabs by domain/path rules</td></tr>
+    <tr><td><code>personal.txt</code></td><td>Personal domain routing list</td></tr>
+    <tr><td><code>smirk.txt</code></td><td>Work domain routing list</td></tr>
+    <tr><td><code>launch-dia.sh</code></td><td>Raycast script to launch Dia with JS flag</td></tr>
+  </table>
+
+  <h3>Key Hammerspoon APIs</h3>
+  <table>
+    <tr><th>API</th><th>What it does</th></tr>
+    <tr><td><code>hs.hotkey.bind</code></td><td>Global keyboard shortcuts</td></tr>
+    <tr><td><code>hs.osascript.applescript</code></td><td>Run AppleScript from Lua</td></tr>
+    <tr><td><code>hs.window.filter</code></td><td>React to window events</td></tr>
+    <tr><td><code>hs.application.watcher</code></td><td>React to app launch/quit</td></tr>
+    <tr><td><code>hs.notify</code></td><td>Native macOS notifications with buttons</td></tr>
+    <tr><td><code>hs.pathwatcher</code></td><td>React to file changes on disk</td></tr>
+  </table>
+</section>
+
+<hr class="section-rule">
+
+<!-- ==================== FINALE ==================== -->
+<section class="finale">
+  <p>The Clapper gave people control over their lamps.<br>Hammerspoon gives you control over your Mac.<br>The only difference is you don't have to clap.</p>
+
+  <blockquote>"Clap on! Clap off! The Clapper!"</blockquote>
+
+  <button class="play-jingle" onclick="document.getElementById('jingle').play()">
+    👏 Play the jingle 👏
+  </button>
+  <audio id="jingle" src="assets/clapper-jingle-trimmed.mp3" preload="auto"></audio>
+</section>
+
+</article>
+</main>
+
+<footer>
+  Clap On, Clap Off &middot; A Hacker Dojo Talk &middot; Micah Alpern &middot;
+  <a href="https://github.com/malpern/hammerspoon">github.com/malpern/hammerspoon</a>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,33 @@
+<svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="500" fill="#0a0612"/>
+  <!-- CRT TV frame -->
+  <rect x="140" y="40" width="520" height="420" rx="40" fill="#1a1530" stroke="#3a3050" stroke-width="4"/>
+  <rect x="170" y="70" width="460" height="340" rx="20" fill="#111"/>
+  <!-- Color bars -->
+  <rect x="170" y="70" width="66" height="240" fill="#fff"/>
+  <rect x="236" y="70" width="66" height="240" fill="#ffd93c"/>
+  <rect x="302" y="70" width="66" height="240" fill="#24d4ff"/>
+  <rect x="368" y="70" width="66" height="240" fill="#33ff33"/>
+  <rect x="434" y="70" width="66" height="240" fill="#ff3ba5"/>
+  <rect x="500" y="70" width="66" height="240" fill="#ff3333"/>
+  <rect x="566" y="70" width="64" height="240" fill="#3333ff"/>
+  <!-- Bottom bars -->
+  <rect x="170" y="310" width="230" height="30" fill="#111"/>
+  <rect x="400" y="310" width="230" height="30" fill="#222"/>
+  <!-- Please stand by text area -->
+  <rect x="170" y="340" width="460" height="70" fill="#0a0612"/>
+  <text x="400" y="385" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="32" fill="#ffd93c" letter-spacing="0.15em">PLEASE STAND BY</text>
+  <!-- TV knobs -->
+  <circle cx="200" cy="440" r="12" fill="#2a2040" stroke="#3a3050" stroke-width="2"/>
+  <circle cx="600" cy="440" r="12" fill="#2a2040" stroke="#3a3050" stroke-width="2"/>
+  <!-- Antenna -->
+  <line x1="340" y1="40" x2="280" y2="0" stroke="#3a3050" stroke-width="3"/>
+  <line x1="460" y1="40" x2="520" y2="0" stroke="#3a3050" stroke-width="3"/>
+  <!-- Scanline effect -->
+  <rect x="170" y="70" width="460" height="340" rx="20" fill="url(#scanlines)" opacity="0.08"/>
+  <defs>
+    <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect width="4" height="2" fill="#fff"/>
+    </pattern>
+  </defs>
+</svg>

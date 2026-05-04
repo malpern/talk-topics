@@ -1,0 +1,35 @@
+<svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#0a0612"/>
+  <!-- Video player frame -->
+  <rect x="100" y="40" width="600" height="340" rx="12" fill="#111" stroke="#2a2535" stroke-width="2"/>
+  <!-- Video content area - dark with subtle image -->
+  <rect x="100" y="40" width="600" height="290" rx="12" fill="#0d0d18"/>
+  <!-- Fake video frame - living room with lamp (The Clapper reference) -->
+  <rect x="300" y="100" width="60" height="120" rx="4" fill="#1a1530" opacity="0.5"/>
+  <circle cx="330" cy="90" r="25" fill="none" stroke="#ffd93c" stroke-width="2" opacity="0.4"/>
+  <line x1="330" y1="115" x2="330" y2="220" stroke="#1a1530" stroke-width="3" opacity="0.5"/>
+  <!-- Person silhouette -->
+  <circle cx="450" cy="180" r="20" fill="#2a2040"/>
+  <rect x="430" y="200" width="40" height="50" rx="8" fill="#2a2040"/>
+  <!-- Hands clapping -->
+  <ellipse cx="440" cy="195" rx="12" ry="8" fill="#3a3050"/>
+  <ellipse cx="460" cy="195" rx="12" ry="8" fill="#3a3050"/>
+  <!-- Sparkle from clap -->
+  <text x="450" y="185" font-size="14" fill="#ffd93c" text-anchor="middle" opacity="0.7">✦</text>
+  <!-- Progress bar -->
+  <rect x="120" y="340" width="560" height="4" rx="2" fill="#2a2535"/>
+  <rect x="120" y="340" width="280" height="4" rx="2" fill="#ff3ba5"/>
+  <circle cx="400" cy="342" r="7" fill="#ff3ba5"/>
+  <!-- Time stamps -->
+  <text x="130" y="365" font-family="'JetBrains Mono',monospace" font-size="13" fill="#8a8280">14:15</text>
+  <text x="640" y="365" font-family="'JetBrains Mono',monospace" font-size="13" fill="#8a8280" text-anchor="end">28:42</text>
+  <!-- Play button overlay -->
+  <polygon points="380,170 380,210 415,190" fill="none" stroke="#fff" stroke-width="2" opacity="0.15"/>
+  <!-- Controls bar -->
+  <rect x="100" y="330" width="600" height="50" rx="0" fill="#111" opacity="0.8"/>
+  <!-- Play/pause -->
+  <rect x="140" y="348" width="4" height="16" rx="1" fill="#fff" opacity="0.5"/>
+  <rect x="148" y="348" width="4" height="16" rx="1" fill="#fff" opacity="0.5"/>
+  <!-- Volume -->
+  <polygon points="170,352 170,364 180,368 180,348" fill="#fff" opacity="0.3"/>
+</svg>

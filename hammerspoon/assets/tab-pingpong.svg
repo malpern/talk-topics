@@ -1,0 +1,28 @@
+<svg viewBox="0 0 800 450" xmlns="http://www.w3.org/2000/svg">
+  <rect width="800" height="450" fill="#0a0612"/>
+  <!-- Left window -->
+  <rect x="60" y="100" width="220" height="180" rx="12" fill="none" stroke="#24d4ff" stroke-width="2.5" opacity="0.9"/>
+  <circle cx="82" cy="118" r="4" fill="#24d4ff" opacity="0.5"/>
+  <circle cx="96" cy="118" r="4" fill="#24d4ff" opacity="0.5"/>
+  <circle cx="110" cy="118" r="4" fill="#24d4ff" opacity="0.5"/>
+  <line x1="60" y1="130" x2="280" y2="130" stroke="#24d4ff" stroke-width="1" opacity="0.3"/>
+  <!-- Right window -->
+  <rect x="520" y="100" width="220" height="180" rx="12" fill="none" stroke="#ff8a3c" stroke-width="2.5" opacity="0.9"/>
+  <circle cx="542" cy="118" r="4" fill="#ff8a3c" opacity="0.5"/>
+  <circle cx="556" cy="118" r="4" fill="#ff8a3c" opacity="0.5"/>
+  <circle cx="570" cy="118" r="4" fill="#ff8a3c" opacity="0.5"/>
+  <line x1="520" y1="130" x2="740" y2="130" stroke="#ff8a3c" stroke-width="1" opacity="0.3"/>
+  <!-- Bouncing tab trails -->
+  <path d="M280,190 Q400,120 520,190" fill="none" stroke="#ff3ba5" stroke-width="2" opacity="0.3" stroke-dasharray="6,4"/>
+  <path d="M520,190 Q400,260 280,190" fill="none" stroke="#ff3ba5" stroke-width="2" opacity="0.5" stroke-dasharray="6,4"/>
+  <path d="M280,190 Q400,140 520,190" fill="none" stroke="#ff3ba5" stroke-width="2.5" opacity="0.8"/>
+  <!-- Tab icon bouncing -->
+  <rect x="375" y="165" width="50" height="35" rx="6" fill="#ff3ba5" opacity="0.9"/>
+  <polygon points="395,175 395,193 410,184" fill="#0a0612"/>
+  <!-- Chaos arrows -->
+  <text x="400" y="350" text-anchor="middle" font-family="'Bebas Neue',sans-serif" font-size="28" fill="#ff3ba5" letter-spacing="0.1em" opacity="0.6">← → ← → ← →</text>
+  <!-- Frustration sparkles -->
+  <text x="340" y="145" font-size="20" fill="#ffd93c" opacity="0.7">✦</text>
+  <text x="460" y="240" font-size="16" fill="#ffd93c" opacity="0.5">✦</text>
+  <text x="390" y="280" font-size="14" fill="#ff3ba5" opacity="0.4">✦</text>
+</svg>

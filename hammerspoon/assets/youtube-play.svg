@@ -1,0 +1,7 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <rect width="200" height="200" fill="#0a0612"/>
+  <rect x="30" y="50" width="140" height="100" rx="14" fill="none" stroke="#ff3ba5" stroke-width="3"/>
+  <polygon points="82,75 82,125 122,100" fill="#ff3ba5" opacity="0.9"/>
+  <!-- Glow -->
+  <rect x="30" y="50" width="140" height="100" rx="14" fill="none" stroke="#ff3ba5" stroke-width="1" opacity="0.3" transform="scale(1.05)" transform-origin="100 100"/>
+</svg>

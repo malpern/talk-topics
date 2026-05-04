@@ -7,6 +7,7 @@
 <meta name="description" content="A Hacker Dojo talk about automating your Mac with Hammerspoon, featuring browser profile routing, YouTube state preservation, and 80s infomercial energy.">
 <meta name="author" content="Micah Alpern">
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css">
 <style>
   :root {
     --bg: #faf5e8;
@@ -708,7 +709,7 @@
 
   <p>Your first script:</p>
 
-  <pre><code>hs.hotkey.bind({"ctrl"}, "h", function()
+  <pre><code class="language-lua">hs.hotkey.bind({"ctrl"}, "h", function()
     hs.alert.show("Hello from Hammerspoon!")
 end)</code></pre>
 
@@ -720,7 +721,7 @@ end)</code></pre>
   <h3>Neovim Users: You Already Know This</h3>
   <p>If you've written an <code>init.lua</code> for Neovim, you've been writing Lua for years. Same language. Same tables-and-functions philosophy.</p>
 
-  <pre><code>-- Neovim: react to an event
+  <pre><code class="language-lua">-- Neovim: react to an event
 vim.api.nvim_create_autocmd("BufWritePre", {
     callback = function() vim.lsp.buf.format() end,
 })
@@ -764,27 +765,27 @@ end):start()</code></pre>
   <h3>How Ctrl+S Actually Works</h3>
   <p>The key insight: Chromium browsers silently ignore synthetic keystrokes from automation tools. Simulating Cmd+C, Cmd+W, Cmd+V doesn't work. What does work: <strong>AppleScript</strong> &mdash; a decades-old Mac scripting language that apps actually listen to.</p>
 
-  <pre><code>-- Get the URL &mdash; no clipboard, no keystrokes, just ask
-local ok, url = hs.osascript.applescript(
-    'tell application "Dia" to return URL of active tab of window 1'
+  <pre><code class="nohl"><span style="color:#6a6280;">-- Get the URL — no clipboard, no keystrokes, just ask</span>
+<span style="color:#24d4ff;">local</span> ok, url = <span style="color:#24d4ff;">hs.osascript.applescript</span>(
+    <span style="color:#ff3ba5;">'tell application "Dia" to return URL of active tab of window 1'</span>
 )
 
--- Close the tab
-hs.osascript.applescript(
-    'tell application "Dia" to close active tab of window 1'
+<span style="color:#6a6280;">-- Close the tab</span>
+<span style="color:#24d4ff;">hs.osascript.applescript</span>(
+    <span style="color:#ff3ba5;">'tell application "Dia" to close active tab of window 1'</span>
 )
 
--- Open in the other profile's window
-hs.osascript.applescript(string.format(
-    'tell application "Dia" to make new tab in window 2 '
-    .. 'with properties {URL:"%s"}', url
+<span style="color:#6a6280;">-- Open in the other profile's window</span>
+<span style="color:#24d4ff;">hs.osascript.applescript</span>(<span style="color:#24d4ff;">string.format</span>(
+    <span style="color:#ff3ba5;">'tell application "Dia" to make new tab in window 2 '</span>
+    .. <span style="color:#ff3ba5;">'with properties {URL:"%s"}'</span>, url
 ))</code></pre>
 
   <p>Three API calls. No timing hacks. No simulated keystrokes. The browser cooperates because you're speaking its language.</p>
 
   <p>The full handler detects which profile you're in, moves the tab, focuses the target window, and fires a native notification:</p>
 
-  <pre><code>hs.hotkey.bind({"ctrl"}, "s", nil, function()
+  <pre><code class="language-lua">hs.hotkey.bind({"ctrl"}, "s", nil, function()
     local app = hs.application.frontmostApplication()
     if not app or app:bundleID() ~= "company.thebrowser.dia" then
         return  -- not Dia, do nothing
@@ -888,7 +889,7 @@ end)</code></pre>
   <h3>How the Auto-Router Works</h3>
   <p>Hammerspoon watches for window title changes (which signal a new page load), grabs the URL via AppleScript, and matches against the rule files:</p>
 
-  <pre><code>local filter = hs.window.filter.new(false):setAppFilter("Dia")
+  <pre><code class="language-lua">local filter = hs.window.filter.new(false):setAppFilter("Dia")
 filter:subscribe(hs.window.filter.windowTitleChanged, function(win)
     hs.timer.doAfter(0.5, function()
         local ok, url = hs.osascript.applescript(
@@ -906,7 +907,7 @@ end)</code></pre>
 
   <p>Files reload via <code>hs.pathwatcher</code> &mdash; no restart needed:</p>
 
-  <pre><code>hs.pathwatcher.new(ROUTES_DIR, function()
+  <pre><code class="language-lua">hs.pathwatcher.new(ROUTES_DIR, function()
     smirkRules = loadRules("smirk.txt")
     personalRules = loadRules("personal.txt")
 end):start()</code></pre>
@@ -941,7 +942,7 @@ end):start()</code></pre>
 <div class="tech-track">
   <h3>The Cooldown System</h3>
 
-  <pre><code>local COOLDOWN_SECONDS = 600
+  <pre><code class="language-lua">local COOLDOWN_SECONDS = 600
 local recentlyRouted = {}
 
 local function isOnCooldown(url)
@@ -956,7 +957,7 @@ end</code></pre>
 
   <p>Notifications with action buttons use <code>hs.notify</code>:</p>
 
-  <pre><code>hs.notify.new(function(notification)
+  <pre><code class="language-lua">hs.notify.new(function(notification)
     if notification:activationType()
        == hs.notify.activationTypes.actionButtonClicked then
         clearCooldown(url)
@@ -1002,33 +1003,33 @@ end, {
 
   <p><strong>Layer 2 &mdash; AppleScript &rarr; Dia &rarr; JavaScript:</strong> Execute JS inside the page to read <code>video.currentTime</code>.</p>
 
-  <pre><code>hs.osascript.applescript([[
-    tell application "Dia"
-        tell active tab of window 1
-            execute javascript "
-                var v = document.querySelector('video');
-                v ? JSON.stringify({
-                    time: Math.floor(v.currentTime),
-                    paused: v.paused
-                }) : 'novideo'
-            "
-        end tell
-    end tell
-]])</code></pre>
+  <pre><code class="nohl"><span style="color:#24d4ff;">hs.osascript.applescript</span>(<span style="color:#ff3ba5;">[[</span>
+    <span style="color:#ff3ba5;">tell application</span> <span style="color:#a8e6a0;">"Dia"</span>
+        <span style="color:#ff3ba5;">tell active tab of window 1</span>
+            <span style="color:#ff3ba5;">execute javascript</span> <span style="color:#a8e6a0;">"</span>
+                <span style="color:#ffd93c;">var</span> v = <span style="color:#ffd93c;">document.querySelector</span>(<span style="color:#a8e6a0;">'video'</span>);
+                v ? <span style="color:#ffd93c;">JSON.stringify</span>({
+                    time: <span style="color:#ffd93c;">Math.floor</span>(v.<span style="color:#ffd93c;">currentTime</span>),
+                    paused: v.<span style="color:#ffd93c;">paused</span>
+                }) : <span style="color:#a8e6a0;">'novideo'</span>
+            <span style="color:#a8e6a0;">"</span>
+        <span style="color:#ff3ba5;">end tell</span>
+    <span style="color:#ff3ba5;">end tell</span>
+<span style="color:#ff3ba5;">]]</span>)</code></pre>
 
   <p><strong>Layer 3 &mdash; AppleScript &rarr; System Events:</strong> Send a spacebar keystroke after the page loads. YouTube's autoplay policy requires a "user gesture" &mdash; a simulated keystroke through the accessibility layer counts.</p>
 
-  <pre><code>hs.osascript.applescript([[
-    tell application "System Events"
-        tell process "Dia"
-            keystroke " "
-        end tell
-    end tell
-]])</code></pre>
+  <pre><code class="nohl"><span style="color:#24d4ff;">hs.osascript.applescript</span>(<span style="color:#ff3ba5;">[[</span>
+    <span style="color:#ff3ba5;">tell application</span> <span style="color:#a8e6a0;">"System Events"</span>
+        <span style="color:#ff3ba5;">tell process</span> <span style="color:#a8e6a0;">"Dia"</span>
+            <span style="color:#ff3ba5;">keystroke</span> <span style="color:#a8e6a0;">" "</span>
+        <span style="color:#ff3ba5;">end tell</span>
+    <span style="color:#ff3ba5;">end tell</span>
+<span style="color:#ff3ba5;">]]</span>)</code></pre>
 
   <p>The JavaScript layer requires a launch flag (<code>--enable-applescript-javascript</code>). I built a Raycast script that launches the browser with the flag &mdash; search "Dia" in Raycast and it just works:</p>
 
-  <pre><code>#!/bin/bash
+  <pre><code class="language-bash">#!/bin/bash
 # @raycast.title Dia (scriptable)
 # @raycast.mode silent
 
@@ -1180,5 +1181,13 @@ fi</code></pre>
   <a href="https://github.com/malpern/hammerspoon">github.com/malpern/hammerspoon</a>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/languages/lua.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/languages/bash.min.js"></script>
+<script>
+  document.querySelectorAll('pre code:not(.nohl)').forEach(el => {
+    hljs.highlightElement(el);
+  });
+</script>
 </body>
 </html>

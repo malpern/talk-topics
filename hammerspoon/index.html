@@ -1141,22 +1141,22 @@ fi</code></pre>
   <h2>What Else Can You Build?</h2>
   <p>The browser routing system uses all three layers. But once you see the pattern &mdash; Lua orchestrates, AppleScript talks to apps, JavaScript reaches inside pages &mdash; you start seeing annoyances everywhere that you can fix. Here are some ideas that combine two or three of these languages:</p>
 
-  <h3>Meeting mode &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript</span></h3>
+  <h3>Meeting mode &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span></span></h3>
   <p>Zoom launches &rarr; Hammerspoon detects it (Lua watcher) &rarr; tells Slack to enable Do Not Disturb (AppleScript) &rarr; resizes Zoom to fill the left half of your screen (Lua) &rarr; shows a notification: "🔕 Meeting mode." When Zoom quits, reverse everything. One app launch triggers three actions across two apps you never had to touch.</p>
 
-  <h3>Smart clipboard &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript + JavaScript</span></h3>
+  <h3>Smart clipboard &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span> <span style="color:#ffd93c;opacity:0.6;">&#9679;</span></span></h3>
   <p>You copy a URL from your browser. Hammerspoon watches the clipboard (Lua), detects it's a URL, asks the browser for the page title (AppleScript &rarr; JavaScript: <code>document.title</code>), and reformats the clipboard as a Markdown link: <code>[Page Title](https://...)</code>. Paste it anywhere and get a properly formatted link instead of a raw URL. Invisible, automatic, always on.</p>
 
-  <h3>Auto-dark-mode for any app &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript</span></h3>
+  <h3>Auto-dark-mode for any app &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span></span></h3>
   <p>macOS changes to dark mode at sunset. But some apps don't follow the system setting &mdash; they need a menu click or a preference toggle. Hammerspoon watches for the system appearance change (Lua), then tells each stubborn app to switch via its menu bar (AppleScript &rarr; System Events: <code>click menu item "Dark" of menu "View"</code>). Every app matches, every time, without you noticing.</p>
 
-  <h3>Research mode &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript + JavaScript</span></h3>
+  <h3>Research mode &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span> <span style="color:#ffd93c;opacity:0.6;">&#9679;</span></span></h3>
   <p>Press a hotkey while reading an article. Hammerspoon grabs the URL and page title from the browser (AppleScript), extracts the selected text from the page (JavaScript: <code>window.getSelection().toString()</code>), and appends a formatted entry to a Markdown file on disk (Lua file I/O): date, title, URL, and your highlighted passage. A research journal that builds itself while you browse.</p>
 
-  <h3>WiFi-aware workspace &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript</span></h3>
+  <h3>WiFi-aware workspace &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span></span></h3>
   <p>You connect to your office WiFi. Hammerspoon detects the network name (Lua), launches Slack and your project management tool (AppleScript), arranges them side-by-side (Lua window management), and opens your team's standup doc in the browser (AppleScript &rarr; <code>make new tab with properties {URL:"..."}</code>). You walk in, open your laptop, and your workspace is ready.</p>
 
-  <h3>YouTube &rarr; podcast player &nbsp;<span style="font-size:14px;color:var(--fg-quiet);font-weight:400;">Lua + AppleScript + JavaScript</span></h3>
+  <h3>YouTube &rarr; podcast player &nbsp;<span style="font-size:11px;font-family:var(--sans);font-weight:500;letter-spacing:0.05em;vertical-align:2px;"><span style="color:#24d4ff;opacity:0.6;">&#9679;</span> <span style="color:#ff3ba5;opacity:0.6;">&#9679;</span> <span style="color:#ffd93c;opacity:0.6;">&#9679;</span></span></h3>
   <p>You're watching a long YouTube talk but need to leave your desk. Press a hotkey. Hammerspoon grabs the video URL and current timestamp (AppleScript &rarr; JavaScript: <code>video.currentTime</code>), copies it to the clipboard with the timestamp appended (Lua), and shows a notification with a "Copy" button. Paste it on your phone and pick up exactly where you left off.</p>
 
   <p>Every one of these is a text file and an idea. The three-layer pattern is the same every time: Lua listens, AppleScript bridges, JavaScript reaches in. And if you can describe what's annoying you to an LLM, you don't even need to write the text file yourself.</p>

@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dates That Don't Exist — Building ThisDayInFiction</title>
+<meta name="description" content="Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway." />
+<meta name="author" content="Micah Alpern" />
+<link rel="canonical" href="https://thisdayinfiction.com/blog/dates-that-dont-exist" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Dates That Don't Exist" />
+<meta property="og:description" content="Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway." />
+<meta property="og:site_name" content="ThisDayInFiction" />
+<meta property="article:author" content="Micah Alpern" />
+<meta property="article:published_time" content="2026-05-12" />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Dates That Don't Exist" />
+<meta name="twitter:description" content="Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway." />
+
+<!-- JSON-LD -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TechArticle",
+  "headline": "Dates That Don't Exist",
+  "description": "Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway.",
+  "author": {
+    "@type": "Person",
+    "name": "Micah Alpern"
+  },
+  "datePublished": "2026-05-12",
+  "publisher": {
+    "@type": "Organization",
+    "name": "ThisDayInFiction"
+  },
+  "proficiencyLevel": "Expert",
+  "dependencies": "Django 6, Python 3.12, HTMX, Tailwind CSS, PostgreSQL"
+}
+</script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ── Design tokens ───────────────────────────────────────── */
+:root {
+  --bg: #141218;
+  --paper: #1c1820;
+  --fg: #f0ebe0;
+  --fg-soft: #d4cfc4;
+  --fg-muted: #8a8580;
+  --fg-quiet: #5a5855;
+  --rule: #2a2628;
+  --accent: #e8a634;
+  --accent-soft: rgba(232,166,52,0.12);
+  --code-bg: #0a0a10;
+  --code-fg: #e0dcd4;
+  --callout-bg: #1a1720;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f5f2eb;
+    --paper: #faf8f4;
+    --fg: #1a1a1a;
+    --fg-soft: #2a2a2a;
+    --fg-muted: #5a5a5a;
+    --fg-quiet: #8a8a8a;
+    --rule: #d4cfc4;
+    --accent: #c4880a;
+    --accent-soft: rgba(196,136,10,0.08);
+    --code-bg: #1a1a1a;
+    --code-fg: #e8e4dc;
+    --callout-bg: #f0ece2;
+  }
+}
+
+/* ── Reset & base ────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html {
+  font-size: 19px;
+  scroll-behavior: smooth;
+  hanging-punctuation: first last;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: Charter, "Iowan Old Style", Georgia, ui-serif, serif;
+  font-feature-settings: "kern", "liga", "calt", "onum";
+  line-height: 1.72;
+}
+
+/* ── Typography ──────────────────────────────────────────── */
+h1, h2, h3 {
+  font-family: "Bebas Neue", Impact, sans-serif;
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: 0.02em;
+  text-wrap: balance;
+}
+
+p, li, blockquote {
+  text-wrap: pretty;
+  orphans: 3;
+  widows: 3;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 0.15s;
+}
+a:hover { color: var(--fg); }
+
+strong { font-weight: 700; }
+
+/* ── Layout ──────────────────────────────────────────────── */
+.page {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem 6rem;
+}
+
+/* ── Sticky chapter nav ──────────────────────────────────── */
+.chapter-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--paper);
+  border-bottom: 1px solid var(--rule);
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+.chapter-nav.visible { transform: translateY(0); }
+.chapter-nav-inner {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0.6rem 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.chapter-nav-title {
+  font-size: 0.82rem;
+  color: var(--fg-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+}
+.chapter-nav-links {
+  display: flex;
+  gap: 0.75rem;
+  flex-shrink: 0;
+}
+.chapter-nav-links a {
+  font-size: 0.78rem;
+  color: var(--fg-quiet);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.chapter-nav-links a:hover { color: var(--accent); }
+.chapter-nav-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--accent);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* ── Hero ────────────────────────────────────────────────── */
+.hero {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 6rem 1.5rem 4rem;
+  background: linear-gradient(180deg, var(--bg) 0%, var(--paper) 100%);
+  position: relative;
+}
+.hero-eyebrow {
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+}
+.hero h1 {
+  font-size: clamp(3.5rem, 10vw, 7rem);
+  color: var(--fg);
+  margin-bottom: 0.3em;
+  letter-spacing: 0.03em;
+}
+.hero-subtitle {
+  font-style: italic;
+  font-size: 1.15rem;
+  color: var(--fg-muted);
+  max-width: 44ch;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+}
+.hero-filmstrip {
+  display: flex;
+  gap: 0.6rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.hero-filmstrip img {
+  height: 80px;
+  width: auto;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+  opacity: 0.8;
+  transition: opacity 0.2s;
+  object-fit: cover;
+}
+.hero-filmstrip img:hover { opacity: 1; }
+.hero-author {
+  margin-top: 2rem;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.8rem;
+  color: var(--fg-quiet);
+  letter-spacing: 0.04em;
+}
+
+/* ── Intro prose ─────────────────────────────────────────── */
+.intro {
+  margin-top: 4rem;
+  margin-bottom: 3rem;
+}
+.intro p {
+  font-size: 1.05rem;
+  color: var(--fg-soft);
+  margin-bottom: 1.4em;
+}
+
+/* ── TOC ─────────────────────────────────────────────────── */
+.toc {
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  padding: 1.8rem 2rem;
+  margin-bottom: 4rem;
+  background: var(--callout-bg);
+}
+.toc-label {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--fg-quiet);
+  margin-bottom: 1rem;
+  font-variant-caps: all-small-caps;
+}
+.toc ol {
+  list-style: none;
+  counter-reset: toc-counter;
+  padding: 0;
+}
+.toc li {
+  counter-increment: toc-counter;
+  margin-bottom: 0.5em;
+}
+.toc li a {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.92rem;
+  color: var(--fg-soft);
+  text-decoration: none;
+  display: flex;
+  align-items: baseline;
+  gap: 0.8em;
+}
+.toc li a:hover { color: var(--accent); }
+.toc li a::before {
+  content: counter(toc-counter, decimal-leading-zero);
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.78rem;
+  color: var(--fg-quiet);
+  flex-shrink: 0;
+}
+
+/* ── Section rules ───────────────────────────────────────── */
+hr.section-rule {
+  border: none;
+  text-align: center;
+  margin: 4rem 0;
+  color: var(--fg-quiet);
+  overflow: visible;
+}
+hr.section-rule::after {
+  content: "\2014\2014\2014";
+  font-size: 1.2rem;
+  letter-spacing: 0.3em;
+}
+
+/* ── Chapter eyebrows ────────────────────────────────────── */
+.chapter-eyebrow {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--fg-quiet);
+  font-variant-caps: all-small-caps;
+  margin-bottom: 0.5rem;
+}
+
+/* ── Chapter titles ──────────────────────────────────────── */
+.chapter-title {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--fg);
+  margin-bottom: 1.5rem;
+}
+
+/* ── Date cards ──────────────────────────────────────────── */
+.date-card {
+  border-left: 3px solid var(--accent);
+  background: var(--accent-soft);
+  padding: 0.7rem 1rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  border-radius: 0 4px 4px 0;
+}
+.date-card-date {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.82rem;
+  color: var(--accent);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.date-card-title {
+  font-style: italic;
+  font-size: 0.88rem;
+  color: var(--fg-muted);
+}
+
+/* ── Goal panels ─────────────────────────────────────────── */
+.goal-panel {
+  border-left: 3px solid var(--accent);
+  padding: 1rem 1.2rem;
+  margin-bottom: 2rem;
+  background: var(--callout-bg);
+  border-radius: 0 4px 4px 0;
+}
+.goal-panel-label {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  color: var(--accent);
+  font-variant-caps: all-small-caps;
+  margin-bottom: 0.3rem;
+}
+.goal-panel-text {
+  font-size: 0.95rem;
+  color: var(--fg-soft);
+  line-height: 1.5;
+}
+
+/* ── Chapter photos ──────────────────────────────────────── */
+.chapter-photo {
+  width: 100%;
+  max-width: 280px;
+  border-radius: 6px;
+  border: 1px solid var(--rule);
+  float: right;
+  margin: 0 0 1.2rem 1.5rem;
+}
+
+/* ── Drop caps ───────────────────────────────────────────── */
+.chapter-opener::first-letter {
+  font-family: "Bebas Neue", Impact, sans-serif;
+  float: left;
+  font-size: 3.6em;
+  line-height: 0.8;
+  padding-right: 0.08em;
+  padding-top: 0.06em;
+  color: var(--accent);
+}
+
+/* ── Body prose ──────────────────────────────────────────── */
+.page p {
+  margin-bottom: 1.3em;
+  color: var(--fg-soft);
+}
+.page p + p { text-indent: 0; }
+
+/* ── Inline code ─────────────────────────────────────────── */
+code {
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  font-size: 0.82em;
+  background: var(--accent-soft);
+  padding: 0.15em 0.35em;
+  border-radius: 3px;
+  color: var(--accent);
+}
+
+/* ── Code blocks ─────────────────────────────────────────── */
+pre {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 1.4rem 1.6rem;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
+  font-size: 0.78rem;
+  line-height: 1.65;
+  margin-bottom: 1.6em;
+  position: relative;
+  border: 1px solid var(--rule);
+  tab-size: 4;
+}
+pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: var(--code-fg);
+  font-size: inherit;
+}
+
+/* Syntax tokens */
+.token.keyword { color: #e8a634; }
+.token.string { color: #7ec699; }
+.token.function { color: #6cb6ff; }
+.token.comment { color: #5a5855; font-style: italic; }
+.token.class-name { color: #e8a634; }
+.token.number { color: #f0a0c0; }
+.token.decorator { color: #c49060; }
+.token.builtin { color: #d4a0ff; }
+.token.operator { color: #8a8580; }
+.token.punctuation { color: #8a8580; }
+
+/* Copy button */
+.copy-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: var(--rule);
+  border: none;
+  color: var(--fg-quiet);
+  font-family: system-ui, sans-serif;
+  font-size: 0.68rem;
+  padding: 0.3em 0.6em;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+pre:hover .copy-btn { opacity: 1; }
+.copy-btn:hover { color: var(--fg); background: var(--fg-quiet); }
+
+/* ── Glossary tooltips ───────────────────────────────────── */
+.tt {
+  border-bottom: 1px dashed var(--fg-quiet);
+  cursor: help;
+  position: relative;
+}
+.tt::after {
+  content: attr(data-tt);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(-4px);
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  color: var(--fg-soft);
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  font-style: normal;
+  padding: 0.5em 0.8em;
+  border-radius: 4px;
+  white-space: nowrap;
+  max-width: 280px;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  z-index: 50;
+  line-height: 1.4;
+}
+.tt:hover::after { opacity: 1; }
+
+/* ── Scenario table ──────────────────────────────────────── */
+.scenario-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.6em;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.82rem;
+}
+.scenario-table th {
+  text-align: left;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--fg-quiet);
+  border-bottom: 2px solid var(--rule);
+  padding: 0.6em 0.8em;
+}
+.scenario-table td {
+  border-bottom: 1px solid var(--rule);
+  padding: 0.6em 0.8em;
+  color: var(--fg-soft);
+}
+
+/* ── Fade-up animations ──────────────────────────────────── */
+.fade-up {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Footer ──────────────────────────────────────────────── */
+.page-footer {
+  border-top: 1px solid var(--rule);
+  padding-top: 2rem;
+  margin-top: 4rem;
+  text-align: center;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 0.78rem;
+  color: var(--fg-quiet);
+  line-height: 1.8;
+}
+.page-footer a {
+  color: var(--fg-muted);
+}
+
+/* ── Responsive ──────────────────────────────────────────── */
+@media (max-width: 720px) {
+  html { font-size: 17px; }
+  .hero { min-height: 60vh; padding: 4rem 1.2rem 3rem; }
+  .hero h1 { font-size: clamp(2.5rem, 10vw, 4rem); }
+  .hero-subtitle { font-size: 1rem; }
+  .page { padding: 0 1rem 4rem; }
+  pre { font-size: 0.72rem; padding: 1rem; }
+  .goal-panel { padding: 0.8rem 1rem; }
+  .toc { padding: 1.2rem 1.4rem; }
+  .chapter-photo {
+    float: none;
+    margin: 0 0 1.5rem 0;
+    max-width: 200px;
+  }
+  .date-card {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+  .scenario-table { font-size: 0.74rem; }
+  .tt::after { left: 0; transform: translateX(0) translateY(-4px); }
+}
+</style>
+</head>
+
+<body>
+
+<!-- ── Sticky chapter nav ────────────────────────────────── -->
+<nav class="chapter-nav" id="chapterNav" aria-label="Chapter navigation">
+  <div class="chapter-nav-inner">
+    <span class="chapter-nav-title" id="navTitle"></span>
+    <div class="chapter-nav-links">
+      <a href="#" id="navPrev" aria-label="Previous section">Prev</a>
+      <a href="#" id="navNext" aria-label="Next section">Next</a>
+    </div>
+  </div>
+  <div class="chapter-nav-progress" id="navProgress"></div>
+</nav>
+
+<!-- ── Hero ───────────────────────────────────────────────── -->
+<header class="hero" id="hero">
+  <span class="hero-eyebrow">A Django + HTMX project</span>
+  <h1>Dates That Don't Exist</h1>
+  <p class="hero-subtitle">Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway.</p>
+  <div class="hero-filmstrip">
+    <img src="https://image.tmdb.org/t/p/w500/pTpxQB1N0waaSc3OSn0e9oc8kx9.jpg" alt="Back to the Future poster" loading="lazy" />
+    <img src="https://image.tmdb.org/t/p/w500/q8ffBuxQlYOHrvPniLgCbmKK4Lv.jpg" alt="The Terminator poster" loading="lazy" />
+    <img src="https://image.tmdb.org/t/p/w500/zaFa1NRZEnFgRTv5OVXkNIZO78O.jpg" alt="The Fifth Element poster" loading="lazy" />
+    <img src="https://image.tmdb.org/t/p/w500/lmwGr6J5y6kngFNQuFV2y1yw4OB.jpg" alt="Rocky poster" loading="lazy" />
+  </div>
+  <p class="hero-author">Micah Alpern</p>
+</header>
+
+<!-- ── Main content ──────────────────────────────────────── -->
+<main>
+<article class="page">
+
+  <!-- ── Intro ─────────────────────────────────────────── -->
+  <div class="intro fade-up">
+    <p>Every programmer has a date library they trust. It handles leap years, timezones, ISO 8601. It does not handle the year 802,701. Or a Tuesday in March with no year at all. Or the possibility that two different movies placed their climactic scene on the same day, forty years apart, and your users can't agree which one they're submitting.</p>
+
+    <p>ThisDayInFiction is a web app that answers one question: what happened in fiction today? It's a curated, crowd-sourced calendar where every entry is a specific date referenced in a movie, TV show, or novel -- November 5, 1955 in <em>Back to the Future</em>, April 4 in <em>Nineteen Eighty-Four</em>, March 18, 2263 in <em>The Fifth Element</em>. The interesting part isn't the concept. It's what breaks when you try to build it.</p>
+  </div>
+
+  <!-- ── TOC ───────────────────────────────────────────── -->
+  <nav class="toc fade-up" aria-label="Table of contents">
+    <div class="toc-label">Six sections</div>
+    <ol>
+      <li><a href="#ch1">The dates that don't exist</a></li>
+      <li><a href="#ch2">Three APIs and a prayer</a></li>
+      <li><a href="#ch3">The same movie, twice</a></li>
+      <li><a href="#ch4">Earning trust</a></li>
+      <li><a href="#ch5">What time is it where you are?</a></li>
+      <li><a href="#ch6">The birthday hook</a></li>
+    </ol>
+  </nav>
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 1                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch1" class="fade-up" data-chapter="The dates that don't exist">
+    <div class="chapter-eyebrow">Section one</div>
+    <h2 class="chapter-title">The dates that don't exist</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">NOV 5, 1955</span>
+      <span class="date-card-title">Back to the Future</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">The problem</div>
+      <div class="goal-panel-text">Fictional dates don't fit in <code>datetime.date</code>.</div>
+    </div>
+
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/pTpxQB1N0waaSc3OSn0e9oc8kx9.jpg" alt="Back to the Future poster" loading="lazy" />
+
+    <p class="chapter-opener">November 5, 1955 works fine. You write <code>datetime.date(1955, 11, 5)</code> and Python is happy. March 18, 2263 for <em>The Fifth Element</em>? Also fine -- Python's <code>datetime</code> handles years up to 9999. So far, no drama.</p>
+
+    <p>The real problem is Winston Smith. He writes in his diary on April 4, but which year? The title of the novel is <em>1984</em>, but that's the world, not a confirmed in-fiction date for that diary entry. Fan debates aside, the honest answer is: we know the month and day, not the year. And <code>datetime.date</code> requires all three. There is no <code>datetime.date(None, 4, 4)</code>.</p>
+
+    <p>This isn't a one-off edge case. Plenty of fictional events carry only a month and day -- recurring holidays in fictional universes, diary entries from ambiguous timelines, events from franchises where only the calendar date matters. The moment you commit to <code>DateField</code>, you commit to inventing years you don't actually have.</p>
+
+    <p>We decomposed the problem instead. Three separate <code>IntegerField</code> columns, with <code>year</code> nullable:</p>
+
+<pre><code><span class="token keyword">class</span> <span class="token class-name">Event</span><span class="token punctuation">(</span><span class="token builtin">models</span><span class="token punctuation">.</span><span class="token class-name">Model</span><span class="token punctuation">):</span>
+    <span class="token builtin">month</span> <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">()</span>
+    <span class="token builtin">day</span>   <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">()</span>
+    <span class="token builtin">year</span>  <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">(</span><span class="token builtin">null</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">,</span> <span class="token builtin">blank</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">)</span></code></pre>
+
+    <p>Crude? Sure. You lose date arithmetic, range queries over a single column, and every ORM convenience Django offers for dates. You gain the ability to represent the data honestly. April 4 with no year is <code>month=4, day=4, year=None</code>. No invented years, no sentinel values, no lying to your database.</p>
+
+    <p>The other axis is just as important. Every event has two temporal coordinates: when it happens <em>in the story</em> and when the <em>work itself</em> was released. The <code>year</code> field is fiction. The <code>source_year</code> field is reality -- 1985 for <em>Back to the Future</em>, even though the event is set in 1955. Conflating them corrupts your queries. "Show me everything set in the 1950s" and "show me everything released in the 1980s" are completely different questions, and if you stored both answers in the same column, you've already lost.</p>
+
+    <p>Three integers and a nullable year. It's the simplest model change in the entire project, and it took the longest to commit to, because every instinct says to reach for <code>DateField</code>. The instinct is wrong. The data told us so.</p>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 2                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch2" class="fade-up" data-chapter="Three APIs and a prayer">
+    <div class="chapter-eyebrow">Section two</div>
+    <h2 class="chapter-title">Three APIs and a prayer</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">MAR 18, 2263</span>
+      <span class="date-card-title">The Fifth Element</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">The approach</div>
+      <div class="goal-panel-text">Matching user-submitted titles to real metadata across three uncooperative APIs.</div>
+    </div>
+
+    <p class="chapter-opener">We started with 88 seed events loaded from a plain text file. Most had a title, a date, a one-line description. No cover images, no creator names, no release years. A database of assertions without evidence.</p>
+
+    <p>The metadata enrichment pipeline runs through three APIs in a fallback chain. <span class="tt" data-tt="The Movie Database -- a community-built API for movie and TV metadata, including poster images">TMDB</span> handles movies and TV shows: it has reliable poster art, release years, and a publication-year filter that actually works. For literature, we hit Google Books first, with Open Library as a fallback if the API key isn't configured or returns nothing.</p>
+
+    <p>TMDB is the best-behaved of the three. Pass it a title and a year, get back structured results with poster paths. The trouble starts with books.</p>
+
+    <p>Google Books has no publication-year filter. You might think you can approximate one by appending the year to the query string -- searching "The Time Machine 1895" instead of "The Time Machine." Don't. That biases results toward later editions that happen to mention 1895 in their descriptions, while the actual first edition quietly drops out of the results. We needed the <em>first</em> publication year, and the API was fighting us on it.</p>
+
+    <p>The fix: fetch 20 results instead of the 6 we need, then use <span class="tt" data-tt="A Python library for fast fuzzy string matching, a faster fork of fuzzywuzzy">rapidfuzz</span> to find titles that score 70% or better against the query. Take the minimum year across those matches. That minimum is almost always the first publication year for any well-known title.</p>
+
+<pre><code><span class="token builtin">similar_years</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
+    <span class="token function">int</span><span class="token punctuation">(</span><span class="token builtin">item</span><span class="token punctuation">[</span><span class="token string">'volumeInfo'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'publishedDate'</span><span class="token punctuation">]</span><span class="token punctuation">[:</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">for</span> <span class="token builtin">item</span> <span class="token keyword">in</span> <span class="token builtin">items</span>
+    <span class="token keyword">if</span> <span class="token builtin">fuzz</span><span class="token punctuation">.</span><span class="token function">token_sort_ratio</span><span class="token punctuation">(</span>
+        <span class="token builtin">query</span><span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(),</span>
+        <span class="token builtin">item</span><span class="token punctuation">[</span><span class="token string">'volumeInfo'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'title'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">()</span>
+    <span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">70</span>
+<span class="token punctuation">]</span>
+<span class="token builtin">first_pub_year</span> <span class="token operator">=</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token function">min</span><span class="token punctuation">(</span><span class="token builtin">similar_years</span><span class="token punctuation">))</span> <span class="token keyword">if</span> <span class="token builtin">similar_years</span> <span class="token keyword">else</span> <span class="token string">''</span></code></pre>
+
+    <p>That 70% threshold earns its keep. Without it, an author with a common surname can pollute the year calculation -- you're searching for Colson Whitehead's <em>Sag Harbor</em>, but an unrelated book by a different Whitehead published in 1923 drags the minimum year down to nonsense. The fuzzy match on title filters those out.</p>
+
+    <p>"Sag Harbor" caused a second problem: it's also a real place on Long Island. Google Books happily returns travel guides and local histories. The fix is the <code>inauthor:</code> field constraint -- we append <code>inauthor:"Whitehead"</code> to the query, and the travel guides disappear. The full query construction looks like this: unquoted title words plus the author's last name as an <code>inauthor:</code> clause. Quoting the title as a phrase turned out to be too restrictive and killed legitimate matches with subtitle variations.</p>
+
+    <p>Title normalization handles the rest of the ambiguity. Strip leading articles (<em>the</em>, <em>a</em>, <em>an</em>), lowercase everything, remove punctuation, collapse whitespace. "The Terminator" and "Terminator" and "terminator" all resolve to the same canonical form. It's brute-force, and it works.</p>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 3                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch3" class="fade-up" data-chapter="The same movie, twice">
+    <div class="chapter-eyebrow">Section three</div>
+    <h2 class="chapter-title">The same movie, twice</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">JAN 1, 1976</span>
+      <span class="date-card-title">Rocky</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">The design</div>
+      <div class="goal-panel-text">Letting strangers add data without chaos.</div>
+    </div>
+
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/lmwGr6J5y6kngFNQuFV2y1yw4OB.jpg" alt="Rocky poster" loading="lazy" />
+
+    <p class="chapter-opener">Crowd-sourced data is a trust problem disguised as a data problem. You want the public to contribute, but you can't publish everything they send. The standard approach is a moderation queue -- every submission waits for an admin to bless it. That works until you have more submissions than admins, which is immediately.</p>
+
+    <p>We built <span class="tt" data-tt="A group of submissions sharing the same month, day, and normalized title -- used to detect consensus and trigger auto-approval">equivalence groups</span> instead. When a user submits an event, we normalize the title, combine it with the month and day, and check if we've seen this combination before. Same month, same day, same normalized title -- same group. The first submission waits. The second waits. The third triggers auto-approval.</p>
+
+    <p>But which submission gets published? Not the first, not the newest -- the most complete. We score each pending submission by counting how many useful fields it has filled in:</p>
+
+<pre><code><span class="token keyword">def</span> <span class="token function">_completeness_score</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">):</span>
+    <span class="token keyword">return</span> <span class="token function">sum</span><span class="token punctuation">([</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">description</span><span class="token punctuation">),</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">cover_image_url</span><span class="token punctuation">),</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">scene_image_url</span><span class="token punctuation">),</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">creator</span><span class="token punctuation">),</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">source_year</span><span class="token punctuation">),</span>
+        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">tmdb_id</span> <span class="token keyword">or</span> <span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">google_books_id</span><span class="token punctuation">),</span>
+    <span class="token punctuation">])</span></code></pre>
+
+    <p>The highest-scoring submission becomes the published event. The rest get set to MERGED status. Not REJECTED -- that distinction matters, and we'll get to why in the next section.</p>
+
+    <p>There's a trap here, though, and Rocky walks right into it. Suppose a Rocky remake comes out and someone submits an event for the same date. The original 1976 <em>Rocky</em> and the hypothetical remake would share the same normalized title and the same calendar date. Three people could submit the remake, trigger auto-approval, and accidentally publish a duplicate that conflicts with the original film.</p>
+
+    <p>The guard is <code>source_year</code>. When pending submissions in the same equivalence group have conflicting non-null release years, auto-approval is blocked. The group sits in the admin queue until a human looks at it. We'd rather have a false hold than a false publication.</p>
+
+<pre><code><span class="token keyword">def</span> <span class="token function">_has_source_year_conflict</span><span class="token punctuation">(</span><span class="token builtin">group</span><span class="token punctuation">):</span>
+    <span class="token builtin">years</span> <span class="token operator">=</span> <span class="token function">set</span><span class="token punctuation">(</span>
+        <span class="token class-name">Event</span><span class="token punctuation">.</span><span class="token builtin">objects</span><span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>
+            <span class="token builtin">equivalence_group</span><span class="token operator">=</span><span class="token builtin">group</span><span class="token punctuation">,</span>
+            <span class="token builtin">status</span><span class="token operator">=</span><span class="token class-name">EventStatus</span><span class="token punctuation">.</span><span class="token builtin">PENDING</span><span class="token punctuation">,</span>
+        <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exclude</span><span class="token punctuation">(</span><span class="token builtin">source_year</span><span class="token operator">=</span><span class="token keyword">None</span><span class="token punctuation">)</span>
+        <span class="token punctuation">.</span><span class="token function">values_list</span><span class="token punctuation">(</span><span class="token string">'source_year'</span><span class="token punctuation">,</span> <span class="token builtin">flat</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">)</span>
+    <span class="token punctuation">)</span>
+    <span class="token keyword">return</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token builtin">years</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span></code></pre>
+
+    <p>Early in development, auto-approval had a different bug: it published <em>all three</em> submissions as separate events. Three identical Rocky entries on the same date. The fix was straightforward once we saw it -- publish the best, merge the rest -- but it's the kind of bug that only surfaces when real data hits a system designed in the abstract.</p>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 4                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch4" class="fade-up" data-chapter="Earning trust">
+    <div class="chapter-eyebrow">Section four</div>
+    <h2 class="chapter-title">Earning trust</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">MAY 12, 1984</span>
+      <span class="date-card-title">The Terminator</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">The philosophy</div>
+      <div class="goal-panel-text">Trust is an earned outcome, not a permission level.</div>
+    </div>
+
+    <p class="chapter-opener">Three roles exist: Registered, Trusted, and Admin. You start as Registered. Every submission goes through the moderation queue -- either waiting for admin approval or accumulating in an equivalence group toward crowd consensus. There are no shortcuts and no form to request promotion.</p>
+
+    <p>Promotion is automatic. Five approved submissions and a rejection rate under 20% makes you Trusted:</p>
+
+<pre><code><span class="token keyword">def</span> <span class="token function">qualifies_for_trusted</span><span class="token punctuation">(</span><span class="token builtin">self</span><span class="token punctuation">):</span>
+    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token builtin">self</span><span class="token punctuation">.</span><span class="token builtin">approved_count</span> <span class="token operator">>=</span> <span class="token number">5</span>
+            <span class="token keyword">and</span> <span class="token builtin">self</span><span class="token punctuation">.</span><span class="token function">rejection_rate</span><span class="token punctuation">()</span> <span class="token operator"><</span> <span class="token number">0.20</span><span class="token punctuation">)</span></code></pre>
+
+    <p>Trusted users bypass the moderation queue entirely. Their submissions publish immediately. The logic is simple: if you've demonstrated good judgment five times with fewer than one-in-five rejections, you've earned the right to contribute without supervision.</p>
+
+    <p>The MERGED status earns its place here. When crowd consensus auto-approves an event, every submitter in that equivalence group gets credit -- including the ones whose specific submission wasn't the published version. Your contribution to the consensus counts, even if someone else's submission had a better cover image. Nobody is punished for participating in a process that worked correctly.</p>
+
+    <p>This creates a clean incentive loop. Submit good data, get approved, accumulate credit, earn autonomy. Submit bad data, accumulate rejections, stay in the queue. The system never needs to make a binary trust/distrust decision about a person. It just counts outcomes.</p>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 5                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch5" class="fade-up" data-chapter="What time is it where you are?">
+    <div class="chapter-eyebrow">Section five</div>
+    <h2 class="chapter-title">What time is it where you are?</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">APR 4</span>
+      <span class="date-card-title">Nineteen Eighty-Four</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">The edge case</div>
+      <div class="goal-panel-text">"Today" depends on where you're standing.</div>
+    </div>
+
+    <p class="chapter-opener">The home page showed the wrong date. The server was rendering UTC, the user was in Pacific time, and at 5pm on April 3rd in San Francisco, the page was showing events for April 4th. For a site whose entire value proposition is "what happened in fiction <em>today</em>," this is not a minor bug. It is the bug.</p>
+
+    <p>The fix runs through three layers. A snippet of JavaScript reads the browser's timezone via <code>Intl.DateTimeFormat().resolvedOptions().timeZone</code> and stores it in a cookie called <code>tdif_timezone</code>. Django middleware picks up the cookie on every request and activates the timezone with <code>zoneinfo.ZoneInfo</code>. From there, <code>timezone.localdate()</code> returns the correct date everywhere in the application.</p>
+
+    <p>First visits are the awkward case. The cookie doesn't exist yet, so the server renders in UTC. The JavaScript detects this, sets the cookie, and reloads the page. The second load has the cookie, activates the correct timezone, and renders the right date. One flash of wrong content on the very first visit, then correct forever after.</p>
+
+    <p>Unless cookies are blocked. If the browser rejects the cookie, the JavaScript sets it, reloads, finds no cookie, sets it again, reloads -- an infinite loop. The fix: use <code>sessionStorage</code> as a reload guard. Before reloading, write a flag to <code>sessionStorage</code>. On load, check the flag. If it's there, don't reload again. <code>sessionStorage</code> survives a reload within the same tab and doesn't require cookies.</p>
+
+    <table class="scenario-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>Cookie</th>
+          <th>sessionStorage</th>
+          <th>Result</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Normal first visit</td>
+          <td>Set, reload</td>
+          <td>Guard set</td>
+          <td>Correct date on second load</td>
+        </tr>
+        <tr>
+          <td>Return visit</td>
+          <td>Already present</td>
+          <td>Not needed</td>
+          <td>Correct date immediately</td>
+        </tr>
+        <tr>
+          <td>Cookies blocked</td>
+          <td>Rejected</td>
+          <td>Guard prevents loop</td>
+          <td>UTC fallback, no crash</td>
+        </tr>
+        <tr>
+          <td>sessionStorage blocked</td>
+          <td>Rejected</td>
+          <td>Unavailable</td>
+          <td>Try/catch prevents loop, UTC fallback</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>The middleware itself is deliberately minimal. Read the cookie, activate the timezone, move on. No database queries, no user-agent sniffing, no IP geolocation. The browser knows what timezone it's in. We just ask it.</p>
+  </section>
+
+  <hr class="section-rule" />
+
+  <!-- ════════════════════════════════════════════════════ -->
+  <!-- CHAPTER 6                                            -->
+  <!-- ════════════════════════════════════════════════════ -->
+  <section id="ch6" class="fade-up" data-chapter="The birthday hook">
+    <div class="chapter-eyebrow">Section six</div>
+    <h2 class="chapter-title">The birthday hook</h2>
+
+    <div class="date-card">
+      <span class="date-card-date">OCT 21, 2015</span>
+      <span class="date-card-title">Back to the Future Part II</span>
+    </div>
+
+    <div class="goal-panel">
+      <div class="goal-panel-label">What's next</div>
+      <div class="goal-panel-text">The features that make it sticky.</div>
+    </div>
+
+    <p class="chapter-opener">The calendar is useful. But "what happened in fiction <em>on your birthday</em>" is personal. Enter your birth month and day -- stored in a cookie for guests, in the user profile for registered accounts -- and the app shows you your own permanent page of fictional events. The data is the same, but the frame changes everything. Nobody forgets their birthday.</p>
+
+    <p>The public JSON API at <code>/api/v1/</code> was designed from day one, not bolted on later. Every event is available as structured data -- date fields, metadata IDs, cover image URLs, media types. The API exists because the database has value beyond a single web interface, and because the best way to attract partnerships is to make integration trivially easy.</p>
+
+    <p>Laura E. Hall's "Dating the Movies" project is the most obvious parallel -- a carefully researched collection of specific dates mentioned in films, maintained by hand. It's the same intellectual project as ThisDayInFiction, built as editorial content rather than a database. A clean API makes a content partnership possible without either side needing to change how they work.</p>
+
+    <p>The Works browse page takes the data in the other direction. Instead of "what happened on this date," it answers "what dates appear in this work." Every film and book with entries gets its own page listing all its fictional dates in chronological order. "All the dates in <em>Back to the Future</em>" is a search people actually make, and the answer is more interesting when you see the full timeline laid out -- 1885, 1955, 1985, 2015 -- four dates spanning 130 years, all anchored to one fictional family.</p>
+
+    <p>The database grows every day. The crowd-sourcing mechanics handle scale. The trust system handles quality. What the project needs now is density -- enough events on every date that the home page always delivers something surprising, whether you visit in January or July, whether you care about science fiction or period dramas. That density comes from contributors, and contributors come from a product worth contributing to. The loop either spins up or it doesn't. We're betting it spins.</p>
+  </section>
+
+  <!-- ── Footer ──────────────────────────────────────────── -->
+  <footer class="page-footer">
+    <p>ThisDayInFiction &mdash; Micah Alpern &mdash; <a href="https://github.com/PeterTheobald/ThisDayInFiction">github.com/PeterTheobald/ThisDayInFiction</a></p>
+  </footer>
+
+</article>
+</main>
+
+<!-- ── JavaScript ─────────────────────────────────────────── -->
+<script>
+(function () {
+  'use strict';
+
+  // ── Fade-up observer ────────────────────────────────────
+  const fadeEls = document.querySelectorAll('.fade-up');
+  if ('IntersectionObserver' in window) {
+    const fadeObs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          fadeObs.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+    fadeEls.forEach(function (el) { fadeObs.observe(el); });
+  } else {
+    fadeEls.forEach(function (el) { el.classList.add('visible'); });
+  }
+
+  // ── Copy buttons on code blocks ─────────────────────────
+  document.querySelectorAll('pre').forEach(function (pre) {
+    var btn = document.createElement('button');
+    btn.className = 'copy-btn';
+    btn.textContent = 'Copy';
+    btn.setAttribute('aria-label', 'Copy code to clipboard');
+    btn.addEventListener('click', function () {
+      var code = pre.querySelector('code');
+      var text = code ? code.textContent : pre.textContent;
+      navigator.clipboard.writeText(text).then(function () {
+        btn.textContent = 'Copied';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+    });
+    pre.appendChild(btn);
+  });
+
+  // ── Sticky chapter nav ──────────────────────────────────
+  var nav = document.getElementById('chapterNav');
+  var navTitle = document.getElementById('navTitle');
+  var navPrev = document.getElementById('navPrev');
+  var navNext = document.getElementById('navNext');
+  var navProgress = document.getElementById('navProgress');
+  var hero = document.getElementById('hero');
+  var sections = Array.from(document.querySelectorAll('section[id^="ch"]'));
+
+  var chapterData = sections.map(function (sec) {
+    return {
+      id: sec.id,
+      title: sec.getAttribute('data-chapter'),
+      el: sec
+    };
+  });
+
+  function getCurrentChapterIndex() {
+    var scrollY = window.scrollY + 120;
+    var idx = 0;
+    for (var i = 0; i < sections.length; i++) {
+      if (sections[i].offsetTop <= scrollY) {
+        idx = i;
+      }
+    }
+    return idx;
+  }
+
+  function updateNav() {
+    var heroBottom = hero.offsetTop + hero.offsetHeight;
+    var scrolled = window.scrollY > heroBottom - 60;
+    nav.classList.toggle('visible', scrolled);
+
+    if (!scrolled) return;
+
+    var idx = getCurrentChapterIndex();
+    var chapter = chapterData[idx];
+    navTitle.textContent = chapter.title;
+
+    if (idx > 0) {
+      navPrev.href = '#' + chapterData[idx - 1].id;
+      navPrev.style.display = '';
+    } else {
+      navPrev.style.display = 'none';
+    }
+
+    if (idx < chapterData.length - 1) {
+      navNext.href = '#' + chapterData[idx + 1].id;
+      navNext.style.display = '';
+    } else {
+      navNext.style.display = 'none';
+    }
+
+    // Progress bar
+    var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    var progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+    navProgress.style.width = Math.min(progress, 100) + '%';
+  }
+
+  var ticking = false;
+  window.addEventListener('scroll', function () {
+    if (!ticking) {
+      requestAnimationFrame(function () {
+        updateNav();
+        ticking = false;
+      });
+      ticking = true;
+    }
+  });
+  updateNav();
+
+})();
+</script>
+</body>
+</html>

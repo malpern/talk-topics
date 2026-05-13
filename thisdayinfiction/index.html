@@ -212,8 +212,23 @@ strong { font-weight: 700; }
   min-width: 0;
   object-fit: cover;
   object-position: top center;
-  opacity: 0.35;
-  filter: grayscale(0.4) contrast(1.1);
+  opacity: 0.3;
+  filter: grayscale(0.5) contrast(1.1);
+  transition: opacity 0.5s ease, filter 0.5s ease, transform 0.5s ease;
+  animation: poster-drift 30s ease-in-out infinite alternate;
+}
+.hero-posters img:nth-child(2) { animation-delay: -8s; }
+.hero-posters img:nth-child(3) { animation-delay: -16s; }
+.hero-posters img:nth-child(4) { animation-delay: -24s; }
+.hero-posters img:hover {
+  opacity: 0.7;
+  filter: grayscale(0) contrast(1.05);
+  transform: scale(1.03) translateY(-8px);
+  z-index: 1;
+}
+@keyframes poster-drift {
+  0%   { object-position: top center; }
+  100% { object-position: 50% 35%; }
 }
 .hero-overlay {
   position: absolute;
@@ -261,6 +276,33 @@ strong { font-weight: 700; }
   color: var(--fg-quiet);
   letter-spacing: 0.04em;
 }
+
+/* ── Date ticker ────────────────────────────────────────── */
+.date-ticker {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 28px;
+  overflow: hidden;
+  z-index: 3;
+  opacity: 0.5;
+}
+.date-ticker-track {
+  display: flex;
+  gap: 3rem;
+  white-space: nowrap;
+  animation: ticker-scroll 50s linear infinite;
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.58rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent);
+  line-height: 28px;
+}
+@keyframes ticker-scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
 @media (max-width: 720px) {
   .hero { min-height: 70vh; }
   .hero-posters img:nth-child(4) { display: none; }
@@ -616,6 +658,30 @@ pre:hover .copy-btn { opacity: 1; }
 
 <!-- ── Hero ───────────────────────────────────────────────── -->
 <header class="hero" id="hero">
+  <div class="date-ticker" aria-hidden="true">
+    <div class="date-ticker-track">
+      <span>Nov 5, 1955 &bull; Back to the Future</span>
+      <span>Apr 4 &bull; Nineteen Eighty-Four</span>
+      <span>May 12, 1984 &bull; The Terminator</span>
+      <span>Oct 21, 2015 &bull; Back to the Future Part II</span>
+      <span>Mar 18, 2263 &bull; The Fifth Element</span>
+      <span>Jan 12, 1997 &bull; 2001: A Space Odyssey</span>
+      <span>Apr 26, 1986 &bull; Donnie Darko</span>
+      <span>Jun 6, 1944 &bull; Saving Private Ryan</span>
+      <span>Dec 24 &bull; Die Hard</span>
+      <span>Feb 2 &bull; Groundhog Day</span>
+      <span>Nov 5, 1955 &bull; Back to the Future</span>
+      <span>Apr 4 &bull; Nineteen Eighty-Four</span>
+      <span>May 12, 1984 &bull; The Terminator</span>
+      <span>Oct 21, 2015 &bull; Back to the Future Part II</span>
+      <span>Mar 18, 2263 &bull; The Fifth Element</span>
+      <span>Jan 12, 1997 &bull; 2001: A Space Odyssey</span>
+      <span>Apr 26, 1986 &bull; Donnie Darko</span>
+      <span>Jun 6, 1944 &bull; Saving Private Ryan</span>
+      <span>Dec 24 &bull; Die Hard</span>
+      <span>Feb 2 &bull; Groundhog Day</span>
+    </div>
+  </div>
   <div class="hero-posters" aria-hidden="true">
     <img src="https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg" alt="" loading="eager" />
     <img src="https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg" alt="" loading="eager" />

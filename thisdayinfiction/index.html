@@ -775,6 +775,8 @@ pre:hover .copy-btn { opacity: 1; }
       <div class="goal-panel-text">Fictional dates don't follow the rules of real ones.</div>
     </div>
 
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/hrdQlicxuyTg3zyVqq78EsA4Z6J.jpg" alt="Nineteen Eighty-Four (1984) film poster" loading="lazy" />
+
     <p class="chapter-opener">Winston Smith begins his diary on April 4. But what year? The novel is called <em>1984</em>, but Orwell deliberately obscures whether that's the actual year in the story. Fan debates aside, the honest answer is: we know the month and day, not the year.</p>
 
     <p>This turns out to be the first interesting design problem. Many fictional events carry only a month and day -- diary entries from ambiguous timelines, recurring holidays in fictional universes, events from franchises where the calendar date matters more than the year. If you force every event into a standard date format, you have to invent years you don't actually have. And once you start making things up in a database of facts, you've already lost.</p>
@@ -895,6 +897,8 @@ pre:hover .copy-btn { opacity: 1; }
       <div class="goal-panel-text">"Today" depends on where you're standing.</div>
     </div>
 
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg" alt="The Terminator poster" loading="lazy" />
+
     <p class="chapter-opener">The very first time someone tested the site, the home page showed the wrong date. The server was in UTC. The user was in California. At 5pm on April 3rd in San Francisco, the page was cheerfully displaying events for April 4th. For a site whose entire reason to exist is "what happened in fiction <em>today</em>," there is no more fundamental bug.</p>
 
     <p>The fix is a small piece of JavaScript that reads the browser's timezone and stores it in a cookie. The server reads the cookie on every request and adjusts accordingly. A user in Tokyo and a user in New York see different events at midnight, and both see the right ones.</p>
@@ -922,6 +926,8 @@ pre:hover .copy-btn { opacity: 1; }
       <div class="goal-panel-label">What's next</div>
       <div class="goal-panel-text">Making it personal.</div>
     </div>
+
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/hQq8xZe5uLjFzSBt4LanNP7SQjl.jpg" alt="Back to the Future Part II poster" loading="lazy" />
 
     <p class="chapter-opener">The calendar is useful. But "what happened in fiction <em>on your birthday</em>" is personal. Enter your birth date and the app gives you your own permanent page of fictional events -- the same data, reframed around a date you'll never forget. It's the difference between a reference tool and something you share with your friends.</p>
 

@@ -34,7 +34,7 @@
       font-family: 'Inter', sans-serif;
       font-weight: 400;
       color: var(--fg);
-      font-size: 28px;
+      font-size: 34px;
     }
 
     .reveal .slides {
@@ -104,7 +104,7 @@
 
     .reveal pre code {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.58em;
+      font-size: 0.65em;
       line-height: 1.55;
       background: #000;
       border: 1px solid var(--rule);
@@ -130,7 +130,7 @@
     .tag {
       display: inline-block;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.45em;
+      font-size: 0.52em;
       text-transform: uppercase;
       letter-spacing: 0.18em;
       color: var(--accent);
@@ -147,7 +147,7 @@
       top: 4vh;
       right: 5vw;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.55em;
+      font-size: 0.6em;
       color: var(--accent-dim);
       opacity: 0.5;
     }
@@ -158,7 +158,7 @@
       bottom: 3vh;
       left: 6vw;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.38em;
+      font-size: 0.48em;
       color: var(--muted);
       letter-spacing: 0.06em;
     }
@@ -196,7 +196,7 @@
     }
 
     .title-slide .subtitle {
-      font-size: 0.72em;
+      font-size: 0.82em;
       color: var(--muted);
       max-width: 70%;
       line-height: 1.5;
@@ -205,7 +205,7 @@
 
     .title-slide .byline {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.4em;
+      font-size: 0.5em;
       letter-spacing: 0.12em;
       color: var(--muted);
     }
@@ -219,7 +219,7 @@
 
     .divider .chapter-num {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.45em;
+      font-size: 0.55em;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--accent-dim);
@@ -232,7 +232,7 @@
     }
 
     .divider .divider-sub {
-      font-size: 0.72em;
+      font-size: 0.82em;
       color: var(--muted);
       max-width: 65%;
       line-height: 1.5;
@@ -301,7 +301,7 @@
 
     .split-divider .chapter-num {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.45em;
+      font-size: 0.55em;
       letter-spacing: 0.22em;
       text-transform: uppercase;
       color: var(--accent-dim);
@@ -317,7 +317,7 @@
     }
 
     .split-divider .divider-sub {
-      font-size: 0.72em;
+      font-size: 0.82em;
       color: var(--muted);
       max-width: 90%;
       line-height: 1.5;
@@ -337,7 +337,7 @@
     }
 
     .bigword .muted-sub {
-      font-size: 0.72em;
+      font-size: 0.82em;
       color: var(--muted);
       margin-top: 0.5em;
     }
@@ -622,7 +622,7 @@ date(2263, 3, 18)    # The Fifth Element ✓</code></pre>
     <code>year</code> = when it happens <em>in the story</em>.<br>
     <code>source_year</code> = when the movie came out.
   </p>
-  <p class="muted" style="font-size:0.68em; margin-top:0.6em;">No DateField. No validation headaches. Just integers that can be NULL.</p>
+  <p class="muted" style="font-size:0.78em; margin-top:0.6em;">No DateField. No validation headaches. Just integers that can be NULL.</p>
   <aside class="notes">This is the key insight: don't use a date at all. Three nullable integers solve every edge case fiction throws at us.</aside>
 </section>
 
@@ -672,13 +672,13 @@ date(2263, 3, 18)    # The Fifth Element ✓</code></pre>
 <section>
   <div class="tag">THE CHAIN</div>
   <h3>The fallback chain</h3>
-  <p class="muted" style="font-size:0.75em; margin-bottom:1.2em;">Every submission needs a cover image and metadata. Three APIs, tried in order.</p>
+  <p class="muted" style="font-size:0.82em; margin-bottom:1.2em;">Every submission needs a cover image and metadata. Three APIs, tried in order.</p>
   <ol class="steps" style="margin-top:0.8em;">
     <li><strong>TMDB</strong> — movies &amp; TV shows. Best metadata, great images. <span class="muted">API key required.</span></li>
     <li><strong>Google Books</strong> — literature. Good coverage, messy data. <span class="muted">API key required.</span></li>
     <li><strong>Open Library</strong> — literature fallback. Community-driven, no key needed. <span class="muted">Free &amp; open.</span></li>
   </ol>
-  <p class="muted v-spacer" style="font-size:0.68em;">If TMDB returns a match, stop. Otherwise try Google Books, then Open Library. If all three miss, the event gets no cover image.</p>
+  <p class="muted v-spacer" style="font-size:0.78em;">If TMDB returns a match, stop. Otherwise try Google Books, then Open Library. If all three miss, the event gets no cover image.</p>
   <aside class="notes">The chain matters because each API has different strengths. TMDB is great for visual media. Google Books has the widest literature coverage. Open Library is the safety net.</aside>
 </section>
 
@@ -724,7 +724,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
   <pre><code class="language-python">query = 'Sag Harbor inauthor:"Whitehead"'
 # → 3 results, all the right book</code></pre>
 
-  <p class="muted v-spacer" style="font-size:0.68em;">When the title is also a real place, the author name is the only reliable disambiguator.</p>
+  <p class="muted v-spacer" style="font-size:0.78em;">When the title is also a real place, the author name is the only reliable disambiguator.</p>
 </section>
 
 <!-- ============================================================ -->
@@ -756,7 +756,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     title = re.sub(r'^(the|a|an)\s+', '', title)
     title = re.sub(r'[^a-z0-9\s]', '', title)
     return re.sub(r'\s+', ' ', title).strip()</code></pre>
-  <p class="muted v-spacer" style="font-size:0.68em;">
+  <p class="muted v-spacer" style="font-size:0.78em;">
     "The Terminator", "the terminator", "Terminator" all collapse to <code>terminator</code>.
     Three people agree independently? It's probably real.
   </p>
@@ -777,7 +777,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
         bool(event.creator),
         bool(event.source_year),
     ])</code></pre>
-  <p class="muted v-spacer" style="font-size:0.68em;">
+  <p class="muted v-spacer" style="font-size:0.78em;">
     The submission with the most filled-in fields gets published. The rest are marked MERGED (not rejected). Everyone gets credit.
   </p>
 </section>
@@ -801,7 +801,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     Same title. Same date. <span class="accent">Different movie.</span>
   </div>
 
-  <p class="muted" style="font-size:0.68em;">The equivalence check isn't just title matching — it also validates that source_years are consistent within the group.</p>
+  <p class="muted" style="font-size:0.78em;">The equivalence check isn't just title matching — it also validates that source_years are consistent within the group.</p>
   <aside class="notes">This is the edge case that makes naive crowd-sourcing dangerous. Remakes break the assumption that title + date = unique event. The source_year check catches it.</aside>
 </section>
 
@@ -830,7 +830,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     return (self.approved_count >= 5
             and self.rejection_rate() < 0.20)</code></pre>
 
-  <p class="muted v-spacer" style="font-size:0.68em;">
+  <p class="muted v-spacer" style="font-size:0.78em;">
     No application process. No social proof. Just contribute good data and you're promoted automatically.
   </p>
   <aside class="notes">The philosophy: don't make people ask for trust. Let them earn it through contribution quality. The thresholds are intentionally low — we want to promote people.</aside>
@@ -879,7 +879,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     <li>Django middleware reads the cookie, activates the timezone per request.</li>
     <li><code>timezone.localdate()</code> returns the correct local date.</li>
   </ol>
-  <p class="muted v-spacer" style="font-size:0.68em;">
+  <p class="muted v-spacer" style="font-size:0.78em;">
     A user in Tokyo and a user in New York see different events at midnight. Both see the right ones.
   </p>
   <aside class="notes">This matters because the whole app is about "today." If we show the wrong today, nothing else works. The cookie approach is simple but has one nasty edge case...</aside>
@@ -904,7 +904,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     <strong>The fix:</strong> one line.
   </p>
   <pre><code class="language-javascript">sessionStorage.setItem('tz_tried', '1');</code></pre>
-  <p class="muted" style="font-size:0.68em; margin-top:0.6em;">
+  <p class="muted" style="font-size:0.78em; margin-top:0.6em;">
     sessionStorage survives reloads but not tab closes. Check it before reloading.
     If the flag exists, don't reload — just serve UTC gracefully.
   </p>
@@ -967,7 +967,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
     <li><strong>Public API</strong>, birthday lookup, work pages</li>
     <li><strong>Live</strong> at <a href="https://thisdayinfiction.com">thisdayinfiction.com</a></li>
   </ul>
-  <p class="muted v-spacer" style="font-size:0.68em;">Django 6 &middot; Python 3.12 &middot; HTMX &middot; Tailwind &middot; PostgreSQL &middot; uv</p>
+  <p class="muted v-spacer" style="font-size:0.78em;">Django 6 &middot; Python 3.12 &middot; HTMX &middot; Tailwind &middot; PostgreSQL &middot; uv</p>
 </section>
 
 <!-- ============================================================ -->
@@ -987,7 +987,7 @@ first_pub_year = min(similar_years) if similar_years else None</code></pre>
       <code>uv run manage.py seed_events && uv run manage.py runserver</code>
     </li>
   </ol>
-  <p class="muted v-spacer" style="font-size:0.68em;">
+  <p class="muted v-spacer" style="font-size:0.78em;">
     Contributions welcome. Especially: dates from books. We're light on literature.
   </p>
   <div class="footer">Peter Theobald · @ControlAltPete · github.com/PeterTheobald/ThisDayInFiction</div>

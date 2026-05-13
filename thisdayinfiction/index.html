@@ -841,11 +841,35 @@ pre:hover .copy-btn { opacity: 1; }
       <div class="goal-panel-text">Matching titles to cover art across three APIs that don't agree on anything.</div>
     </div>
 
+    <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/fPtlCO1yQtnoLHOwKtWz7db6RGU.jpg" alt="The Fifth Element poster" loading="lazy" />
+
     <p class="chapter-opener">A calendar of fictional events without cover art is just a spreadsheet. The poster is what makes you stop scrolling. But 88 seed events loaded from a text file had no images, no creator names, no release years. Just titles and dates. Every event needed to be matched against external databases to fill in the gaps.</p>
 
     <p>For movies and TV, <span class="tt" data-tt="The Movie Database -- a community-built API for movie and TV metadata, including poster images">TMDB</span> is excellent. Search a title, optionally filter by year, get back poster art and structured metadata. It handles remakes, distinguishes between the 1976 and 2018 versions of a film, and almost always returns the right thing.</p>
 
     <p>Books are where it gets messy. Google Books has no way to filter by publication year. If you search for "The Time Machine," you get dozens of editions spanning a century -- and the API returns the <em>edition</em> date, not the original publication date. A 2023 reprint of H.G. Wells returns 2023, not 1895. To find the true first-publication year, we fetch far more results than we need, use fuzzy string matching to confirm the titles actually match our query, and take the earliest year across all the confirmed matches. It's a hack, but it reliably finds 1895 for Wells and 1949 for Orwell.</p>
+
+    <figure style="margin:2rem 0;">
+      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
+        <div style="text-align:center;">
+          <img src="https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg" alt="The Terminator poster via TMDB" loading="lazy" style="height:200px;border-radius:4px;border:1px solid var(--rule);box-shadow:0 6px 20px rgba(0,0,0,0.3);" />
+          <div style="font-family:system-ui,sans-serif;font-size:0.65rem;color:var(--fg-quiet);margin-top:0.5rem;">The Terminator<br/><span style="color:var(--accent);">via TMDB</span></div>
+        </div>
+        <div style="text-align:center;">
+          <img src="https://covers.openlibrary.org/b/id/9009316-L.jpg" alt="The Time Machine cover via Open Library" loading="lazy" style="height:200px;border-radius:4px;border:1px solid var(--rule);box-shadow:0 6px 20px rgba(0,0,0,0.3);" />
+          <div style="font-family:system-ui,sans-serif;font-size:0.65rem;color:var(--fg-quiet);margin-top:0.5rem;">The Time Machine<br/><span style="color:var(--accent);">via Open Library</span></div>
+        </div>
+        <div style="text-align:center;">
+          <img src="https://covers.openlibrary.org/b/id/6303065-L.jpg" alt="Sag Harbor cover via Google Books" loading="lazy" style="height:200px;border-radius:4px;border:1px solid var(--rule);box-shadow:0 6px 20px rgba(0,0,0,0.3);" />
+          <div style="font-family:system-ui,sans-serif;font-size:0.65rem;color:var(--fg-quiet);margin-top:0.5rem;">Sag Harbor<br/><span style="color:var(--accent);">via Google Books</span></div>
+        </div>
+        <div style="text-align:center;">
+          <img src="https://covers.openlibrary.org/b/id/9267242-L.jpg" alt="Nineteen Eighty-Four cover via Open Library" loading="lazy" style="height:200px;border-radius:4px;border:1px solid var(--rule);box-shadow:0 6px 20px rgba(0,0,0,0.3);" />
+          <div style="font-family:system-ui,sans-serif;font-size:0.65rem;color:var(--fg-quiet);margin-top:0.5rem;">Nineteen Eighty-Four<br/><span style="color:var(--accent);">via Open Library</span></div>
+        </div>
+      </div>
+      <figcaption style="text-align:center;font-family:system-ui,sans-serif;font-size:0.68rem;color:var(--fg-muted);font-style:italic;margin-top:1rem;">Matched automatically: one API for films, two for books, zero for guesswork.</figcaption>
+    </figure>
 
     <p>Then there's <em>Sag Harbor</em>. Colson Whitehead's novel about a teenager in the Hamptons. Search Google Books for "Sag Harbor" and you get travel guides, local histories, and real estate listings for the actual town on Long Island. The novel is buried on page two. The fix: include the author's name in the search query. "Sag Harbor" plus "Whitehead" returns the right book immediately. Without it, the algorithm confidently presents you with a road map of eastern Long Island.</p>
 

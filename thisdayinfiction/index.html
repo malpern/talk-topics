@@ -637,20 +637,20 @@ pre:hover .copy-btn { opacity: 1; }
 
   <!-- ── Intro ─────────────────────────────────────────── -->
   <div class="intro fade-up">
-    <p>Every programmer has a date library they trust. It handles leap years, timezones, ISO 8601. It does not handle the year 802,701. Or a Tuesday in March with no year at all. Or the possibility that two different movies placed their climactic scene on the same day, forty years apart, and your users can't agree which one they're submitting.</p>
+    <p>November 5, 1955. You know what happened. You probably know it better than you know what happened on most actual dates in the 1950s. Marty McFly arrived in Hill Valley, and that date became permanently etched in the minds of anyone who grew up with a VHS player.</p>
 
-    <p>ThisDayInFiction is a web app that answers one question: what happened in fiction today? It's a curated, crowd-sourced calendar where every entry is a specific date referenced in a movie, TV show, or novel -- November 5, 1955 in <em>Back to the Future</em>, April 4 in <em>Nineteen Eighty-Four</em>, March 18, 2263 in <em>The Fifth Element</em>. The interesting part isn't the concept. It's what breaks when you try to build it.</p>
+    <p>Fiction does this. It colonizes the calendar. April 4 belongs to Winston Smith. October 21, 2015 belongs to the hoverboard. March 18, 2263 belongs to Korben Dallas and the Fifth Element. These dates feel more real than most history, because they come attached to stories we care about. We built a web app to collect them all in one place and answer a single question every morning: <em>what happened in fiction today?</em></p>
   </div>
 
   <!-- ── TOC ───────────────────────────────────────────── -->
   <nav class="toc fade-up" aria-label="Table of contents">
     <div class="toc-label">Six sections</div>
     <ol>
-      <li><a href="#ch1">The dates that don't exist</a></li>
-      <li><a href="#ch2">Three APIs and a prayer</a></li>
-      <li><a href="#ch3">The same movie, twice</a></li>
-      <li><a href="#ch4">Earning trust</a></li>
-      <li><a href="#ch5">What time is it where you are?</a></li>
+      <li><a href="#ch1">November fifth</a></li>
+      <li><a href="#ch2">The calendar</a></li>
+      <li><a href="#ch3">Letting strangers in</a></li>
+      <li><a href="#ch4">Finding the poster</a></li>
+      <li><a href="#ch5">What day is it?</a></li>
       <li><a href="#ch6">The birthday hook</a></li>
     </ol>
   </nav>
@@ -658,9 +658,9 @@ pre:hover .copy-btn { opacity: 1; }
   <!-- ════════════════════════════════════════════════════ -->
   <!-- CHAPTER 1                                            -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section id="ch1" class="fade-up" data-chapter="The dates that don't exist">
+  <section id="ch1" class="fade-up" data-chapter="November fifth">
     <div class="chapter-eyebrow">Section one</div>
-    <h2 class="chapter-title">The dates that don't exist</h2>
+    <h2 class="chapter-title">November fifth</h2>
 
     <div class="date-card">
       <span class="date-card-date">NOV 5, 1955</span>
@@ -668,30 +668,19 @@ pre:hover .copy-btn { opacity: 1; }
     </div>
 
     <div class="goal-panel">
-      <div class="goal-panel-label">The problem</div>
-      <div class="goal-panel-text">Fictional dates don't fit in <code>datetime.date</code>.</div>
+      <div class="goal-panel-label">The idea</div>
+      <div class="goal-panel-text">Some dates belong to fiction. We built a database to keep track.</div>
     </div>
 
     <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg" alt="Back to the Future poster" loading="lazy" />
 
-    <p class="chapter-opener">November 5, 1955 works fine. You write <code>datetime.date(1955, 11, 5)</code> and Python is happy. March 18, 2263 for <em>The Fifth Element</em>? Also fine -- Python's <code>datetime</code> handles years up to 9999. So far, no drama.</p>
+    <p class="chapter-opener">There's a particular thrill when you notice the date. You're watching a movie, and a character writes something on a chalkboard, or a timestamp flashes on screen, and suddenly the fiction is anchored to the same calendar you use. April 26, 1986 -- the night of the prom in <em>Donnie Darko</em>. January 12, 1997 -- HAL 9000 becomes operational in <em>2001: A Space Odyssey</em>. May 12, 1984 -- Kyle Reese arrives from the future in <em>The Terminator</em>.</p>
 
-    <p>The real problem is Winston Smith. He writes in his diary on April 4, but which year? The title of the novel is <em>1984</em>, but that's the world, not a confirmed in-fiction date for that diary entry. Fan debates aside, the honest answer is: we know the month and day, not the year. And <code>datetime.date</code> requires all three. There is no <code>datetime.date(None, 4, 4)</code>.</p>
+    <p>These aren't random. Filmmakers and novelists choose specific dates with intention. Sometimes they're plot points. Sometimes they're Easter eggs. Sometimes they're just the kind of detail that makes a fictional world feel lived-in. And fans remember them -- often more precisely than they remember actual historical events.</p>
 
-    <p>This isn't a one-off edge case. Plenty of fictional events carry only a month and day -- recurring holidays in fictional universes, diary entries from ambiguous timelines, events from franchises where only the calendar date matters. The moment you commit to <code>DateField</code>, you commit to inventing years you don't actually have.</p>
+    <p><a href="https://thisdayinfiction.com">ThisDayInFiction</a> is a curated, crowd-sourced calendar of these moments. Visit on any day of the year and see what happened in fiction on that date -- across movies, TV shows, and literature. The home page always shows today. The calendar lets you browse any month. Every event links to its source work, with cover art, a description, and links to watch or buy.</p>
 
-    <p>We decomposed the problem instead. Three separate <code>IntegerField</code> columns, with <code>year</code> nullable:</p>
-
-<pre><code><span class="token keyword">class</span> <span class="token class-name">Event</span><span class="token punctuation">(</span><span class="token builtin">models</span><span class="token punctuation">.</span><span class="token class-name">Model</span><span class="token punctuation">):</span>
-    <span class="token builtin">month</span> <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">()</span>
-    <span class="token builtin">day</span>   <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">()</span>
-    <span class="token builtin">year</span>  <span class="token operator">=</span> <span class="token builtin">models</span><span class="token punctuation">.</span><span class="token function">IntegerField</span><span class="token punctuation">(</span><span class="token builtin">null</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">,</span> <span class="token builtin">blank</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">)</span></code></pre>
-
-    <p>Crude? Sure. You lose date arithmetic, range queries over a single column, and every ORM convenience Django offers for dates. You gain the ability to represent the data honestly. April 4 with no year is <code>month=4, day=4, year=None</code>. No invented years, no sentinel values, no lying to your database.</p>
-
-    <p>The other axis is just as important. Every event has two temporal coordinates: when it happens <em>in the story</em> and when the <em>work itself</em> was released. The <code>year</code> field is fiction. The <code>source_year</code> field is reality -- 1985 for <em>Back to the Future</em>, even though the event is set in 1955. Conflating them corrupts your queries. "Show me everything set in the 1950s" and "show me everything released in the 1980s" are completely different questions, and if you stored both answers in the same column, you've already lost.</p>
-
-    <p>Three integers and a nullable year. It's the simplest model change in the entire project, and it took the longest to commit to, because every instinct says to reach for <code>DateField</code>. The instinct is wrong. The data told us so.</p>
+    <p>The idea is simple enough that you can explain it in one sentence. The interesting part is everything that breaks when you try to build it.</p>
   </section>
 
   <hr class="section-rule" />
@@ -699,45 +688,29 @@ pre:hover .copy-btn { opacity: 1; }
   <!-- ════════════════════════════════════════════════════ -->
   <!-- CHAPTER 2                                            -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section id="ch2" class="fade-up" data-chapter="Three APIs and a prayer">
+  <section id="ch2" class="fade-up" data-chapter="The calendar">
     <div class="chapter-eyebrow">Section two</div>
-    <h2 class="chapter-title">Three APIs and a prayer</h2>
+    <h2 class="chapter-title">The calendar</h2>
 
     <div class="date-card">
-      <span class="date-card-date">MAR 18, 2263</span>
-      <span class="date-card-title">The Fifth Element</span>
+      <span class="date-card-date">APR 4</span>
+      <span class="date-card-title">Nineteen Eighty-Four</span>
     </div>
 
     <div class="goal-panel">
-      <div class="goal-panel-label">The approach</div>
-      <div class="goal-panel-text">Matching user-submitted titles to real metadata across three uncooperative APIs.</div>
+      <div class="goal-panel-label">The twist</div>
+      <div class="goal-panel-text">Fictional dates don't follow the rules of real ones.</div>
     </div>
 
-    <p class="chapter-opener">We started with 88 seed events loaded from a plain text file. Most had a title, a date, a one-line description. No cover images, no creator names, no release years. A database of assertions without evidence.</p>
+    <p class="chapter-opener">Winston Smith begins his diary on April 4. But what year? The novel is called <em>1984</em>, but Orwell deliberately obscures whether that's the actual year in the story. Fan debates aside, the honest answer is: we know the month and day, not the year.</p>
 
-    <p>The metadata enrichment pipeline runs through three APIs in a fallback chain. <span class="tt" data-tt="The Movie Database -- a community-built API for movie and TV metadata, including poster images">TMDB</span> handles movies and TV shows: it has reliable poster art, release years, and a publication-year filter that actually works. For literature, we hit Google Books first, with Open Library as a fallback if the API key isn't configured or returns nothing.</p>
+    <p>This turns out to be the first interesting design problem. Many fictional events carry only a month and day -- diary entries from ambiguous timelines, recurring holidays in fictional universes, events from franchises where the calendar date matters more than the year. If you force every event into a standard date format, you have to invent years you don't actually have. And once you start making things up in a database of facts, you've already lost.</p>
 
-    <p>TMDB is the best-behaved of the three. Pass it a title and a year, get back structured results with poster paths. The trouble starts with books.</p>
+    <p>The solution is to store month, day, and year as three separate fields, with year being optional. April 4 with no year is just that -- month 4, day 4, year unknown. No invented years, no placeholder values.</p>
 
-    <p>Google Books has no publication-year filter. You might think you can approximate one by appending the year to the query string -- searching "The Time Machine 1895" instead of "The Time Machine." Don't. That biases results toward later editions that happen to mention 1895 in their descriptions, while the actual first edition quietly drops out of the results. We needed the <em>first</em> publication year, and the API was fighting us on it.</p>
+    <p>Every event also has a second temporal coordinate: when the <em>work itself</em> was released. <em>Back to the Future</em> is set in 1955 but came out in 1985. <em>The Fifth Element</em> is set in 2263 but came out in 1997. These are completely different axes. "Show me everything set in the 1950s" and "show me everything released in the 1980s" are different questions, and confusing them corrupts both answers. So we track them separately: the fictional year and the release year.</p>
 
-    <p>The fix: fetch 20 results instead of the 6 we need, then use <span class="tt" data-tt="A Python library for fast fuzzy string matching, a faster fork of fuzzywuzzy">rapidfuzz</span> to find titles that score 70% or better against the query. Take the minimum year across those matches. That minimum is almost always the first publication year for any well-known title.</p>
-
-<pre><code><span class="token builtin">similar_years</span> <span class="token operator">=</span> <span class="token punctuation">[</span>
-    <span class="token function">int</span><span class="token punctuation">(</span><span class="token builtin">item</span><span class="token punctuation">[</span><span class="token string">'volumeInfo'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token string">'publishedDate'</span><span class="token punctuation">]</span><span class="token punctuation">[:</span><span class="token number">4</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">for</span> <span class="token builtin">item</span> <span class="token keyword">in</span> <span class="token builtin">items</span>
-    <span class="token keyword">if</span> <span class="token builtin">fuzz</span><span class="token punctuation">.</span><span class="token function">token_sort_ratio</span><span class="token punctuation">(</span>
-        <span class="token builtin">query</span><span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">(),</span>
-        <span class="token builtin">item</span><span class="token punctuation">[</span><span class="token string">'volumeInfo'</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'title'</span><span class="token punctuation">,</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">lower</span><span class="token punctuation">()</span>
-    <span class="token punctuation">)</span> <span class="token operator">>=</span> <span class="token number">70</span>
-<span class="token punctuation">]</span>
-<span class="token builtin">first_pub_year</span> <span class="token operator">=</span> <span class="token function">str</span><span class="token punctuation">(</span><span class="token function">min</span><span class="token punctuation">(</span><span class="token builtin">similar_years</span><span class="token punctuation">))</span> <span class="token keyword">if</span> <span class="token builtin">similar_years</span> <span class="token keyword">else</span> <span class="token string">''</span></code></pre>
-
-    <p>That 70% threshold earns its keep. Without it, an author with a common surname can pollute the year calculation -- you're searching for Colson Whitehead's <em>Sag Harbor</em>, but an unrelated book by a different Whitehead published in 1923 drags the minimum year down to nonsense. The fuzzy match on title filters those out.</p>
-
-    <p>"Sag Harbor" caused a second problem: it's also a real place on Long Island. Google Books happily returns travel guides and local histories. The fix is the <code>inauthor:</code> field constraint -- we append <code>inauthor:"Whitehead"</code> to the query, and the travel guides disappear. The full query construction looks like this: unquoted title words plus the author's last name as an <code>inauthor:</code> clause. Quoting the title as a phrase turned out to be too restrictive and killed legitimate matches with subtitle variations.</p>
-
-    <p>Title normalization handles the rest of the ambiguity. Strip leading articles (<em>the</em>, <em>a</em>, <em>an</em>), lowercase everything, remove punctuation, collapse whitespace. "The Terminator" and "Terminator" and "terminator" all resolve to the same canonical form. It's brute-force, and it works.</p>
+    <p>It's a small decision, but it unlocks everything else. The calendar can show you what happened on any date without lying about what it doesn't know. The browse page can sort by fictional timeline or by release decade. And when two films share a title and a date -- which happens more often than you'd think -- the release year is what tells them apart.</p>
   </section>
 
   <hr class="section-rule" />
@@ -745,9 +718,9 @@ pre:hover .copy-btn { opacity: 1; }
   <!-- ════════════════════════════════════════════════════ -->
   <!-- CHAPTER 3                                            -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section id="ch3" class="fade-up" data-chapter="The same movie, twice">
+  <section id="ch3" class="fade-up" data-chapter="Letting strangers in">
     <div class="chapter-eyebrow">Section three</div>
-    <h2 class="chapter-title">The same movie, twice</h2>
+    <h2 class="chapter-title">Letting strangers in</h2>
 
     <div class="date-card">
       <span class="date-card-date">JAN 1, 1976</span>
@@ -756,44 +729,24 @@ pre:hover .copy-btn { opacity: 1; }
 
     <div class="goal-panel">
       <div class="goal-panel-label">The design</div>
-      <div class="goal-panel-text">Letting strangers add data without chaos.</div>
+      <div class="goal-panel-text">Crowd-sourced data without chaos.</div>
     </div>
 
     <img class="chapter-photo" src="https://image.tmdb.org/t/p/w500/hEjK9A9BkNXejFW4tfacVAEHtkn.jpg" alt="Rocky poster" loading="lazy" />
 
-    <p class="chapter-opener">Crowd-sourced data is a trust problem disguised as a data problem. You want the public to contribute, but you can't publish everything they send. The standard approach is a moderation queue -- every submission waits for an admin to bless it. That works until you have more submissions than admins, which is immediately.</p>
+    <p class="chapter-opener">No one person knows every fictional date. The seed database started with 88 events -- a respectable foundation, but thin enough that most days of the year had nothing to show. The site needs contributors. And contributors need a way in that doesn't require an admin to personally approve every entry.</p>
 
-    <p>We built <span class="tt" data-tt="A group of submissions sharing the same month, day, and normalized title -- used to detect consensus and trigger auto-approval">equivalence groups</span> instead. When a user submits an event, we normalize the title, combine it with the month and day, and check if we've seen this combination before. Same month, same day, same normalized title -- same group. The first submission waits. The second waits. The third triggers auto-approval.</p>
+    <p>The standard approach is a moderation queue. Every submission waits for a human to bless it. That works until you have more submissions than admins, which for a solo project is immediately. We needed something smarter.</p>
 
-    <p>But which submission gets published? Not the first, not the newest -- the most complete. We score each pending submission by counting how many useful fields it has filled in:</p>
+    <p>The solution is crowd consensus. When someone submits an event, the system checks whether other users have independently submitted the same thing -- same date, same title. If three different people say the same fictional event happened on the same day, it's probably real. Auto-approved.</p>
 
-<pre><code><span class="token keyword">def</span> <span class="token function">_completeness_score</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">):</span>
-    <span class="token keyword">return</span> <span class="token function">sum</span><span class="token punctuation">([</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">description</span><span class="token punctuation">),</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">cover_image_url</span><span class="token punctuation">),</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">scene_image_url</span><span class="token punctuation">),</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">creator</span><span class="token punctuation">),</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">source_year</span><span class="token punctuation">),</span>
-        <span class="token function">bool</span><span class="token punctuation">(</span><span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">tmdb_id</span> <span class="token keyword">or</span> <span class="token builtin">event</span><span class="token punctuation">.</span><span class="token builtin">google_books_id</span><span class="token punctuation">),</span>
-    <span class="token punctuation">])</span></code></pre>
+    <p>When multiple submissions describe the same event, the system picks the most complete one to publish -- the one with the most metadata filled in. The others aren't rejected. They're marked as <em>merged</em>: your contribution helped confirm the event, even if your specific version wasn't the one that went live. Everyone gets credit.</p>
 
-    <p>The highest-scoring submission becomes the published event. The rest get set to MERGED status. Not REJECTED -- that distinction matters, and we'll get to why in the next section.</p>
+    <p>This distinction matters for the trust system. Users start as Registered -- every submission goes through the queue. But after five approved contributions with a rejection rate under 20%, you're automatically promoted to Trusted, and your submissions bypass the queue entirely. Since merged submissions count as approvals, contributing to crowd consensus accelerates your path to trust. The system rewards participation without punishing redundancy.</p>
 
-    <p>There's a trap here, though, and Rocky walks right into it. Suppose a Rocky remake comes out and someone submits an event for the same date. The original 1976 <em>Rocky</em> and the hypothetical remake would share the same normalized title and the same calendar date. Three people could submit the remake, trigger auto-approval, and accidentally publish a duplicate that conflicts with the original film.</p>
+    <p>There's a trap in the crowd logic, though, and <em>Rocky</em> walks right into it. Suppose a remake comes out and someone submits an event for the same date. The original 1976 film and the remake share the same title, the same calendar date -- the system sees three submissions and wants to auto-approve. But they're different movies.</p>
 
-    <p>The guard is <code>source_year</code>. When pending submissions in the same equivalence group have conflicting non-null release years, auto-approval is blocked. The group sits in the admin queue until a human looks at it. We'd rather have a false hold than a false publication.</p>
-
-<pre><code><span class="token keyword">def</span> <span class="token function">_has_source_year_conflict</span><span class="token punctuation">(</span><span class="token builtin">group</span><span class="token punctuation">):</span>
-    <span class="token builtin">years</span> <span class="token operator">=</span> <span class="token function">set</span><span class="token punctuation">(</span>
-        <span class="token class-name">Event</span><span class="token punctuation">.</span><span class="token builtin">objects</span><span class="token punctuation">.</span><span class="token function">filter</span><span class="token punctuation">(</span>
-            <span class="token builtin">equivalence_group</span><span class="token operator">=</span><span class="token builtin">group</span><span class="token punctuation">,</span>
-            <span class="token builtin">status</span><span class="token operator">=</span><span class="token class-name">EventStatus</span><span class="token punctuation">.</span><span class="token builtin">PENDING</span><span class="token punctuation">,</span>
-        <span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">exclude</span><span class="token punctuation">(</span><span class="token builtin">source_year</span><span class="token operator">=</span><span class="token keyword">None</span><span class="token punctuation">)</span>
-        <span class="token punctuation">.</span><span class="token function">values_list</span><span class="token punctuation">(</span><span class="token string">'source_year'</span><span class="token punctuation">,</span> <span class="token builtin">flat</span><span class="token operator">=</span><span class="token keyword">True</span><span class="token punctuation">)</span>
-    <span class="token punctuation">)</span>
-    <span class="token keyword">return</span> <span class="token function">len</span><span class="token punctuation">(</span><span class="token builtin">years</span><span class="token punctuation">)</span> <span class="token operator">></span> <span class="token number">1</span></code></pre>
-
-    <p>Early in development, auto-approval had a different bug: it published <em>all three</em> submissions as separate events. Three identical Rocky entries on the same date. The fix was straightforward once we saw it -- publish the best, merge the rest -- but it's the kind of bug that only surfaces when real data hits a system designed in the abstract.</p>
+    <p>The guard is the release year. When pending submissions in the same group have conflicting release years, auto-approval is blocked. The group sits in the admin queue until a human looks at it. A false hold is always better than a false publication.</p>
   </section>
 
   <hr class="section-rule" />
@@ -801,33 +754,29 @@ pre:hover .copy-btn { opacity: 1; }
   <!-- ════════════════════════════════════════════════════ -->
   <!-- CHAPTER 4                                            -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section id="ch4" class="fade-up" data-chapter="Earning trust">
+  <section id="ch4" class="fade-up" data-chapter="Finding the poster">
     <div class="chapter-eyebrow">Section four</div>
-    <h2 class="chapter-title">Earning trust</h2>
+    <h2 class="chapter-title">Finding the poster</h2>
 
     <div class="date-card">
-      <span class="date-card-date">MAY 12, 1984</span>
-      <span class="date-card-title">The Terminator</span>
+      <span class="date-card-date">MAR 18, 2263</span>
+      <span class="date-card-title">The Fifth Element</span>
     </div>
 
     <div class="goal-panel">
-      <div class="goal-panel-label">The philosophy</div>
-      <div class="goal-panel-text">Trust is an earned outcome, not a permission level.</div>
+      <div class="goal-panel-label">The detective work</div>
+      <div class="goal-panel-text">Matching titles to cover art across three APIs that don't agree on anything.</div>
     </div>
 
-    <p class="chapter-opener">Three roles exist: Registered, Trusted, and Admin. You start as Registered. Every submission goes through the moderation queue -- either waiting for admin approval or accumulating in an equivalence group toward crowd consensus. There are no shortcuts and no form to request promotion.</p>
+    <p class="chapter-opener">A calendar of fictional events without cover art is just a spreadsheet. The poster is what makes you stop scrolling. But 88 seed events loaded from a text file had no images, no creator names, no release years. Just titles and dates. Every event needed to be matched against external databases to fill in the gaps.</p>
 
-    <p>Promotion is automatic. Five approved submissions and a rejection rate under 20% makes you Trusted:</p>
+    <p>For movies and TV, <span class="tt" data-tt="The Movie Database -- a community-built API for movie and TV metadata, including poster images">TMDB</span> is excellent. Search a title, optionally filter by year, get back poster art and structured metadata. It handles remakes, distinguishes between the 1976 and 2018 versions of a film, and almost always returns the right thing.</p>
 
-<pre><code><span class="token keyword">def</span> <span class="token function">qualifies_for_trusted</span><span class="token punctuation">(</span><span class="token builtin">self</span><span class="token punctuation">):</span>
-    <span class="token keyword">return</span> <span class="token punctuation">(</span><span class="token builtin">self</span><span class="token punctuation">.</span><span class="token builtin">approved_count</span> <span class="token operator">>=</span> <span class="token number">5</span>
-            <span class="token keyword">and</span> <span class="token builtin">self</span><span class="token punctuation">.</span><span class="token function">rejection_rate</span><span class="token punctuation">()</span> <span class="token operator"><</span> <span class="token number">0.20</span><span class="token punctuation">)</span></code></pre>
+    <p>Books are where it gets messy. Google Books has no way to filter by publication year. If you search for "The Time Machine," you get dozens of editions spanning a century -- and the API returns the <em>edition</em> date, not the original publication date. A 2023 reprint of H.G. Wells returns 2023, not 1895. To find the true first-publication year, we fetch far more results than we need, use fuzzy string matching to confirm the titles actually match our query, and take the earliest year across all the confirmed matches. It's a hack, but it reliably finds 1895 for Wells and 1949 for Orwell.</p>
 
-    <p>Trusted users bypass the moderation queue entirely. Their submissions publish immediately. The logic is simple: if you've demonstrated good judgment five times with fewer than one-in-five rejections, you've earned the right to contribute without supervision.</p>
+    <p>Then there's <em>Sag Harbor</em>. Colson Whitehead's novel about a teenager in the Hamptons. Search Google Books for "Sag Harbor" and you get travel guides, local histories, and real estate listings for the actual town on Long Island. The novel is buried on page two. The fix: include the author's name in the search query. "Sag Harbor" plus "Whitehead" returns the right book immediately. Without it, the algorithm confidently presents you with a road map of eastern Long Island.</p>
 
-    <p>The MERGED status earns its place here. When crowd consensus auto-approves an event, every submitter in that equivalence group gets credit -- including the ones whose specific submission wasn't the published version. Your contribution to the consensus counts, even if someone else's submission had a better cover image. Nobody is punished for participating in a process that worked correctly.</p>
-
-    <p>This creates a clean incentive loop. Submit good data, get approved, accumulate credit, earn autonomy. Submit bad data, accumulate rejections, stay in the queue. The system never needs to make a binary trust/distrust decision about a person. It just counts outcomes.</p>
+    <p>When Google Books fails entirely, the system falls back to Open Library -- a community-maintained catalog run by the Internet Archive. It requires no API key, has good coverage of well-known titles, and provides its own first-publication-year field. Between the three sources -- TMDB for visual media, Google Books for literature, Open Library as a safety net -- most events end up with a cover image, a creator, and a release year. The rest get fixed by hand in the admin.</p>
   </section>
 
   <hr class="section-rule" />
@@ -835,13 +784,13 @@ pre:hover .copy-btn { opacity: 1; }
   <!-- ════════════════════════════════════════════════════ -->
   <!-- CHAPTER 5                                            -->
   <!-- ════════════════════════════════════════════════════ -->
-  <section id="ch5" class="fade-up" data-chapter="What time is it where you are?">
+  <section id="ch5" class="fade-up" data-chapter="What day is it?">
     <div class="chapter-eyebrow">Section five</div>
-    <h2 class="chapter-title">What time is it where you are?</h2>
+    <h2 class="chapter-title">What day is it?</h2>
 
     <div class="date-card">
-      <span class="date-card-date">APR 4</span>
-      <span class="date-card-title">Nineteen Eighty-Four</span>
+      <span class="date-card-date">MAY 12, 1984</span>
+      <span class="date-card-title">The Terminator</span>
     </div>
 
     <div class="goal-panel">
@@ -849,52 +798,13 @@ pre:hover .copy-btn { opacity: 1; }
       <div class="goal-panel-text">"Today" depends on where you're standing.</div>
     </div>
 
-    <p class="chapter-opener">The home page showed the wrong date. The server was rendering UTC, the user was in Pacific time, and at 5pm on April 3rd in San Francisco, the page was showing events for April 4th. For a site whose entire value proposition is "what happened in fiction <em>today</em>," this is not a minor bug. It is the bug.</p>
+    <p class="chapter-opener">The very first time someone tested the site, the home page showed the wrong date. The server was in UTC. The user was in California. At 5pm on April 3rd in San Francisco, the page was cheerfully displaying events for April 4th. For a site whose entire reason to exist is "what happened in fiction <em>today</em>," there is no more fundamental bug.</p>
 
-    <p>The fix runs through three layers. A snippet of JavaScript reads the browser's timezone via <code>Intl.DateTimeFormat().resolvedOptions().timeZone</code> and stores it in a cookie called <code>tdif_timezone</code>. Django middleware picks up the cookie on every request and activates the timezone with <code>zoneinfo.ZoneInfo</code>. From there, <code>timezone.localdate()</code> returns the correct date everywhere in the application.</p>
+    <p>The fix is a small piece of JavaScript that reads the browser's timezone and stores it in a cookie. The server reads the cookie on every request and adjusts accordingly. A user in Tokyo and a user in New York see different events at midnight, and both see the right ones.</p>
 
-    <p>First visits are the awkward case. The cookie doesn't exist yet, so the server renders in UTC. The JavaScript detects this, sets the cookie, and reloads the page. The second load has the cookie, activates the correct timezone, and renders the right date. One flash of wrong content on the very first visit, then correct forever after.</p>
+    <p>The first visit is the awkward case -- no cookie yet, so the server guesses UTC, the JavaScript corrects it, and the page reloads once. After that, the cookie persists and every subsequent visit renders correctly with no flash.</p>
 
-    <p>Unless cookies are blocked. If the browser rejects the cookie, the JavaScript sets it, reloads, finds no cookie, sets it again, reloads -- an infinite loop. The fix: use <code>sessionStorage</code> as a reload guard. Before reloading, write a flag to <code>sessionStorage</code>. On load, check the flag. If it's there, don't reload again. <code>sessionStorage</code> survives a reload within the same tab and doesn't require cookies.</p>
-
-    <table class="scenario-table">
-      <thead>
-        <tr>
-          <th>Scenario</th>
-          <th>Cookie</th>
-          <th>sessionStorage</th>
-          <th>Result</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>Normal first visit</td>
-          <td>Set, reload</td>
-          <td>Guard set</td>
-          <td>Correct date on second load</td>
-        </tr>
-        <tr>
-          <td>Return visit</td>
-          <td>Already present</td>
-          <td>Not needed</td>
-          <td>Correct date immediately</td>
-        </tr>
-        <tr>
-          <td>Cookies blocked</td>
-          <td>Rejected</td>
-          <td>Guard prevents loop</td>
-          <td>UTC fallback, no crash</td>
-        </tr>
-        <tr>
-          <td>sessionStorage blocked</td>
-          <td>Rejected</td>
-          <td>Unavailable</td>
-          <td>Try/catch prevents loop, UTC fallback</td>
-        </tr>
-      </tbody>
-    </table>
-
-    <p>The middleware itself is deliberately minimal. Read the cookie, activate the timezone, move on. No database queries, no user-agent sniffing, no IP geolocation. The browser knows what timezone it's in. We just ask it.</p>
+    <p>Unless cookies are blocked. Then the JavaScript sets the cookie, reloads, finds no cookie, reloads again -- forever. An infinite loop, triggered by exactly the kind of privacy-conscious user you'd want to keep on your site. The fix is a single flag in the browser's session storage: "I already tried to reload once, don't do it again." One line of defense between a working website and a browser tab that spins until the heat death of the universe.</p>
   </section>
 
   <hr class="section-rule" />
@@ -913,18 +823,16 @@ pre:hover .copy-btn { opacity: 1; }
 
     <div class="goal-panel">
       <div class="goal-panel-label">What's next</div>
-      <div class="goal-panel-text">The features that make it sticky.</div>
+      <div class="goal-panel-text">Making it personal.</div>
     </div>
 
-    <p class="chapter-opener">The calendar is useful. But "what happened in fiction <em>on your birthday</em>" is personal. Enter your birth month and day -- stored in a cookie for guests, in the user profile for registered accounts -- and the app shows you your own permanent page of fictional events. The data is the same, but the frame changes everything. Nobody forgets their birthday.</p>
+    <p class="chapter-opener">The calendar is useful. But "what happened in fiction <em>on your birthday</em>" is personal. Enter your birth date and the app gives you your own permanent page of fictional events -- the same data, reframed around a date you'll never forget. It's the difference between a reference tool and something you share with your friends.</p>
 
-    <p>The public JSON API at <code>/api/v1/</code> was designed from day one, not bolted on later. Every event is available as structured data -- date fields, metadata IDs, cover image URLs, media types. The API exists because the database has value beyond a single web interface, and because the best way to attract partnerships is to make integration trivially easy.</p>
+    <p>The Works page takes the data in the other direction. Instead of "what happened on this date," it answers "what dates appear in this work." Every film and book gets its own page listing all its fictional dates in chronological order. <em>Back to the Future</em> alone spans four dates across 130 years -- 1885, 1955, 1985, 2015 -- all anchored to one fictional family. Seeing the full timeline laid out is more interesting than any single entry.</p>
 
-    <p>Laura E. Hall's "Dating the Movies" project is the most obvious parallel -- a carefully researched collection of specific dates mentioned in films, maintained by hand. It's the same intellectual project as ThisDayInFiction, built as editorial content rather than a database. A clean API makes a content partnership possible without either side needing to change how they work.</p>
+    <p>A public JSON API was designed from day one. Every event is available as structured data -- dates, metadata IDs, cover images, media types. The API exists because the database has value beyond a single web interface. Laura E. Hall's "Dating the Movies" is the most obvious parallel -- a carefully researched collection of film dates, maintained by hand as editorial content. It's the same intellectual project in a different form. A clean API makes collaboration possible without either side changing how they work.</p>
 
-    <p>The Works browse page takes the data in the other direction. Instead of "what happened on this date," it answers "what dates appear in this work." Every film and book with entries gets its own page listing all its fictional dates in chronological order. "All the dates in <em>Back to the Future</em>" is a search people actually make, and the answer is more interesting when you see the full timeline laid out -- 1885, 1955, 1985, 2015 -- four dates spanning 130 years, all anchored to one fictional family.</p>
-
-    <p>The database grows every day. The crowd-sourcing mechanics handle scale. The trust system handles quality. What the project needs now is density -- enough events on every date that the home page always delivers something surprising, whether you visit in January or July, whether you care about science fiction or period dramas. That density comes from contributors, and contributors come from a product worth contributing to. The loop either spins up or it doesn't. We're betting it spins.</p>
+    <p>What the project needs now is density. Enough events on every date that the home page always delivers something surprising, whether you visit in January or July, whether you care about science fiction or period dramas. The database grows every time someone remembers a date from a movie they love. The crowd-sourcing handles scale. The trust system handles quality. The rest is just time, and contributors who care enough to add one more entry to the calendar of things that never happened.</p>
   </section>
 
   <!-- ── Footer ──────────────────────────────────────────── -->

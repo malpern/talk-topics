@@ -188,15 +188,48 @@ strong { font-weight: 700; }
 
 /* ── Hero ────────────────────────────────────────────────── */
 .hero {
-  min-height: 80vh;
+  min-height: 90vh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-end;
   align-items: center;
   text-align: center;
   padding: 6rem 1.5rem 4rem;
-  background: linear-gradient(180deg, var(--bg) 0%, var(--paper) 100%);
   position: relative;
+  overflow: hidden;
+}
+.hero-posters {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 0;
+  z-index: 0;
+}
+.hero-posters img {
+  flex: 1;
+  min-width: 0;
+  object-fit: cover;
+  object-position: top center;
+  opacity: 0.35;
+  filter: grayscale(0.4) contrast(1.1);
+}
+.hero-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(20,18,24,0.3) 0%,
+    rgba(20,18,24,0.65) 40%,
+    rgba(20,18,24,0.92) 75%,
+    var(--bg) 100%
+  );
+  z-index: 1;
+}
+.hero-content {
+  position: relative;
+  z-index: 2;
 }
 .hero-eyebrow {
   font-family: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, monospace;
@@ -211,6 +244,7 @@ strong { font-weight: 700; }
   color: var(--fg);
   margin-bottom: 0.3em;
   letter-spacing: 0.03em;
+  text-shadow: 0 2px 30px rgba(0,0,0,0.5);
 }
 .hero-subtitle {
   font-style: italic;
@@ -218,30 +252,18 @@ strong { font-weight: 700; }
   color: var(--fg-muted);
   max-width: 44ch;
   line-height: 1.6;
-  margin-bottom: 2.5rem;
+  margin: 0 auto 2rem;
 }
-.hero-filmstrip {
-  display: flex;
-  gap: 0.6rem;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.hero-filmstrip img {
-  height: 80px;
-  width: auto;
-  border-radius: 4px;
-  border: 1px solid var(--rule);
-  opacity: 0.8;
-  transition: opacity 0.2s;
-  object-fit: cover;
-}
-.hero-filmstrip img:hover { opacity: 1; }
 .hero-author {
-  margin-top: 2rem;
+  margin-top: 1rem;
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 0.8rem;
   color: var(--fg-quiet);
   letter-spacing: 0.04em;
+}
+@media (max-width: 720px) {
+  .hero { min-height: 70vh; }
+  .hero-posters img:nth-child(4) { display: none; }
 }
 
 /* ── Intro prose ─────────────────────────────────────────── */
@@ -594,16 +616,19 @@ pre:hover .copy-btn { opacity: 1; }
 
 <!-- ── Hero ───────────────────────────────────────────────── -->
 <header class="hero" id="hero">
-  <span class="hero-eyebrow">A Django + HTMX project</span>
-  <h1>Dates That Don't Exist</h1>
-  <p class="hero-subtitle">Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway.</p>
-  <div class="hero-filmstrip">
-    <img src="https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg" alt="Back to the Future poster" loading="lazy" />
-    <img src="https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg" alt="The Terminator poster" loading="lazy" />
-    <img src="https://image.tmdb.org/t/p/w500/fPtlCO1yQtnoLHOwKtWz7db6RGU.jpg" alt="The Fifth Element poster" loading="lazy" />
-    <img src="https://image.tmdb.org/t/p/w500/hEjK9A9BkNXejFW4tfacVAEHtkn.jpg" alt="Rocky poster" loading="lazy" />
+  <div class="hero-posters" aria-hidden="true">
+    <img src="https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg" alt="" loading="eager" />
+    <img src="https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg" alt="" loading="eager" />
+    <img src="https://image.tmdb.org/t/p/w500/fPtlCO1yQtnoLHOwKtWz7db6RGU.jpg" alt="" loading="eager" />
+    <img src="https://image.tmdb.org/t/p/w500/hEjK9A9BkNXejFW4tfacVAEHtkn.jpg" alt="" loading="eager" />
   </div>
-  <p class="hero-author">A project by <a href="https://github.com/PeterTheobald" style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);">Peter Theobald</a> (<a href="https://youtube.com/@ControlAltPete" style="color:var(--fg-muted);text-decoration:none;">@ControlAltPete</a>)</p>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <span class="hero-eyebrow">A Django + HTMX project</span>
+    <h1>Dates That Don't Exist</h1>
+    <p class="hero-subtitle">Fictional dates break your date library, resist your metadata APIs, and require a crowd to get right. We built a Django app to wrangle them anyway.</p>
+    <p class="hero-author">A project by <a href="https://github.com/PeterTheobald" style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);">Peter Theobald</a> (<a href="https://youtube.com/@ControlAltPete" style="color:var(--fg-muted);text-decoration:none;">@ControlAltPete</a>)</p>
+  </div>
 </header>
 
 <!-- ── Main content ──────────────────────────────────────── -->

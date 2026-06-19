@@ -3,344 +3,165 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Six Hundred Pages on a Four-Inch Screen — An MIT Textbook, Reflowed</title>
-<meta name="description" content="Turning MIT's 320-page 6.01 textbook into a clean, reflowable e-ink EPUB: a state-of-the-art OCR pipeline, a macOS loader bug, 1,030 equations, and an R that thought it was a real number." />
+<title>How to Turn a PDF Textbook into a Pocket EPUB</title>
+<meta name="description" content="A short, practical guide: convert a 320-page technical PDF into a clean, reflowable EPUB for a 4-inch pocket e-ink reader — using Marker, pandoc, and epubcheck." />
 <meta name="author" content="Micah Alpern (malpern)" />
 
 <!-- Open Graph -->
 <meta property="og:type" content="article" />
-<meta property="og:title" content="Six Hundred Pages on a Four-Inch Screen" />
-<meta property="og:description" content="Turning MIT's 320-page 6.01 textbook into a clean, reflowable e-ink EPUB — OCR, MathML, and the bugs in between." />
+<meta property="og:title" content="How to Turn a PDF Textbook into a Pocket EPUB" />
+<meta property="og:description" content="A short, practical guide to converting a technical PDF into a clean, reflowable EPUB for a pocket e-ink reader." />
 <meta property="og:site_name" content="Hacker Dojo · Talk Topics" />
-<meta property="og:image" content="assets/cover.png" />
-<meta property="article:author" content="Micah Alpern" />
-<meta property="article:published_time" content="2026-06-19" />
+<meta property="og:image" content="assets/source-page.png" />
 
 <!-- Twitter Card -->
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Six Hundred Pages on a Four-Inch Screen" />
-<meta name="twitter:description" content="Turning MIT's 320-page 6.01 textbook into a clean, reflowable e-ink EPUB — OCR, MathML, and the bugs in between." />
-<meta name="twitter:image" content="assets/cover.png" />
+<meta name="twitter:title" content="How to Turn a PDF Textbook into a Pocket EPUB" />
+<meta name="twitter:description" content="A short, practical guide to converting a technical PDF into a clean, reflowable EPUB for a pocket e-ink reader." />
+<meta name="twitter:image" content="assets/source-page.png" />
 
 <!-- JSON-LD -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "TechArticle",
-  "headline": "Six Hundred Pages on a Four-Inch Screen",
-  "description": "Turning MIT's 320-page 6.01 textbook into a clean, reflowable e-ink EPUB: a state-of-the-art OCR pipeline, a macOS loader bug, 1,030 equations, and an R that thought it was a real number.",
-  "author": {
-    "@type": "Person",
-    "name": "Micah Alpern",
-    "alternateName": "malpern",
-    "url": "https://github.com/malpern"
-  },
+  "@type": "HowTo",
+  "name": "Convert a PDF textbook into a reflowable EPUB for a pocket e-ink reader",
+  "description": "Extract a technical PDF with Marker, clean the Markdown, and build a reflowable EPUB with pandoc, validated by epubcheck.",
+  "author": { "@type": "Person", "name": "Micah Alpern", "alternateName": "malpern", "url": "https://github.com/malpern" },
   "datePublished": "2026-06-19",
-  "publisher": { "@type": "Organization", "name": "Hacker Dojo Python Meetup" },
-  "proficiencyLevel": "Intermediate",
-  "dependencies": "Marker (Surya), pandoc, epubcheck, Python 3.12, Pillow"
+  "tool": ["Marker (Surya OCR)", "pandoc", "epubcheck", "Python 3.12", "Pillow"]
 }
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=JetBrains+Mono:wght@400;500&display=swap');
 
-/* ── Design tokens ───────────────────────────────────────── */
 :root {
-  --bg: #12141a;
-  --paper: #191c24;
-  --fg: #eef1f4;
-  --fg-soft: #cdd2da;
-  --fg-muted: #858b97;
-  --fg-quiet: #565b66;
-  --rule: #262a33;
-  --accent: #74b8c7;          /* e-ink slate-cyan */
-  --accent-soft: rgba(116,184,199,0.12);
-  --code-bg: #0b0c10;
-  --code-fg: #dde2e8;
-  --callout-bg: #171a21;
+  --bg: #12141a; --paper: #191c24; --fg: #eef1f4; --fg-soft: #cdd2da;
+  --fg-muted: #858b97; --fg-quiet: #565b66; --rule: #262a33;
+  --accent: #74b8c7; --accent-soft: rgba(116,184,199,0.12);
+  --code-bg: #0b0c10; --code-fg: #dde2e8; --callout-bg: #171a21;
+  --eink: #f3f1ea;
 }
-
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-html {
-  font-size: 19px;
-  scroll-behavior: smooth;
-  hanging-punctuation: first last;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-body {
-  background: var(--bg);
-  color: var(--fg);
-  font-family: Charter, "Iowan Old Style", Georgia, ui-serif, serif;
-  font-feature-settings: "kern", "liga", "calt", "onum";
-  line-height: 1.72;
-}
-
-h1, h2, h3 {
-  font-family: "Bebas Neue", Impact, sans-serif;
-  font-weight: 400;
-  line-height: 1.1;
-  letter-spacing: 0.02em;
-  text-wrap: balance;
-}
-p, li, blockquote { text-wrap: pretty; orphans: 3; widows: 3; }
-a {
-  color: var(--accent);
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  transition: color 0.15s;
-}
+html { font-size: 19px; scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { background: var(--bg); color: var(--fg); font-family: Charter, "Iowan Old Style", Georgia, ui-serif, serif; line-height: 1.7; }
+h1, h2, h3 { font-family: "Bebas Neue", Impact, sans-serif; font-weight: 400; line-height: 1.1; letter-spacing: 0.02em; text-wrap: balance; }
+p, li { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 3px; transition: color 0.15s; }
 a:hover { color: var(--fg); }
 strong { font-weight: 700; color: var(--fg); }
+.page { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 5rem; }
 
-.page { max-width: 720px; margin: 0 auto; padding: 0 1.5rem 6rem; }
-
-/* ── Sticky chapter nav ──────────────────────────────────── */
-.chapter-nav {
-  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-  background: var(--paper); border-bottom: 1px solid var(--rule);
-  transform: translateY(-100%); transition: transform 0.3s ease;
-  font-family: system-ui, -apple-system, sans-serif;
-}
-.chapter-nav.visible { transform: translateY(0); }
-.chapter-nav-inner {
-  max-width: 720px; margin: 0 auto; padding: 0.6rem 1.5rem;
-  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
-}
-.chapter-nav-title {
-  font-size: 0.82rem; color: var(--fg-muted); white-space: nowrap;
-  overflow: hidden; text-overflow: ellipsis; min-width: 0; flex: 1;
-}
-.chapter-nav-links { display: flex; gap: 0.75rem; flex-shrink: 0; }
-.chapter-nav-links a {
-  font-size: 0.78rem; color: var(--fg-quiet); text-decoration: none;
-  text-transform: uppercase; letter-spacing: 0.08em;
-}
-.chapter-nav-links a:hover { color: var(--accent); }
-.chapter-nav-progress {
-  position: absolute; bottom: 0; left: 0; height: 2px;
-  background: var(--accent); width: 0%; transition: width 0.1s linear;
-}
-
-/* ── Hero ────────────────────────────────────────────────── */
-.hero {
-  min-height: 90vh; display: flex; flex-direction: column;
-  justify-content: flex-end; align-items: center; text-align: center;
-  padding: 6rem 1.5rem 4rem; position: relative; overflow: hidden;
-}
-.hero-figs {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  display: flex; justify-content: center; align-items: center; gap: 0; z-index: 0;
-  background: #f4f4f2;
-}
-.hero-figs img {
-  flex: 1; min-width: 0; height: 100%; object-fit: contain;
-  object-position: center; opacity: 0.5; padding: 2vh 1vw;
-  filter: contrast(1.05);
-  animation: fig-drift 32s ease-in-out infinite alternate;
-}
-.hero-figs img:nth-child(2) { animation-delay: -8s; }
-.hero-figs img:nth-child(3) { animation-delay: -16s; }
-.hero-figs img:nth-child(4) { animation-delay: -24s; }
-@keyframes fig-drift {
-  0% { transform: translateY(0) scale(1); }
-  100% { transform: translateY(-10px) scale(1.04); }
-}
-.hero-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(180deg,
-    rgba(18,20,26,0.55) 0%, rgba(18,20,26,0.78) 45%,
-    rgba(18,20,26,0.94) 78%, var(--bg) 100%);
-  z-index: 1; pointer-events: none;
-}
+/* Hero */
+.hero { min-height: 64vh; display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: center; text-align: center; padding: 5rem 1.5rem 3.5rem; position: relative; overflow: hidden; }
+.hero-figs { position: absolute; inset: 0; display: flex; justify-content: center; align-items: center; z-index: 0; background: #f4f4f2; }
+.hero-figs img { flex: 1; min-width: 0; height: 100%; object-fit: contain; opacity: 0.5; padding: 3vh 1vw;
+  animation: drift 32s ease-in-out infinite alternate; }
+.hero-figs img:nth-child(2){animation-delay:-10s;} .hero-figs img:nth-child(3){animation-delay:-20s;}
+@keyframes drift { 0%{transform:translateY(0) scale(1);} 100%{transform:translateY(-10px) scale(1.04);} }
+.hero-overlay { position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(180deg, rgba(18,20,26,0.55), rgba(18,20,26,0.8) 50%, var(--bg)); }
 .hero-content { position: relative; z-index: 2; }
-.hero-eyebrow {
-  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.2em;
-  color: var(--accent); margin-bottom: 1.5rem;
-}
-.hero h1 {
-  font-size: clamp(3rem, 9vw, 6.4rem); color: var(--fg);
-  margin-bottom: 0.3em; letter-spacing: 0.03em;
-  text-shadow: 0 2px 30px rgba(0,0,0,0.6);
-}
-.hero-subtitle {
-  font-style: italic; font-size: 1.15rem; color: var(--fg-soft);
-  max-width: 46ch; line-height: 1.6; margin: 0 auto 2rem;
-}
-.hero-author {
-  margin-top: 1rem; font-family: system-ui, -apple-system, sans-serif;
-  font-size: 0.8rem; color: var(--fg-quiet); letter-spacing: 0.04em;
-}
-@media (max-width: 720px) {
-  .hero { min-height: 72vh; }
-  .hero-figs img:nth-child(4) { display: none; }
-}
+.hero-eyebrow { font-family: "JetBrains Mono", monospace; font-size: 0.72rem; text-transform: uppercase;
+  letter-spacing: 0.2em; color: var(--accent); margin-bottom: 1.2rem; }
+.hero h1 { font-size: clamp(2.6rem, 8vw, 5.2rem); color: var(--fg); margin-bottom: 0.3em; text-shadow: 0 2px 30px rgba(0,0,0,0.6); }
+.hero-subtitle { font-style: italic; font-size: 1.1rem; color: var(--fg-soft); max-width: 44ch; margin: 0 auto 1.5rem; }
+.hero-author { font-family: system-ui, sans-serif; font-size: 0.8rem; color: var(--fg-quiet); }
+.hero-author a { color: var(--accent); text-decoration: none; border-bottom: 1px solid var(--accent); }
 
-/* ── Intro / TOC / sections (shared with the series template) ── */
-.intro { margin-top: 4rem; margin-bottom: 3rem; }
-.intro p { font-size: 1.05rem; color: var(--fg-soft); margin-bottom: 1.4em; }
+.intro { margin: 3rem 0 2.5rem; }
+.intro p { color: var(--fg-soft); margin-bottom: 1.2em; font-size: 1.05rem; }
 
-.stat-row {
-  display: flex; flex-wrap: wrap; gap: 1.5rem; justify-content: center;
-  margin: 2.5rem 0 1rem; font-family: system-ui, sans-serif;
-}
-.stat { text-align: center; }
-.stat-num {
-  font-family: "Bebas Neue", Impact, sans-serif; font-size: 2.6rem;
-  color: var(--accent); line-height: 1;
-}
-.stat-label {
-  font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.14em;
-  color: var(--fg-quiet); margin-top: 0.3rem;
-}
+h2.sec { font-size: clamp(1.8rem, 4.5vw, 2.6rem); color: var(--fg); margin: 3rem 0 0.4rem; }
+.sec-eyebrow { font-family: system-ui, sans-serif; font-size: 0.68rem; text-transform: uppercase;
+  letter-spacing: 0.18em; color: var(--accent); margin-top: 2.5rem; }
+.page p { color: var(--fg-soft); margin-bottom: 1.1em; }
 
-.toc {
-  border: 1px solid var(--rule); border-radius: 6px; padding: 1.8rem 2rem;
-  margin-bottom: 4rem; background: var(--callout-bg);
-}
-.toc-label {
-  font-family: system-ui, sans-serif; font-size: 0.7rem; text-transform: uppercase;
-  letter-spacing: 0.16em; color: var(--fg-quiet); margin-bottom: 1rem;
-  font-variant-caps: all-small-caps;
-}
-.toc ol { list-style: none; counter-reset: toc-counter; padding: 0; }
-.toc li { counter-increment: toc-counter; margin-bottom: 0.5em; }
-.toc li a {
-  font-family: system-ui, sans-serif; font-size: 0.92rem; color: var(--fg-soft);
-  text-decoration: none; display: flex; align-items: baseline; gap: 0.8em;
-}
-.toc li a:hover { color: var(--accent); }
-.toc li a::before {
-  content: counter(toc-counter, decimal-leading-zero);
-  font-family: "JetBrains Mono", monospace; font-size: 0.78rem;
-  color: var(--fg-quiet); flex-shrink: 0;
-}
+/* Before / after compare */
+.compare { display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center; margin: 1.5rem 0 1rem; }
+.compare .col { text-align: center; }
+.compare .col img { width: 100%; border-radius: 4px; border: 1px solid var(--rule); }
+.compare .arrow { font-family: "JetBrains Mono", monospace; color: var(--accent); font-size: 1.6rem; }
+.compare .cap { font-family: system-ui, sans-serif; font-size: 0.7rem; color: var(--fg-muted); margin-top: 0.5rem; line-height: 1.4; }
 
-hr.section-rule {
-  border: none; text-align: center; margin: 4rem 0; color: var(--fg-quiet); overflow: visible;
-}
-hr.section-rule::after { content: "\2014\2014\2014"; font-size: 1.2rem; letter-spacing: 0.3em; }
+/* X4 device mockup */
+.device { width: 100%; max-width: 215px; margin: 0 auto; background: #15171c; border-radius: 16px;
+  padding: 12px 12px 30px; box-shadow: 0 14px 40px rgba(0,0,0,0.5); position: relative; border: 1px solid #2c2f37; }
+.device .screen { background: var(--eink); color: #1b1b1b; border-radius: 3px; padding: 11px 10px; height: 300px;
+  overflow: hidden; font-family: "Iowan Old Style", Georgia, serif; line-height: 1.42; position: relative; }
+.device .screen h4 { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.62rem; margin-bottom: 0.45em; color: #111; }
+.device .screen p { font-size: 0.56rem; text-align: justify; margin-bottom: 0.5em; color: #1b1b1b; hyphens: auto; }
+.device .screen math { font-size: 0.62rem; color: #111; }
+.device .screen .mini-eyebrow { font-family: "Helvetica Neue", Arial, sans-serif; font-size: 0.46rem;
+  text-transform: uppercase; letter-spacing: 0.12em; color: #777; }
+.device .screen::after { content: "47"; position: absolute; bottom: 5px; left: 0; right: 0; text-align: center;
+  font-family: "Helvetica Neue", sans-serif; font-size: 0.46rem; color: #999; }
+.device .btns { position: absolute; bottom: 9px; left: 0; right: 0; display: flex; justify-content: center; gap: 14px; }
+.device .btns span { width: 26px; height: 5px; border-radius: 3px; background: #2c2f37; }
 
-.chapter-eyebrow {
-  font-family: system-ui, sans-serif; font-size: 0.68rem; text-transform: uppercase;
-  letter-spacing: 0.18em; color: var(--fg-quiet); font-variant-caps: all-small-caps;
-  margin-bottom: 0.5rem;
-}
-.chapter-title { font-size: clamp(2rem, 5vw, 3rem); color: var(--fg); margin-bottom: 1.5rem; }
+/* Why-popular spec chips */
+.specs { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.2rem 0; font-family: "JetBrains Mono", monospace; }
+.specs span { font-size: 0.72rem; color: var(--accent); background: var(--accent-soft); border: 1px solid var(--rule);
+  padding: 0.25em 0.6em; border-radius: 999px; }
 
-.goal-panel {
-  border-left: 3px solid var(--accent); padding: 1rem 1.2rem; margin-bottom: 2rem;
-  background: var(--callout-bg); border-radius: 0 4px 4px 0;
-}
-.goal-panel-label {
-  font-family: system-ui, sans-serif; font-size: 0.68rem; text-transform: uppercase;
-  letter-spacing: 0.16em; color: var(--accent); font-variant-caps: all-small-caps;
-  margin-bottom: 0.3rem;
-}
-.goal-panel-text { font-size: 0.95rem; color: var(--fg-soft); line-height: 1.5; }
+/* Steps */
+ol.steps { list-style: none; counter-reset: step; padding: 0; margin: 1rem 0; }
+ol.steps > li { counter-increment: step; position: relative; padding-left: 3rem; margin-bottom: 2rem; }
+ol.steps > li::before { content: counter(step); position: absolute; left: 0; top: -0.1rem;
+  font-family: "Bebas Neue", sans-serif; font-size: 1.7rem; color: var(--accent);
+  width: 2.1rem; height: 2.1rem; border: 1px solid var(--accent); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; }
+ol.steps h3 { font-size: 1.25rem; color: var(--fg); margin-bottom: 0.3rem; }
+ol.steps p { margin-bottom: 0.6em; }
 
-figure.fig { margin: 2rem 0; }
-figure.fig img {
-  width: 100%; background: #f4f4f2; border-radius: 6px; border: 1px solid var(--rule);
-  padding: 1rem;
-}
-figure.fig figcaption {
-  text-align: center; font-family: system-ui, sans-serif; font-size: 0.72rem;
-  color: var(--fg-muted); font-style: italic; margin-top: 0.8rem;
-}
-
-.chapter-opener::first-letter {
-  font-family: "Bebas Neue", Impact, sans-serif; float: left; font-size: 3.6em;
-  line-height: 0.8; padding-right: 0.08em; padding-top: 0.06em; color: var(--accent);
-}
-.page p { margin-bottom: 1.3em; color: var(--fg-soft); }
-
-code {
-  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 0.82em;
-  background: var(--accent-soft); padding: 0.15em 0.35em; border-radius: 3px; color: var(--accent);
-}
-pre {
-  background: var(--code-bg); color: var(--code-fg); padding: 1.4rem 1.6rem;
-  border-radius: 6px; overflow-x: auto;
-  font-family: "JetBrains Mono", ui-monospace, Menlo, monospace; font-size: 0.78rem;
-  line-height: 1.65; margin-bottom: 1.6em; position: relative; border: 1px solid var(--rule); tab-size: 4;
-}
-pre code { background: none; padding: 0; border-radius: 0; color: var(--code-fg); font-size: inherit; }
+pre { background: var(--code-bg); color: var(--code-fg); padding: 1.1rem 1.2rem; border-radius: 6px; overflow-x: auto;
+  font-family: "JetBrains Mono", monospace; font-size: 0.74rem; line-height: 1.6; margin: 0.6em 0; border: 1px solid var(--rule); position: relative; }
+pre code { background: none; padding: 0; color: var(--code-fg); }
+code { font-family: "JetBrains Mono", monospace; font-size: 0.82em; background: var(--accent-soft); padding: 0.12em 0.35em; border-radius: 3px; color: var(--accent); }
 .c-com { color: #565b66; font-style: italic; }
-.c-str { color: #8fd0a0; }
 .c-key { color: var(--accent); }
-.c-err { color: #e89a8a; }
-
-.copy-btn {
-  position: absolute; top: 0.5rem; right: 0.5rem; background: var(--rule); border: none;
-  color: var(--fg-quiet); font-family: system-ui, sans-serif; font-size: 0.68rem;
-  padding: 0.3em 0.6em; border-radius: 3px; cursor: pointer; opacity: 0;
-  transition: opacity 0.15s; text-transform: uppercase; letter-spacing: 0.06em;
-}
+.copy-btn { position: absolute; top: 0.45rem; right: 0.45rem; background: var(--rule); border: none; color: var(--fg-quiet);
+  font-family: system-ui, sans-serif; font-size: 0.64rem; padding: 0.25em 0.55em; border-radius: 3px; cursor: pointer; opacity: 0; transition: opacity 0.15s; text-transform: uppercase; letter-spacing: 0.06em; }
 pre:hover .copy-btn { opacity: 1; }
-.copy-btn:hover { color: var(--fg); background: var(--fg-quiet); }
 
-.scenario-table {
-  width: 100%; border-collapse: collapse; margin-bottom: 1.6em;
-  font-family: system-ui, sans-serif; font-size: 0.82rem;
-}
-.scenario-table th {
-  text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--fg-quiet); border-bottom: 2px solid var(--rule); padding: 0.6em 0.8em;
-}
-.scenario-table td { border-bottom: 1px solid var(--rule); padding: 0.6em 0.8em; color: var(--fg-soft); }
-.scenario-table td:last-child { color: var(--accent); font-family: "JetBrains Mono", monospace; }
+.callout { border-left: 3px solid var(--accent); background: var(--callout-bg); padding: 1rem 1.2rem; border-radius: 0 4px 4px 0; margin: 1.2rem 0; }
+.callout ul { margin: 0.3rem 0 0 1.1rem; }
+.callout li { color: var(--fg-soft); font-size: 0.95rem; margin-bottom: 0.5em; }
 
-.fade-up { opacity: 0; transform: translateY(24px); transition: opacity 0.6s ease, transform 0.6s ease; }
+figure.shot { margin: 1.5rem 0; }
+figure.shot figcaption { text-align: center; font-family: system-ui, sans-serif; font-size: 0.72rem; color: var(--fg-muted); font-style: italic; margin-top: 0.7rem; }
+
+.fade-up { opacity: 0; transform: translateY(20px); transition: opacity 0.6s ease, transform 0.6s ease; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
 
-.page-footer {
-  border-top: 1px solid var(--rule); padding-top: 2rem; margin-top: 4rem; text-align: center;
-  font-family: system-ui, sans-serif; font-size: 0.78rem; color: var(--fg-quiet); line-height: 1.8;
-}
+.page-footer { border-top: 1px solid var(--rule); padding-top: 2rem; margin-top: 4rem; text-align: center;
+  font-family: system-ui, sans-serif; font-size: 0.78rem; color: var(--fg-quiet); line-height: 1.8; }
 .page-footer a { color: var(--fg-muted); }
 
-@media (max-width: 720px) {
+@media (max-width: 640px) {
   html { font-size: 17px; }
-  .hero { min-height: 62vh; padding: 4rem 1.2rem 3rem; }
-  .hero h1 { font-size: clamp(2.4rem, 11vw, 4rem); }
-  .page { padding: 0 1rem 4rem; }
-  pre { font-size: 0.72rem; padding: 1rem; }
-  .toc { padding: 1.2rem 1.4rem; }
-  .stat-row { gap: 1rem; }
+  .compare { grid-template-columns: 1fr; }
+  .compare .arrow { transform: rotate(90deg); }
+  ol.steps > li { padding-left: 2.6rem; }
 }
 </style>
 </head>
-
 <body>
 
-<nav class="chapter-nav" id="chapterNav" aria-label="Section navigation">
-  <div class="chapter-nav-inner">
-    <span class="chapter-nav-title" id="navTitle"></span>
-    <div class="chapter-nav-links">
-      <a href="#" id="navPrev" aria-label="Previous section">Prev</a>
-      <a href="#" id="navNext" aria-label="Next section">Next</a>
-    </div>
-  </div>
-  <div class="chapter-nav-progress" id="navProgress"></div>
-</nav>
-
-<header class="hero" id="hero">
+<header class="hero">
   <div class="hero-figs" aria-hidden="true">
-    <img src="assets/_page_114_Figure_3.jpeg" alt="" loading="eager" />
-    <img src="assets/_page_236_Figure_3.jpeg" alt="" loading="eager" />
-    <img src="assets/_page_119_Figure_8.jpeg" alt="" loading="eager" />
-    <img src="assets/_page_57_Figure_3.jpeg" alt="" loading="eager" />
+    <img src="assets/_page_114_Figure_3.jpeg" alt="" />
+    <img src="assets/_page_236_Figure_3.jpeg" alt="" />
+    <img src="assets/_page_57_Figure_3.jpeg" alt="" />
   </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
-    <span class="hero-eyebrow">A PDF → EPUB pipeline</span>
-    <h1>Six Hundred Pages,<br/>Four-Inch Screen</h1>
-    <p class="hero-subtitle">MIT's 6.01 textbook is 320 pages of prose, Python, circuit diagrams, and equations. I wanted to read it on a 4-inch e-reader. Here's everything that broke on the way to a clean EPUB.</p>
-    <p class="hero-author">A project by <a href="https://github.com/malpern" style="color:var(--accent);text-decoration:none;border-bottom:1px solid var(--accent);">Micah Alpern</a></p>
+    <span class="hero-eyebrow">A how-to · PDF → EPUB</span>
+    <h1>PDF Textbook → Pocket EPUB</h1>
+    <p class="hero-subtitle">How I turned MIT's 320-page 6.01 textbook into a clean, reflowable EPUB for a 4-inch e-ink reader — and how you can do it to any PDF.</p>
+    <p class="hero-author">by <a href="https://github.com/malpern">Micah Alpern</a></p>
   </div>
 </header>
 
@@ -348,206 +169,103 @@ pre:hover .copy-btn { opacity: 1; }
 <article class="page">
 
   <div class="intro fade-up">
-    <p>I have a 4-inch e-paper reader — an 800&times;480 grayscale panel about the size of a deck of cards. It is a wonderful object for reading prose and a hostile environment for everything else. PDFs are the worst case: a 320-page technical textbook laid out for US Letter, rendered onto a screen a fifth the width, is a pinch-zoom nightmare.</p>
-
-    <p>The book I wanted on it was <a href="https://ocw.mit.edu/courses/6-01sc-introduction-to-electrical-engineering-and-computer-science-i-spring-2011/">MIT 6.01SC — Introduction to EECS I</a>, the OpenCourseWare textbook. The goal was a <strong>reflowable</strong> EPUB: text that rewraps to the screen, fonts the reader can resize, a real table of contents, and — the hard part — the equations, code, and circuit diagrams surviving the trip. Visual fidelity was negotiable. The reading experience was not.</p>
-
-    <div class="stat-row">
-      <div class="stat"><div class="stat-num">320</div><div class="stat-label">PDF pages</div></div>
-      <div class="stat"><div class="stat-num">1,030</div><div class="stat-label">equations → MathML</div></div>
-      <div class="stat"><div class="stat-num">217</div><div class="stat-label">figures</div></div>
-      <div class="stat"><div class="stat-num">9 / 9</div><div class="stat-label">EPUBs valid</div></div>
-    </div>
+    <p>I picked up a <strong>4.3-inch pocket e-ink reader</strong> and immediately hit the catch: PDFs don't reflow. A 320-page textbook laid out for US&nbsp;Letter, squeezed onto a 480-pixel-wide screen, is a pinch-zoom nightmare. The fix is to convert the PDF into a <strong>reflowable EPUB</strong> — text that rewraps to the screen, with resizable fonts. Here's the whole recipe, short enough to follow in an afternoon.</p>
   </div>
 
-  <nav class="toc fade-up" aria-label="Table of contents">
-    <div class="toc-label">Seven sections</div>
-    <ol>
-      <li><a href="#ch1">The four-inch problem</a></li>
-      <li><a href="#ch2">Picking a brain</a></li>
-      <li><a href="#ch3">The Mac that wouldn't load SciPy</a></li>
-      <li><a href="#ch4">Ninety-eight minutes</a></li>
-      <li><a href="#ch5">The R that thought it was a real number</a></li>
-      <li><a href="#ch6">The footnote that broke the book</a></li>
-      <li><a href="#ch7">Built to re-run</a></li>
-    </ol>
-  </nav>
-
-  <!-- 1 -->
-  <section id="ch1" class="fade-up" data-chapter="The four-inch problem">
-    <div class="chapter-eyebrow">Section one</div>
-    <h2 class="chapter-title">The four-inch problem</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The goal</div>
-      <div class="goal-panel-text">A reflowable EPUB — not a shrunk-down PDF — that keeps chapters, equations, figures, and code, and throws away page furniture.</div>
+  <!-- The device / why pocket e-ink -->
+  <div class="sec-eyebrow fade-up">The reader</div>
+  <h2 class="sec fade-up">Why a pocket e-ink reader</h2>
+  <div class="fade-up">
+    <p>The device is an <a href="https://www.xteink.com/products/xteink-x4">Xteink&nbsp;X4</a> — part of a wave of tiny, cheap e-readers that have caught on for one reason: they make reading <em>frictionless</em>. E-ink is easy on the eyes and readable in sunlight, there's no backlight glare and nothing to notify you, the battery lasts roughly two weeks, and it's small enough to live in a pocket. The X4 even ships with magnetic rings so it sticks to the back of your phone. At around $55 it's an impulse buy, which is most of why these little readers are having a moment.</p>
+    <div class="specs">
+      <span>4.3″ E Ink</span><span>800×480 · 220ppi</span><span>74 g</span><span>5.9 mm thin</span><span>~14-day battery</span><span>button nav</span><span>≈ $55</span>
     </div>
+    <p>The trade-off: a small, grayscale, non-touch screen. So the conversion has to optimize for exactly that — small images, grayscale, reflow, big-enough text.</p>
+  </div>
 
-    <p class="chapter-opener">A PDF is a description of ink on a fixed page. An EPUB is a description of a <em>document</em> — headings, paragraphs, figures — that a reader lays out however it likes. Converting one to the other is really an act of <em>re-interpretation</em>: you have to recover the structure the PDF threw away when it froze everything into coordinates.</p>
+  <!-- Before / after -->
+  <div class="sec-eyebrow fade-up">The result</div>
+  <h2 class="sec fade-up">Before &amp; after</h2>
+  <p class="fade-up">Same chapter, two formats. On the left, the original PDF page — fixed US-Letter layout, a running header (<code>6.01 — Spring 2011 …</code>), and a page number. On the right, the produced EPUB on the X4: the page furniture is gone, the text reflows to the narrow screen, the equation is real (resizable) math, and you turn pages with a button.</p>
 
-    <p>For a novel that's easy; it's all one column of prose. For a technical textbook it's genuinely hard. The 6.01 book has section numbering four levels deep, hundreds of Python listings, 200-plus circuit and state-machine diagrams, and equations on nearly every page of the signals chapter. Each of those is a different failure mode. And running across the top of every page is the same banner — <code>6.01 — Spring 2011 — April 25, 2011</code> and a page number — that I needed to <em>not</em> end up sprinkled through the reading text.</p>
-
-    <p>So the requirements list wrote itself: reflowable EPUB3, preserved heading hierarchy, a hierarchical TOC, figures kept with their captions, equations as real math (not screenshots), code that wraps instead of running off the screen, grayscale images sized for 480 pixels, resizable fonts, and every scrap of page furniture removed. Then: prove it's all there.</p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 2 -->
-  <section id="ch2" class="fade-up" data-chapter="Picking a brain">
-    <div class="chapter-eyebrow">Section two</div>
-    <h2 class="chapter-title">Picking a brain</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The decision</div>
-      <div class="goal-panel-text">For a textbook, the extractor lives or dies on two things: equations and figures. That picks the tool.</div>
+  <div class="compare fade-up">
+    <div class="col">
+      <img src="assets/source-page.png" alt="A page of the original MIT 6.01 PDF — dense US-Letter layout with a running header and page number" loading="lazy" />
+      <div class="cap">SOURCE PDF — fixed layout, page furniture, doesn't reflow</div>
     </div>
-
-    <p class="chapter-opener">The naive approach is <code>pdftotext</code>. It is fast, it is everywhere, and on this book it produces garbage: equations flatten into word-soup, figures vanish, and two-column reasoning interleaves into nonsense. The text layer is there, but the <em>structure</em> isn't.</p>
-
-    <p>The modern approach is a machine-learning document parser. Two lead the field: <a href="https://github.com/docling-project/docling">Docling</a> (IBM) and <a href="https://github.com/datalab-to/marker">Marker</a> (built on the Surya OCR models). Both detect layout, reading order, tables, and math with neural models rather than heuristics. I chose Marker for one reason that matters enormously here: it emits <strong>equations as LaTeX</strong> and extracts every figure as its own image file, with reading order intact. For a book that is one-third math and diagrams, that's the whole game. The cost — and it is real — is speed: Marker runs vision models over every page.</p>
-
-    <p>The downstream half of the pipeline was never in doubt. <a href="https://pandoc.org">pandoc</a> turns Markdown into a standards-clean EPUB3, converts LaTeX math into <strong>MathML</strong> (which scales with the reader's font instead of being a fixed-size picture), builds the navigation TOC, and can split the book into one file per chapter. And <a href="https://www.w3.org/publishing/epubcheck/">epubcheck</a>, the reference validator, would be the judge at the end. The shape of the pipeline: <code>Marker → Markdown → repair → pandoc → epubcheck</code>.</p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 3 -->
-  <section id="ch3" class="fade-up" data-chapter="The Mac that wouldn't load SciPy">
-    <div class="chapter-eyebrow">Section three</div>
-    <h2 class="chapter-title">The Mac that wouldn't load SciPy</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The yak</div>
-      <div class="goal-panel-text">Before extracting a single page, the ML stack refused to even import. A loader bug from the future.</div>
+    <div class="arrow" aria-hidden="true">→</div>
+    <div class="col">
+      <div class="device" role="img" aria-label="The produced EPUB shown on the Xteink X4 e-reader: a reflowed chapter with a heading, paragraph, and a real equation">
+        <div class="screen">
+          <div class="mini-eyebrow">Chapter 1 · Course Overview</div>
+          <h4>1.3 &nbsp;Voltage dividers</h4>
+          <p>We can use the abstraction of a voltage divider to find the voltage across a component. For two resistors in series,</p>
+          <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mtext mathvariant="normal">out</mtext></msub><mo>=</mo><mfrac><msub><mi>R</mi><mi>B</mi></msub><mrow><msub><mi>R</mi><mi>A</mi></msub><mo>+</mo><msub><mi>R</mi><mi>B</mi></msub></mrow></mfrac><msub><mi>V</mi><mtext mathvariant="normal">in</mtext></msub><mspace width="0.222em"></mspace><mi>.</mi></mrow><annotation encoding="application/x-tex">V_{\text{out}} = \frac{R_B}{R_A + R_B} V_{\text{in}} \ . </annotation></semantics></math>
+          <p>The output voltage is the input scaled by the ratio of the resistances — the building block for the rest of the chapter.</p>
+        </div>
+        <div class="btns" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+      <div class="cap">PRODUCED EPUB on the Xteink X4 — reflowed, furniture stripped, real MathML</div>
     </div>
+  </div>
+  <p class="fade-up" style="font-size:0.85rem;color:var(--fg-muted);">(The right-hand panel is a live mockup using the actual text and the real MathML equation from the generated EPUB.)</p>
 
-    <p class="chapter-opener">Marker was already installed. It crashed on import — not in its own code, but deep inside SciPy, pulled in transitively by the transformers library:</p>
+  <!-- How to -->
+  <div class="sec-eyebrow fade-up">The recipe</div>
+  <h2 class="sec fade-up">Convert your own PDF</h2>
+  <p class="fade-up">Five steps. The hard part — turning a fixed PDF into structured text with the equations and figures intact — is done by <a href="https://github.com/datalab-to/marker">Marker</a>, a machine-learning document parser. <a href="https://pandoc.org">pandoc</a> builds the EPUB; <a href="https://www.w3.org/publishing/epubcheck/">epubcheck</a> checks it.</p>
 
-    <pre><code><span class="c-err">ImportError</span>: dlopen(.../scipy/sparse/linalg/_propack/_spropack...so):
-  tried: '..._spropack...so' (section '__DATA/__thread_bss' has a
-  zero-fill section type, but offset field is not zero)</code></pre>
+  <ol class="steps fade-up">
+    <li>
+      <h3>Install the tools</h3>
+      <p>Marker needs Python <strong>3.12+</strong> (older wheels hit a loader bug on current macOS). pandoc and epubcheck come from Homebrew.</p>
+      <pre><code><span class="c-key">brew</span> install pandoc epubcheck
+<span class="c-key">python3.12</span> -m venv .venv &amp;&amp; <span class="c-key">source</span> .venv/bin/activate
+pip install marker-pdf pillow</code></pre>
+    </li>
+    <li>
+      <h3>Extract the PDF to Markdown</h3>
+      <p>Marker detects layout, reading order, tables, figures, and equations, and writes Markdown plus an image per figure. On an Apple-Silicon GPU set <code>TORCH_DEVICE=mps</code>. (It's not fast — a 320-page book took ~90 minutes.)</p>
+      <pre><code>marker_single book.pdf --output_dir out --output_format markdown</code></pre>
+    </li>
+    <li>
+      <h3>Clean up the Markdown</h3>
+      <p>The raw output needs light repair: strip running headers and page numbers, fix heading levels, reattach "Figure&nbsp;N" captions to their images, and tidy equations. A ~150-line Python script handles it (see <code>02_clean.py</code> in the repo) — the patterns are book-specific but small.</p>
+    </li>
+    <li>
+      <h3>Build the EPUB</h3>
+      <p>pandoc makes a reflowable EPUB3, turns LaTeX math into <strong>MathML</strong> (scales with the font instead of being a fixed image), builds the TOC, and splits chapters. Disabling raw HTML keeps stray OCR tags from breaking the file.</p>
+      <pre><code>pandoc clean.md \
+  --from=markdown<span class="c-key">-raw_html</span>+tex_math_dollars+superscript+subscript \
+  --to=epub3 --mathml --toc --toc-depth=3 --split-level=1 \
+  --css=epub.css --epub-cover-image=cover.png \
+  -o book.epub</code></pre>
+    </li>
+    <li>
+      <h3>Validate &amp; load it</h3>
+      <p>Confirm it's a clean EPUB, then copy it to the reader over USB-C.</p>
+      <pre><code>epubcheck book.epub   <span class="c-com"># 0 errors / 0 warnings = ship it</span></code></pre>
+    </li>
+  </ol>
 
-    <p>That error is the macOS dynamic linker rejecting a Mach-O binary it considers malformed. The prebuilt SciPy wheel for Python 3.10 was compiled with an older toolchain; the newer, stricter <code>dyld</code> on this machine won't load it. Upgrading SciPy didn't help — every 3.10 wheel hit the same wall. The problem wasn't the version, it was the <em>interpreter generation</em>: the 3.10 wheels predate the toolchain the OS now insists on.</p>
+  <!-- Gotchas -->
+  <div class="sec-eyebrow fade-up">Lessons</div>
+  <h2 class="sec fade-up">What to watch for</h2>
+  <div class="callout fade-up">
+    <ul>
+      <li><strong>Use Python 3.12+.</strong> The 3.10 wheels for Marker's dependencies fail to load on current macOS (a <code>dyld</code> / SciPy error). A fresh 3.12 venv fixes it.</li>
+      <li><strong>Trust, but verify the OCR.</strong> On this book the model read the Signals chapter's <em>R</em> (delay) operator as <code>\Re</code> (real-part ℜ) 322 times. A one-line find-replace fixed every equation — but only because I read the text and confirmed the book never means "real part."</li>
+      <li><strong>Equations are MathML.</strong> Great readers render it beautifully; weak ones ignore it. If your device can't, regenerate with equations as small images instead.</li>
+      <li><strong>Grayscale &amp; shrink images.</strong> The screen is grayscale and ~480px wide; convert figures to gray and cap the long edge (~760px) to keep the file small and sharp.</li>
+      <li><strong>Hosting on GitHub Pages?</strong> Add a <code>.nojekyll</code> file, or any asset whose name starts with <code>_</code> silently 404s.</li>
+    </ul>
+  </div>
 
-    <p>The fix was to stop fighting the wheels and move up a Python. A fresh 3.12 virtual environment pulls 3.12-era wheels, built with the toolchain the loader expects:</p>
-
-    <pre><code><span class="c-key">python3.12</span> -m venv .venv
-<span class="c-key">source</span> .venv/bin/activate
-pip install marker-pdf      <span class="c-com"># 3.12 wheels load cleanly</span></code></pre>
-
-    <p>SciPy imported on the first try. It's a good reminder that "it doesn't import" is sometimes a packaging-and-platform problem wearing a Python-error costume — and that the cheapest fix is often a newer interpreter, not a night spent compiling from source.</p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 4 -->
-  <section id="ch4" class="fade-up" data-chapter="Ninety-eight minutes">
-    <div class="chapter-eyebrow">Section four</div>
-    <h2 class="chapter-title">Ninety-eight minutes</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The grind</div>
-      <div class="goal-panel-text">Layout, then OCR across 3,474 text regions, then equations, then tables. On a laptop GPU, it takes a while.</div>
-    </div>
-
-    <p class="chapter-opener">Marker runs in stages, and you watch them tick by: recognize layout on all 320 pages, then run text recognition across every detected region, then the equation model, then tables. On Apple-Silicon GPU acceleration (<code>TORCH_DEVICE=mps</code>) the whole book took <strong>98 minutes</strong> — most of it the OCR pass over 3,474 individual text regions at roughly one per second.</p>
-
-    <p>What came out the other side was genuinely good. The figures extracted as clean grayscale line art — here's a finite-state-machine diagram and a circuit, straight from the pipeline, untouched:</p>
-
-    <figure class="fig">
-      <img src="assets/_page_114_Figure_3.jpeg" alt="A finite state machine diagram with states 0–3 and labeled transitions, extracted from the textbook" loading="lazy" />
-      <figcaption>A state-machine diagram (Ch. 4) as extracted — crisp at 760px, legible on a 480px panel.</figcaption>
-    </figure>
-
-    <p>And the equations arrived as LaTeX, ready for pandoc to turn into MathML. By the numbers: the cleaned text held <strong>97% of the words</strong> in the PDF's own text layer — the missing 3% being exactly the running headers, page numbers, and the PDF's own table of contents that I <em>wanted</em> gone. 1,030 equations, 217 figures, 460 code blocks. A strong starting point — which is not the same as a finished one. The interesting bugs were hiding in the math.</p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 5 -->
-  <section id="ch5" class="fade-up" data-chapter="The R that thought it was a real number">
-    <div class="chapter-eyebrow">Section five</div>
-    <h2 class="chapter-title">The R that thought it was a real number</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The detective story</div>
-      <div class="goal-panel-text">One mis-read character, repeated 322 times, silently rewrote the math of an entire chapter.</div>
-    </div>
-
-    <p class="chapter-opener">The Signals and Systems chapter is built on a single operator: <strong>R</strong>, the delay (right-shift) operator. <code>RX</code> is the signal X delayed one step; <code>R²X</code> delays it two. Whole pages are algebra in R.</p>
-
-    <p>Scanning the extracted math, I noticed something off: the operator had been read not as the letter R but as <code>\Re</code> — the LaTeX command for the <em>real part</em> of a complex number, which renders as a fancy ℜ. The OCR model saw a stylized capital R and reached for the closest symbol it knew. It did this <strong>322 times</strong>. Every delay equation in the chapter was quietly wrong.</p>
-
-    <p>Before mass-editing a textbook's math, you verify the assumption. Could any of those be a genuine real-part operator? I read the chapter's complex-number sections: they use <code>j</code> for the imaginary unit and spell out "real part" in words. The real-part symbol is never used. Every single <code>\Re</code> was the delay operator. So the fix was safe, and surgical:</p>
-
-    <pre><code><span class="c-com"># Surya read the delay operator R as \Re (real-part). The book</span>
-<span class="c-com"># never uses real-part notation, so every \Re here is the operator.</span>
-seg = re.sub(r<span class="c-str">"\\Re(?![a-zA-Z])"</span>, r<span class="c-str">"\\mathrm{R}"</span>, seg)</code></pre>
-
-    <p>That one substitution corrected more equations than any other change in the project. It's also the part of the job a fully automated tool would have shipped wrong: the pipeline can't know that <em>this</em> book never means "real part." Catching it took reading the prose around the math — exactly the judgment call worth being a human for.</p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 6 -->
-  <section id="ch6" class="fade-up" data-chapter="The footnote that broke the book">
-    <div class="chapter-eyebrow">Section six</div>
-    <h2 class="chapter-title">The footnote that broke the book</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The cascade</div>
-      <div class="goal-panel-text">A garbled footnote marker produced fatal XHTML errors — and 120 phantom errors downstream. One decision fixed all of them.</div>
-    </div>
-
-    <p class="chapter-opener">The first build produced EPUBs, and epubcheck lit up red. The fatal one:</p>
-
-    <pre><code><span class="c-err">FATAL(RSC-016)</span>: The element type "p" must be terminated
-  by the matching end-tag "&lt;/p&gt;".</code></pre>
-
-    <p>The culprit was footnote markers. The OCR had rendered a superscript footnote number as broken inline HTML — literally <code>&lt;sup&gt;&amp;&lt;/sup&gt;lt;sup&gt;35&lt;/sup&gt;</code> — with an unbalanced closing tag. pandoc passed the raw HTML straight through, the stray <code>&lt;/sup&gt;</code> broke the paragraph, and the whole chapter file became invalid XHTML. Worse, that corruption rippled: 120 more errors about "fragment identifier not defined" in the navigation, because the broken markup had mangled the heading IDs the TOC pointed at.</p>
-
-    <p>I could have patched each bad footnote. The better fix was to change the contract. Those <code>&lt;sup&gt;</code> tags were the <em>only</em> HTML I actually wanted; everything else that looked like a tag was either OCR noise or, in this book, literal BNF grammar like <code>&lt;statement&gt;</code> and <code>&lt;booleanExpr&gt;</code> that <em>should</em> display as angle-bracket text. So I converted the real super/subscripts to native Markdown and told pandoc to stop trusting raw HTML entirely:</p>
-
-    <pre><code><span class="c-com"># real footnotes → native Markdown super/subscript</span>
-&lt;sup&gt;35&lt;/sup&gt;   →   ^35^
-<span class="c-com"># then build with raw HTML disabled, so every stray</span>
-<span class="c-com"># &lt;tag&gt; becomes harmless escaped text:</span>
-pandoc --from=markdown<span class="c-key">-raw_html</span>+tex_math_dollars+superscript+subscript ...</code></pre>
-
-    <p>That single flag fixed the fatal errors <em>and</em> the 120 phantom TOC errors at once — because the navigation IDs were only broken as a side effect of the bad markup. The grammar placeholders now render exactly as the textbook intends, and the math still becomes MathML, because <code>tex_math_dollars</code> is independent of HTML parsing. Final score: <strong>nine EPUBs, zero errors, zero warnings.</strong></p>
-  </section>
-
-  <hr class="section-rule" />
-
-  <!-- 7 -->
-  <section id="ch7" class="fade-up" data-chapter="Built to re-run">
-    <div class="chapter-eyebrow">Section seven</div>
-    <h2 class="chapter-title">Built to re-run</h2>
-    <div class="goal-panel">
-      <div class="goal-panel-label">The finish</div>
-      <div class="goal-panel-text">A one-command pipeline, a quality scorecard, and an honest list of what still needs a human.</div>
-    </div>
-
-    <p class="chapter-opener">Every fix lives in a script, not in a hand-edited file, so the whole thing reruns from the source PDF with one command. The pipeline stores a hash of the PDF and only re-runs the 98-minute extraction if the source actually changed; otherwise it jumps straight to cleanup and build. Page furniture stripped, headings rebuilt by section number, captions reattached to figures, images flattened to grayscale and capped at 760px, equations to MathML, then validated.</p>
-
-    <p>The result, graded honestly:</p>
-
-    <table class="scenario-table">
-      <thead><tr><th>Dimension</th><th>How it did</th><th>Score</th></tr></thead>
-      <tbody>
-        <tr><td>Validation</td><td>9/9 EPUBs, 0 errors / 0 warnings</td><td>A</td></tr>
-        <tr><td>Text accuracy</td><td>97% of PDF words; furniture removed</td><td>A</td></tr>
-        <tr><td>Equations</td><td>1,028 / 1,030 to MathML (99.8%)</td><td>A&minus;</td></tr>
-        <tr><td>Figures + captions</td><td>217 figures, captions reattached</td><td>A</td></tr>
-        <tr><td>Code blocks</td><td>460 blocks, indentation preserved, wraps</td><td>A</td></tr>
-        <tr><td>E-ink fit</td><td>reflowable, resizable, grayscale</td><td>A</td></tr>
-      </tbody>
-    </table>
-
-    <p>And the honest caveats, because a conversion report that claims perfection is lying: <strong>two</strong> equations out of 1,030 are malformed in the OCR and fall back to raw TeX — one probability matrix in the estimation chapter, one broken footnote superscript. The complex numbers in the signals chapter render in a fraktur font instead of italic — mathematically correct, stylistically quirky. And a handful of unnumbered sub-headings sit one level too high because Marker had no section number to infer depth from. For daily reading, none of these are blockers; they're a short, specific punch-list rather than a vague "needs review."</p>
-
-    <p>One thing I'd still verify on the actual hardware: the equations are MathML, which the best e-readers render beautifully and the worst ignore. If a given device can't, the same Markdown can regenerate the book with equations as small images instead. That's the quiet advantage of keeping the whole thing as a scripted pipeline over a pile of manual edits — the book isn't a one-off artifact, it's a build target. Change the source, run one command, get a fresh EPUB.</p>
-
-    <p style="margin-top:2rem;">The code, the scripts, and the full quality report are on <a href="https://github.com/malpern/mit6-01-eink-epub">GitHub</a>.</p>
-  </section>
+  <p class="fade-up" style="margin-top:2rem;">The full pipeline — scripts, the e-ink CSS, and a quality report — is on <a href="https://github.com/malpern/mit6-01-eink-epub">GitHub</a>. Point it at any PDF and run one command.</p>
 
   <footer class="page-footer">
-    <p>Six Hundred Pages on a Four-Inch Screen &mdash; <a href="https://github.com/malpern">Micah Alpern</a> &mdash; Hacker Dojo Python Meetup, 2026</p>
-    <p style="margin-top:0.5rem;color:var(--fg-quiet);">Source: <a href="https://ocw.mit.edu/courses/6-01sc-introduction-to-electrical-engineering-and-computer-science-i-spring-2011/">MIT 6.01SC OpenCourseWare</a> &middot; CC BY-NC-SA</p>
+    <p>PDF → Pocket EPUB &mdash; <a href="https://github.com/malpern">Micah Alpern</a> &mdash; Hacker Dojo Python Meetup, 2026</p>
+    <p style="margin-top:0.5rem;">Source text: <a href="https://ocw.mit.edu/courses/6-01sc-introduction-to-electrical-engineering-and-computer-science-i-spring-2011/">MIT 6.01SC OpenCourseWare</a> · CC BY-NC-SA</p>
   </footer>
 
 </article>
@@ -556,63 +274,23 @@ pandoc --from=markdown<span class="c-key">-raw_html</span>+tex_math_dollars+supe
 <script>
 (function () {
   'use strict';
-  // Fade-up
   var fadeEls = document.querySelectorAll('.fade-up');
   if ('IntersectionObserver' in window) {
-    var fadeObs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) { e.target.classList.add('visible'); fadeObs.unobserve(e.target); }
-      });
-    }, { threshold: 0.12 });
-    fadeEls.forEach(function (el) { fadeObs.observe(el); });
-  } else {
-    fadeEls.forEach(function (el) { el.classList.add('visible'); });
-  }
-  // Copy buttons
+    var obs = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+    }, { threshold: 0.1 });
+    fadeEls.forEach(function (el) { obs.observe(el); });
+  } else { fadeEls.forEach(function (el) { el.classList.add('visible'); }); }
+
   document.querySelectorAll('pre').forEach(function (pre) {
     var btn = document.createElement('button');
     btn.className = 'copy-btn'; btn.textContent = 'Copy';
-    btn.setAttribute('aria-label', 'Copy code to clipboard');
     btn.addEventListener('click', function () {
-      var code = pre.querySelector('code');
-      var text = code ? code.textContent : pre.textContent;
-      navigator.clipboard.writeText(text).then(function () {
-        btn.textContent = 'Copied'; setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
-      });
+      var c = pre.querySelector('code'); var t = c ? c.textContent : pre.textContent;
+      navigator.clipboard.writeText(t).then(function () { btn.textContent = 'Copied'; setTimeout(function(){btn.textContent='Copy';},1500); });
     });
     pre.appendChild(btn);
   });
-  // Sticky nav
-  var nav = document.getElementById('chapterNav');
-  var navTitle = document.getElementById('navTitle');
-  var navPrev = document.getElementById('navPrev');
-  var navNext = document.getElementById('navNext');
-  var navProgress = document.getElementById('navProgress');
-  var hero = document.getElementById('hero');
-  var sections = Array.from(document.querySelectorAll('section[id^="ch"]'));
-  var chapterData = sections.map(function (s) { return { id: s.id, title: s.getAttribute('data-chapter'), el: s }; });
-  function curIdx() {
-    var y = window.scrollY + 120, idx = 0;
-    for (var i = 0; i < sections.length; i++) { if (sections[i].offsetTop <= y) idx = i; }
-    return idx;
-  }
-  function update() {
-    var heroBottom = hero.offsetTop + hero.offsetHeight;
-    var scrolled = window.scrollY > heroBottom - 60;
-    nav.classList.toggle('visible', scrolled);
-    if (!scrolled) return;
-    var idx = curIdx(), ch = chapterData[idx];
-    navTitle.textContent = ch.title;
-    if (idx > 0) { navPrev.href = '#' + chapterData[idx - 1].id; navPrev.style.display = ''; } else { navPrev.style.display = 'none'; }
-    if (idx < chapterData.length - 1) { navNext.href = '#' + chapterData[idx + 1].id; navNext.style.display = ''; } else { navNext.style.display = 'none'; }
-    var docH = document.documentElement.scrollHeight - window.innerHeight;
-    navProgress.style.width = Math.min(docH > 0 ? (window.scrollY / docH) * 100 : 0, 100) + '%';
-  }
-  var ticking = false;
-  window.addEventListener('scroll', function () {
-    if (!ticking) { requestAnimationFrame(function () { update(); ticking = false; }); ticking = true; }
-  });
-  update();
 })();
 </script>
 </body>

@@ -109,6 +109,11 @@
   <section class="chapter" id="ch1">
     <p class="chapter-eyebrow">Chapter one</p>
     <h2>New laptop, now what?</h2>
+    <p>First, the honest reason I needed a new laptop at all: <strong>my cat bit the LCD.</strong> The bottom third of the screen is a smear of dead pixels, and it's off for repair. This is the <em>third</em> device she's destroyed since COVID — laptops and monitors alike. Reproducibility stops being academic when your hardware has a natural predator.</p>
+    <figure>
+      <img src="assets/cat-bite.gif" alt="A cat biting — a re-enactment of my laptop screen's untimely demise" style="width:auto;max-width:360px;display:block;margin:0 auto;">
+      <figcaption>the responsible party (re-enactment) · device #3 since 2020</figcaption>
+    </figure>
     <p>You unbox a new Mac and feel it: two days of "wait… how did I set that up?" Reinstalling tools from memory, hunting down old config, re-pasting API keys from wherever they ended up. The install isn't the hard part — <em>reconstruction from memory</em> is.</p>
     <p>And there's a quieter, nastier version of the same problem: <strong>drift</strong>. Two machines that started identical and slowly diverged, each accumulating little undocumented tweaks.</p>
     <p class="pull">My Mac mini — a headless CI runner — had silently let its GitHub Actions runner deregister, and its <code>.gitconfig</code> had ballooned to <strong>2,581 lines</strong> (CI appended a <code>safe.directory</code> entry on every single job). "Works on my machine," at the level of the machine itself.</p>

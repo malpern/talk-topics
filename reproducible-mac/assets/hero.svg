@@ -10,7 +10,7 @@
   <text x="500" y="78" text-anchor="middle" fill="#88928b" font-size="13">~/ — zsh</text>
   <!-- lines -->
   <text x="118" y="128" font-size="19"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7">git clone </tspan><tspan fill="#88928b">github.com/malpern/dotfiles ~/dotfiles</tspan></text>
-  <text x="118" y="162" font-size="19"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7">cd ~/dotfiles && </tspan><tspan fill="#e9ece7">./bootstrap.sh</tspan></text>
+  <text x="118" y="162" font-size="19"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7">cd ~/dotfiles &amp;&amp; </tspan><tspan fill="#e9ece7">./bootstrap.sh</tspan></text>
   <text x="118" y="196" font-size="16" fill="#88928b">  installing Homebrew, oh-my-zsh, taps… linking dotfiles…</text>
   <text x="118" y="224" font-size="16" fill="#88928b">  brew bundle complete · sops secrets loaded · uv tool: qmk</text>
   <text x="118" y="258" font-size="16"><tspan fill="#28c840">  ✓ </tspan><tspan fill="#e9ece7">Done. </tspan><tspan fill="#88928b">Open a new terminal.</tspan></text>

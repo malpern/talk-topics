@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>git clone my-laptop — Reproducible Macs</title>
+  <meta name="description" content="A Hacker Dojo talk: making a Mac reproducible from a git repo and taming a headless Mac mini — with dotfiles, sops, uv, and a few self-inflicted wounds.">
+  <meta name="author" content="Micah Alpern">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --bg: #0a0d0c;
+      --bg-soft: #141a17;
+      --fg: #e9ece7;
+      --muted: #88928b;
+      --accent: #7dd3c0;
+      --accent-dim: #3f8a7a;
+      --rule: #232a26;
+    }
+
+    body, .reveal-viewport { background: var(--bg) !important; }
+
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--fg);
+      font-size: 34px;
+    }
+    .reveal .slides { text-align: left; }
+    .reveal .slides section { height: 100%; padding: 4vh 6vw; box-sizing: border-box; }
+
+    .reveal h1, .reveal h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em; line-height: 1.02; color: var(--fg);
+      margin-bottom: 0.4em;
+    }
+    .reveal h1 { font-size: 3.6em; }
+    .reveal h2 { font-size: 2.4em; }
+    .reveal h3 {
+      font-family: 'Inter', sans-serif; font-weight: 800;
+      font-size: 1.35em; line-height: 1.15; margin-bottom: 0.5em;
+    }
+
+    .reveal em { font-style: normal; color: var(--accent); }
+    .reveal strong { color: var(--accent); font-weight: 700; }
+    .accent { color: var(--accent); }
+    .muted { color: var(--muted); }
+    .v-spacer { margin-top: 1.1em; }
+
+    .reveal pre { width: 100%; margin: 0.7em 0; box-shadow: none; }
+    .reveal pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62em; line-height: 1.55;
+      background: #05080700; background-color: #050807;
+      border: 1px solid var(--rule); border-radius: 6px;
+      padding: 1em 1.2em; max-height: 560px;
+    }
+    .reveal code { font-family: 'JetBrains Mono', monospace; }
+    .reveal p code, .reveal li code {
+      color: var(--accent); background: var(--bg-soft);
+      padding: 0.1em 0.35em; border-radius: 4px; font-size: 0.88em;
+    }
+
+    .tag {
+      display: inline-block; font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5em; text-transform: uppercase; letter-spacing: 0.18em;
+      color: var(--accent); border: 1px solid var(--accent-dim);
+      padding: 0.25em 0.7em; border-radius: 3px; margin-bottom: 1.1em;
+    }
+
+    .tech-marker::after {
+      content: '~/'; position: absolute; top: 4vh; right: 5vw;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.6em;
+      color: var(--accent-dim); opacity: 0.5;
+    }
+
+    .footer {
+      position: absolute; bottom: 3vh; left: 6vw;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.46em;
+      color: var(--muted); letter-spacing: 0.06em;
+    }
+
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.55em;
+      color: var(--muted); background: transparent; right: 1.5vw; bottom: 1.5vh;
+    }
+    .reveal .progress { height: 3px; color: var(--accent); }
+    .reveal .progress span { background: var(--accent); }
+
+    /* TITLE */
+    .title-slide { display: flex !important; flex-direction: column; justify-content: center; }
+    .title-slide h1 { font-size: 4.6em; margin-bottom: 0.15em; }
+    .title-slide .subtitle { font-size: 0.8em; color: var(--muted); max-width: 72%; line-height: 1.5; margin-bottom: 1.5em; }
+    .title-slide .byline { font-family: 'JetBrains Mono', monospace; font-size: 0.5em; letter-spacing: 0.12em; color: var(--muted); }
+
+    /* DIVIDER */
+    .divider { display: flex !important; flex-direction: column; justify-content: center; }
+    .divider .chapter-num { font-family: 'JetBrains Mono', monospace; font-size: 0.55em; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 0.6em; }
+    .divider h2 { font-size: 3.2em; margin-bottom: 0.15em; }
+    .divider .divider-sub { font-size: 0.8em; color: var(--muted); max-width: 70%; line-height: 1.5; }
+
+    /* SPLIT */
+    .split { display: flex !important; flex-direction: row; align-items: stretch; gap: 4vw; padding: 4vh 6vw !important; }
+    .split .left { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .split .right { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+
+    /* BIGWORD */
+    .bigword { display: flex !important; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+    .bigword h1 { font-size: 4.2em; }
+    .bigword .muted-sub { font-size: 0.8em; color: var(--muted); margin-top: 0.5em; }
+
+    /* PULLQUOTE */
+    .pullquote { border-left: 4px solid var(--accent); padding-left: 1.2em; margin: 1.1em 0; font-size: 1.1em; line-height: 1.5; }
+
+    /* STEPS */
+    .steps { list-style: none; padding: 0; counter-reset: step; }
+    .steps li { position: relative; padding-left: 2.6em; margin-bottom: 0.95em; font-size: 0.9em; line-height: 1.4; }
+    .steps li::before {
+      counter-increment: step; content: counter(step, decimal-leading-zero);
+      position: absolute; left: 0; top: 0.1em;
+      font-family: 'JetBrains Mono', monospace; font-size: 0.62em; color: var(--accent);
+      border: 1px solid var(--accent-dim); border-radius: 3px; padding: 0.15em 0.45em;
+    }
+
+    /* WAR LIST */
+    .warlist { list-style: none; padding: 0; }
+    .warlist li { position: relative; padding-left: 1.6em; margin-bottom: 0.85em; font-size: 0.82em; line-height: 1.45; }
+    .warlist li::before { content: '✗'; position: absolute; left: 0; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+    .warlist li .fix { color: var(--muted); }
+  </style>
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================== TITLE ============================== -->
+<section class="title-slide">
+  <div class="tag">Hacker Dojo · Python Meetup · 2026</div>
+  <h1><span class="accent">git clone</span><br>my&#8209;laptop.</h1>
+  <p class="subtitle">Making a Mac reproducible from a git repo — and taming a headless Mac mini — with dotfiles, sops, uv, and a few self-inflicted wounds.</p>
+  <p class="byline">MICAH ALPERN · github.com/malpern/dotfiles</p>
+  <aside class="notes">The title is the thesis: your machine as something you can clone. ~15 min, 5 chapters, ends with the war stories. Let the title breathe.</aside>
+</section>
+
+<!-- ============================== HOOK ============================== -->
+<section>
+  <div class="tag">The dread</div>
+  <h2>New laptop. <span class="accent">Now what?</span></h2>
+  <p style="font-size:0.9em; line-height:1.6; max-width:80%;">
+    Two days of "wait… how did I set that up?" Re-installing tools from memory,
+    hunting old config, re-pasting API keys. And the worse version —
+    <em>drift</em>: two machines that started identical and silently diverged.
+  </p>
+  <aside class="notes">Everyone in the room has felt this. The pain isn't install time — it's reconstruction from memory + drift. ~45s.</aside>
+</section>
+
+<section class="split">
+  <div class="left">
+    <div class="tag">A true story</div>
+    <h3>The mini that broke quietly</h3>
+    <p style="font-size:0.82em; line-height:1.6;">
+      A headless Mac&nbsp;mini — my CI runner. One day I look closer:<br><br>
+      • its GitHub Actions runner had <em>silently deregistered</em><br>
+      • its <code>.gitconfig</code> had grown to <em>2,581 lines</em><br>
+    </p>
+  </div>
+  <div class="right">
+    <pre><code class="language-ini">[core]
+  directory = …/KeyPath
+  directory = …/KeyPath
+  directory = …/KeyPath
+  directory = …/KeyPath
+  # × 2,500 more
+  #  (every CI job appended one)</code></pre>
+  </div>
+  <aside class="notes">"Works on my machine" — at the machine level. CI appended a safe.directory line every single job. Nobody was watching. This is what drift looks like.</aside>
+</section>
+
+<section class="bigword">
+  <h1>A laptop you can<br><span class="accent">git&nbsp;clone</span>.</h1>
+  <p class="muted-sub">Not a snowflake. A repo.</p>
+  <aside class="notes">The mission statement. One repo → any Mac → working environment. Transition into principles.</aside>
+</section>
+
+<!-- ============================== CH 01 ============================== -->
+<section class="divider">
+  <div class="chapter-num">Chapter · 01</div>
+  <h2>The <span class="accent">principle</span>.</h2>
+  <p class="divider-sub">Three rules that make a machine reproducible.</p>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">The model</div>
+  <h3>Declarative state + thin bootstrap + secrets out-of-band</h3>
+  <ol class="steps v-spacer">
+    <li><strong>Declarative state in git</strong> — <em>what should exist</em>: dotfiles, a <code>Brewfile</code>, configs. The source of truth.</li>
+    <li><strong>A thin, idempotent <code>bootstrap.sh</code></strong> — <em>applies</em> it. Safe to run a hundred times.</li>
+    <li><strong>Secrets out-of-band</strong> — never plaintext in the repo. (More in Ch.&nbsp;3.)</li>
+  </ol>
+  <p class="muted" style="font-size:0.72em; margin-top:0.6em;">…and <em>host-aware</em>: one repo, many machines.</p>
+  <aside class="notes">This is the whole talk in one slide. Declarative = the Brewfile/dotfiles. Imperative = bootstrap. Idempotent is the magic word. Everything else is detail.</aside>
+</section>
+
+<!-- ============================== CH 02 ============================== -->
+<section class="divider">
+  <div class="chapter-num">Chapter · 02</div>
+  <h2>The <span class="accent">build</span>.</h2>
+  <p class="divider-sub">From a blank Mac to a working one, one command.</p>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">Self-installing</div>
+  <h3>bootstrap.sh installs its own prerequisites</h3>
+  <pre><code class="language-bash"># Command Line Tools → Homebrew → oh-my-zsh, only if missing
+xcode-select -p &>/dev/null    || xcode-select --install
+command -v brew &>/dev/null    || /bin/bash -c "$(curl -fsSL …/install.sh)"
+[ -d ~/.oh-my-zsh ]            || RUNZSH=no KEEP_ZSHRC=yes \
+                                   sh -c "$(curl -fsSL …/ohmyzsh/install.sh)"
+
+# then: symlink dotfiles, trust taps, brew bundle, uv tool install …</code></pre>
+  <p class="muted" style="font-size:0.72em; margin-top:0.4em;">No-op on a configured machine. <code>KEEP_ZSHRC=yes</code> so it can't clobber yours.</p>
+  <aside class="notes">The trick: every step is guarded. Running it on a fresh Mac installs everything; running it on a set-up Mac changes nothing. That's idempotence.</aside>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">One repo, two machines</div>
+  <h3>Host-aware bootstrap</h3>
+  <pre><code class="language-bash">case "$(scutil --get LocalHostName)" in
+  openclaw*) IS_MINI=true ;;     # the headless CI mini
+esac
+
+BREWFILE="Brewfile"                          # laptop: full + GUI casks
+$IS_MINI && BREWFILE="Brewfile.mini"         # mini: CLI only, no GUI
+brew bundle --file="$BREWFILE"</code></pre>
+  <p style="font-size:0.76em; margin-top:0.5em;">
+    Laptop gets apps, fonts, GUI tools. The mini gets a lean CLI toolchain —
+    and skips the keyboard-remap &amp; window-manager configs it can't use.
+  </p>
+  <aside class="notes">Same repo drives both. The mini isn't a different setup — it's the same setup with the GUI parts switched off. Brewfile.apps (App Store + GUI) is a third, run-once file.</aside>
+</section>
+
+<!-- ============================== CH 03 ============================== -->
+<section class="divider">
+  <div class="chapter-num">Chapter · 03</div>
+  <h2>The <span class="accent">secrets</span>.</h2>
+  <p class="divider-sub">How do you commit secrets… without committing secrets?</p>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">sops + age</div>
+  <h3>Encrypted in the repo, decrypted at startup</h3>
+  <pre><code class="language-bash"># secrets.env — committed to the (private) repo, values encrypted:
+ANTHROPIC_API_KEY=ENC[AES256_GCM,data:+wTQ9u…,type:str]
+OPENAI_API_KEY=ENC[AES256_GCM,data:wVJ3GN…,type:str]
+
+# .zshrc, interactive shells only:
+set -a; source <(sops -d ~/dotfiles/secrets.env); set +a</code></pre>
+  <p style="font-size:0.74em; margin-top:0.4em;">
+    Reproducible by <code>git clone</code>. <span class="muted">Why not 1Password? It needs
+    interactive unlock — it dies in cron/CI. Same reason I'd ditched Keychain.</span>
+  </p>
+  <aside class="notes">Key names visible, values encrypted. The whole file is in git. This is the part people assume is impossible. age keys are tiny and file-based — perfect for non-interactive use.</aside>
+</section>
+
+<section class="split">
+  <div class="left">
+    <div class="tag">The catch</div>
+    <h3>One key to rule them all</h3>
+    <p style="font-size:0.84em; line-height:1.6;">
+      The encrypted secrets are reproducible. The <strong>age key</strong> that decrypts
+      them is the one thing that <em>isn't</em> in git.<br><br>
+      So it's the one thing you actually back up — Keychain, iCloud, and a printed copy.
+    </p>
+  </div>
+  <div class="right">
+    <pre><code class="language-text">~/.config/sops/age/keys.txt
+
+AGE-SECRET-KEY-1………………
+
+🔑  crown jewel.
+    lose it → secrets gone.
+    back it up 3 ways.</code></pre>
+  </div>
+  <aside class="notes">Be honest about the tradeoff: you've reduced the problem from "back up N scattered secrets" to "back up one key." That's the win. But you MUST back it up.</aside>
+</section>
+
+<!-- ============================== CH 04 ============================== -->
+<section class="divider">
+  <div class="chapter-num">Chapter · 04</div>
+  <h2>The <span class="accent">fleet</span>.</h2>
+  <p class="divider-sub">Driving the mini from the laptop — without it drifting again.</p>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">Manage from one place</div>
+  <h3>Sync, see drift, update — by policy</h3>
+  <pre><code class="language-bash">mini-sync      # push my dotfiles to the mini (pull + bootstrap)
+mini-status    # disk · CI runners online? · dotfiles vs origin: N behind
+
+# topgrade, with a DIFFERENT policy per machine:
+#   laptop.toml   → aggressive: latest everything
+#   openclaw.toml → only = ["brew_formula","custom_commands"]   # conservative</code></pre>
+  <p style="font-size:0.74em; margin-top:0.4em;">
+    A <code>pre-push</code> git hook nags me to <code>mini-sync</code> when shared files change.
+    The CI box never auto-updates — a <code>brew</code> upgrade mid-build is a bad day.
+  </p>
+  <aside class="notes">Drift killed the mini once. Fix = visibility (mini-status shows "N behind") + a hook reminder, NOT auto-pull. Conservative on the CI box is deliberate.</aside>
+</section>
+
+<!-- ============================== CH 05 — WAR STORIES ============================== -->
+<section class="divider">
+  <div class="chapter-num">Chapter · 05</div>
+  <h2>The <span class="accent">scars</span>.</h2>
+  <p class="divider-sub">Everything that went wrong. (The fun part.)</p>
+</section>
+
+<section class="tech-marker">
+  <div class="tag">Self-inflicted wounds</div>
+  <h3>Things that broke, and what they taught me</h3>
+  <ul class="warlist v-spacer">
+    <li><code>brew autoremove</code> ate my keyboard's QMK flashing toolchain — an untrusted tap made its deps look orphaned. <span class="fix">→ declare them as leaves; <code>autoremove=false</code> on CI.</span></li>
+    <li>qmk's vendored Python venv broke on macOS beta. <span class="fix">→ <code>uv tool install qmk</code>.</span></li>
+    <li>sops couldn't find its key — macOS looks in <code>~/Library/…</code>, not <code>~/.config</code>. <span class="fix">→ set <code>SOPS_AGE_KEY_FILE</code>.</span></li>
+    <li>GitHub silently <em>deletes</em> idle self-hosted runners. <span class="fix">→ surface status in <code>mini-status</code>.</span></li>
+    <li>"The mini has no Homebrew!" It did — non-interactive SSH just hides it from <code>$PATH</code>.</li>
+  </ul>
+  <aside class="notes">This is the slide people remember. Tell the QMK one as a story — autoremove deleting your keyboard tools is absurd and relatable. The uv fix is the Python angle.</aside>
+</section>
+
+<section class="split">
+  <div class="left">
+    <div class="tag">Python angle</div>
+    <h3><code>uv</code> all the way down</h3>
+    <p style="font-size:0.84em; line-height:1.6;">
+      The fast Python tooling that kept showing up:<br><br>
+      • <code>uv tool install</code> — pipx successor, even for non-Python CLIs<br>
+      • <code>mise</code> — pinned Python &amp; runtime versions, per project<br><br>
+      My <em>keyboard firmware</em> CLI runs on uv now.
+    </p>
+  </div>
+  <div class="right">
+    <pre><code class="language-bash">uv tool install qmk
+mise use python@3.14
+
+# reproducible, fast,
+# no system-python roulette.</code></pre>
+  </div>
+  <aside class="notes">For the Python crowd: this is the reusable takeaway. uv + mise give you reproducible Python (and tools) anywhere. Tie it back: reproducibility scales from one venv to a whole machine.</aside>
+</section>
+
+<!-- ============================== CLOSE ============================== -->
+<section class="tech-marker">
+  <div class="tag">Trust, but verify</div>
+  <h3>Did it actually work?</h3>
+  <pre><code class="language-bash"># cold-boot the whole thing into a throwaway HOME
+TESTHOME=$(mktemp -d)
+git clone -q ~/dotfiles "$TESTHOME/dotfiles"
+HOME="$TESTHOME" bash "$TESTHOME/dotfiles/bootstrap.sh"
+#  → exit 0 · symlinks ✓ · oh-my-zsh ✓ · plugins ✓ · 0 errors</code></pre>
+  <p class="muted" style="font-size:0.74em; margin-top:0.4em;">A reproducibility claim you haven't tested is a wish.</p>
+  <aside class="notes">Quick but important. I didn't just hope it'd reproduce — I ran bootstrap into a fake home and watched it build clean. ~30s.</aside>
+</section>
+
+<section>
+  <div class="tag">Takeaways</div>
+  <h2>What to <span class="accent">steal</span>.</h2>
+  <ul style="font-size:0.82em; line-height:1.7; max-width:85%;">
+    <li><strong>Declarative + idempotent</strong> beats a setup doc you'll never update.</li>
+    <li><strong>sops + age</strong>: secrets that live in git, safely.</li>
+    <li><strong>Reproducible ≠ Migration Assistant</strong> — you skip the cruft, keep the intent.</li>
+    <li>Make <strong>drift visible</strong>; the principles transfer to any OS or team.</li>
+  </ul>
+  <aside class="notes">Land the plane. Even if they never touch a Mac mini, the pattern — declarative state + thin bootstrap + encrypted secrets in git — works for any environment, any team.</aside>
+</section>
+
+<section class="bigword">
+  <h1>Q <span class="accent">&amp;</span> A</h1>
+  <p style="margin-top:1em; font-size:0.5em;">
+    <a href="https://github.com/malpern/dotfiles" style="color:var(--accent);">github.com/malpern/dotfiles</a><br>
+    <span class="muted">Micah Alpern · Hacker Dojo Python Meetup</span>
+  </p>
+  <aside class="notes">Likely questions: why not Nix? (great, heavier — this is the 80% with no migration). Why not Ansible? (overkill for a few machines). Is the secrets repo safe if public? (values are encrypted, but keep it private anyway).</aside>
+</section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    controls: false,
+    progress: true,
+    center: false,
+    width: 1400,
+    height: 850,
+    margin: 0.02,
+    minScale: 0.3,
+    maxScale: 2.0,
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+</script>
+</body>
+</html>

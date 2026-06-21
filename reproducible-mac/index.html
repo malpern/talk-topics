@@ -17,6 +17,7 @@
       --bg: #0a0d0c; --bg-soft: #141a17; --paper: #0f1512;
       --fg: #e9ece7; --muted: #88928b; --quiet: #5f6661;
       --accent: #7dd3c0; --accent-dim: #3f8a7a; --rule: #232a26;
+      --home: #f0b34a;
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -38,7 +39,7 @@
     .hero { padding: 5rem 0 2rem; text-align: center; }
     .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--accent); margin: 0 0 1.4em; }
     .hero h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(3rem, 9vw, 5.5rem); line-height: 0.95; letter-spacing: 0.02em; margin: 0 0 0.3em; }
-    .hero h1 .mono { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.62em; }
+    .hero h1 .mono { font-family: 'JetBrains Mono', monospace; color: var(--home); font-size: 0.62em; }
     .hero .subtitle { font-size: 1.2rem; color: var(--muted); max-width: 32ch; margin: 0 auto 2.2em; line-height: 1.4; }
     .hero-image { width: 100%; border: 1px solid var(--rule); border-radius: 12px; display: block; }
     .byline { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 1.6em; }
@@ -60,7 +61,7 @@
 
     /* chapters */
     .chapter { padding-top: 2rem; margin-bottom: 3.5rem; }
-    .chapter-eyebrow { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--accent-dim); margin-bottom: 0.4em; }
+    .chapter-eyebrow { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--accent-dim); margin-bottom: 0.4em; padding-left: 2em; background: url("assets/home.svg") no-repeat left center; background-size: 1.4em 1.4em; min-height: 1.4em; line-height: 1.4em; }
     .chapter h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(2.2rem, 5vw, 3.2rem); letter-spacing: 0.03em; line-height: 1; margin: 0 0 0.8em; }
     .chapter h3 { font-weight: 800; font-size: 1.25rem; margin: 2em 0 0.4em; }
     .pull { border-left: 3px solid var(--accent); padding-left: 1.2em; margin: 1.6em 0; font-size: 1.25rem; line-height: 1.45; color: var(--fg); }

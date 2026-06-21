@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" font-family="ui-monospace,'JetBrains Mono',SFMono-Regular,monospace">
+  <path d="M9 23 L24 9 L39 23" fill="none" stroke="#7dd3c0" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M13 21 L13 39 L35 39 L35 21" fill="none" stroke="#7dd3c0" stroke-width="2.5" stroke-linejoin="round"/>
+  <text x="24" y="35" text-anchor="middle" font-size="13" font-weight="700" fill="#f0b34a">~/</text>
+</svg>

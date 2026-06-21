@@ -1,18 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="ui-monospace, 'JetBrains Mono', SFMono-Regular, monospace">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 400" font-family="ui-monospace,'JetBrains Mono',SFMono-Regular,monospace">
+  <defs>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="9" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
   <rect width="1000" height="400" rx="14" fill="#0a0d0c"/>
-  <!-- terminal window -->
-  <rect x="90" y="50" width="820" height="300" rx="12" fill="#0f1512" stroke="#232a26" stroke-width="1.5"/>
-  <!-- title bar -->
-  <path d="M90 62 a12 12 0 0 1 12 -12 h796 a12 12 0 0 1 12 12 v22 h-820 z" fill="#141a17"/>
-  <circle cx="116" cy="73" r="6" fill="#ff5f57"/>
-  <circle cx="138" cy="73" r="6" fill="#febc2e"/>
-  <circle cx="160" cy="73" r="6" fill="#28c840"/>
-  <text x="500" y="78" text-anchor="middle" fill="#88928b" font-size="13">~/ — zsh</text>
-  <!-- lines -->
-  <text x="118" y="128" font-size="19"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7">git clone </tspan><tspan fill="#88928b">github.com/malpern/dotfiles ~/dotfiles</tspan></text>
-  <text x="118" y="162" font-size="19"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7">cd ~/dotfiles &amp;&amp; </tspan><tspan fill="#e9ece7">./bootstrap.sh</tspan></text>
-  <text x="118" y="196" font-size="16" fill="#88928b">  installing Homebrew, oh-my-zsh, taps… linking dotfiles…</text>
-  <text x="118" y="224" font-size="16" fill="#88928b">  brew bundle complete · sops secrets loaded · uv tool: qmk</text>
-  <text x="118" y="258" font-size="16"><tspan fill="#28c840">  ✓ </tspan><tspan fill="#e9ece7">Done. </tspan><tspan fill="#88928b">Open a new terminal.</tspan></text>
-  <text x="118" y="308" font-size="22"><tspan fill="#7dd3c0">❯ </tspan><tspan fill="#e9ece7" font-weight="700">there's no place like </tspan><tspan fill="#7dd3c0" font-weight="700">~/</tspan><tspan fill="#7dd3c0" font-size="22">█</tspan></text>
+
+  <!-- start: a new mac, scattered config (drift) -->
+  <g fill="#2a322d">
+    <circle cx="58" cy="300" r="3"/><circle cx="92" cy="320" r="2.5"/><circle cx="46" cy="332" r="2"/><circle cx="106" cy="300" r="2"/><circle cx="74" cy="344" r="2"/>
+  </g>
+  <text x="60" y="372" fill="#5f6661" font-size="13">a new mac</text>
+
+  <!-- the road home -->
+  <polyline points="84,330 250,302 430,252 610,210 770,162 852,130" fill="none" stroke="#23463f" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+  <polyline points="84,330 250,302 430,252 610,210 770,162 852,130" fill="none" stroke="#7dd3c0" stroke-width="2.5" stroke-dasharray="2 13" stroke-linecap="round"/>
+
+  <!-- milestone nodes -->
+  <g>
+    <circle cx="250" cy="302" r="8" fill="#0a0d0c" stroke="#7dd3c0" stroke-width="2.5"/>
+    <text x="250" y="334" text-anchor="middle" fill="#88928b" font-size="13">git clone</text>
+    <circle cx="430" cy="252" r="8" fill="#0a0d0c" stroke="#7dd3c0" stroke-width="2.5"/>
+    <text x="430" y="284" text-anchor="middle" fill="#88928b" font-size="13">./bootstrap.sh</text>
+    <circle cx="610" cy="210" r="8" fill="#0a0d0c" stroke="#7dd3c0" stroke-width="2.5"/>
+    <text x="610" y="242" text-anchor="middle" fill="#88928b" font-size="13">sops + age</text>
+    <circle cx="770" cy="162" r="8" fill="#0a0d0c" stroke="#7dd3c0" stroke-width="2.5"/>
+    <text x="770" y="194" text-anchor="middle" fill="#88928b" font-size="13">the key</text>
+  </g>
+
+  <!-- HOME: the house = ~/ -->
+  <circle cx="890" cy="118" r="62" fill="#f0b34a" opacity="0.10" filter="url(#glow)"/>
+  <path d="M852 116 L890 82 L928 116" fill="none" stroke="#f0b34a" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M861 112 L861 156 L919 156 L919 112" fill="none" stroke="#f0b34a" stroke-width="3.5" stroke-linejoin="round"/>
+  <text x="890" y="145" text-anchor="middle" fill="#f0b34a" font-size="23" font-weight="700">~/</text>
+  <text x="890" y="190" text-anchor="middle" fill="#88928b" font-size="13">there's no place like home</text>
 </svg>

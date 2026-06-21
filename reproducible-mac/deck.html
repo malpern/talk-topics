@@ -24,6 +24,7 @@
       --accent: #7dd3c0;
       --accent-dim: #3f8a7a;
       --rule: #232a26;
+      --home: #f0b34a;
     }
 
     body, .reveal-viewport { background: var(--bg) !important; }
@@ -103,7 +104,7 @@
 
     /* DIVIDER */
     .divider { display: flex !important; flex-direction: column; justify-content: center; }
-    .divider .chapter-num { font-family: 'JetBrains Mono', monospace; font-size: 0.55em; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 0.6em; }
+    .divider .chapter-num { font-family: 'JetBrains Mono', monospace; font-size: 0.55em; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent-dim); margin-bottom: 0.6em; padding-left: 1.7em; background: url("assets/home.svg") no-repeat left center; background-size: 1.2em 1.2em; min-height: 1.2em; line-height: 1.2em; display: inline-block; }
     .divider h2 { font-size: 3.2em; margin-bottom: 0.15em; }
     .divider .divider-sub { font-size: 0.8em; color: var(--muted); max-width: 70%; line-height: 1.5; }
 
@@ -151,7 +152,7 @@
 <!-- ============================== TITLE ============================== -->
 <section class="title-slide">
   <div class="tag">Hacker Dojo · Python Meetup · 2026</div>
-  <h1>There's no place<br>like <span class="accent" style="font-family:'JetBrains Mono',monospace; font-size:0.82em;">~/</span></h1>
+  <h1>There's no place<br>like <span style="font-family:'JetBrains Mono',monospace; font-size:0.82em; color:#f0b34a;">~/</span></h1>
   <p class="subtitle">Making a Mac reproducible from a git repo — and taming a headless Mac mini — with dotfiles, sops, uv, and a few self-inflicted wounds.</p>
   <p class="byline">MICAH ALPERN · github.com/malpern/dotfiles</p>
   <img class="hero" src="assets/hero.svg" alt="Terminal: git clone the dotfiles repo, run bootstrap, and 'there's no place like ~/'">

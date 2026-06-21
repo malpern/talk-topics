@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 880 480" font-family="ui-monospace, 'JetBrains Mono', SFMono-Regular, monospace">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#7dd3c0"/></marker>
+  </defs>
+  <rect width="880" height="480" rx="12" fill="#0a0d0c"/>
+
+  <!-- repo -->
+  <rect x="320" y="28" width="240" height="56" rx="8" fill="#102019" stroke="#7dd3c0" stroke-width="2"/>
+  <text x="440" y="54" text-anchor="middle" fill="#7dd3c0" font-size="17" font-weight="700">~/dotfiles</text>
+  <text x="440" y="73" text-anchor="middle" fill="#88928b" font-size="12">one git repo · source of truth</text>
+
+  <line x1="440" y1="84" x2="440" y2="120" stroke="#3f8a7a" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- bootstrap -->
+  <rect x="296" y="124" width="288" height="62" rx="8" fill="#141a17" stroke="#3f8a7a" stroke-width="1.5"/>
+  <text x="440" y="150" text-anchor="middle" fill="#e9ece7" font-size="16" font-weight="700">./bootstrap.sh</text>
+  <text x="440" y="172" text-anchor="middle" fill="#88928b" font-size="12.5">idempotent · detects the host</text>
+
+  <!-- split arrows -->
+  <path d="M440 186 L440 210 L200 210 L200 246" fill="none" stroke="#3f8a7a" stroke-width="1.5" marker-end="url(#ar)"/>
+  <path d="M440 186 L440 210 L680 210 L680 246" fill="none" stroke="#3f8a7a" stroke-width="1.5" marker-end="url(#ar)"/>
+
+  <!-- laptop -->
+  <rect x="50" y="250" width="300" height="190" rx="10" fill="#141a17" stroke="#3f8a7a" stroke-width="1.5"/>
+  <text x="70" y="284" fill="#7dd3c0" font-size="17" font-weight="700">MacBook Air</text>
+  <text x="70" y="306" fill="#88928b" font-size="12">the daily driver — full + GUI</text>
+  <line x1="70" y1="320" x2="330" y2="320" stroke="#232a26" stroke-width="1"/>
+  <text x="70" y="348" fill="#e9ece7" font-size="14">• Brewfile + Brewfile.apps</text>
+  <text x="70" y="374" fill="#e9ece7" font-size="14">• GUI apps · fonts · App Store</text>
+  <text x="70" y="400" fill="#e9ece7" font-size="14">• KeyPath · Hammerspoon</text>
+  <text x="70" y="426" fill="#e9ece7" font-size="14">• macOS defaults</text>
+
+  <!-- mini -->
+  <rect x="530" y="250" width="300" height="190" rx="10" fill="#141a17" stroke="#3f8a7a" stroke-width="1.5"/>
+  <text x="550" y="284" fill="#7dd3c0" font-size="17" font-weight="700">Mac mini · openclaw</text>
+  <text x="550" y="306" fill="#88928b" font-size="12">headless CI runner — lean</text>
+  <line x1="550" y1="320" x2="810" y2="320" stroke="#232a26" stroke-width="1"/>
+  <text x="550" y="348" fill="#e9ece7" font-size="14">• Brewfile.mini (CLI only)</text>
+  <text x="550" y="374" fill="#e9ece7" font-size="14">• no GUI casks</text>
+  <text x="550" y="400" fill="#e9ece7" font-size="14">• + zellij for SSH sessions</text>
+  <text x="550" y="426" fill="#88928b" font-size="14">• skips KeyPath / Hammerspoon</text>
+
+  <text x="440" y="466" text-anchor="middle" fill="#88928b" font-size="13">one repo → many machines, host-aware</text>
+</svg>

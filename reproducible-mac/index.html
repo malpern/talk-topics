@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>There's No Place Like ~/ — Reproducible Macs</title>
+  <meta name="description" content="The long-form writeup: making a Mac reproducible from a git repo, taming a headless Mac mini, and encrypting secrets in git with sops + age — plus the war stories.">
+  <meta name="author" content="Micah Alpern">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/atom-one-dark.min.css">
+
+  <style>
+    :root {
+      --bg: #0a0d0c; --bg-soft: #141a17; --paper: #0f1512;
+      --fg: #e9ece7; --muted: #88928b; --quiet: #5f6661;
+      --accent: #7dd3c0; --accent-dim: #3f8a7a; --rule: #232a26;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg);
+      font-family: 'Inter', system-ui, sans-serif; font-weight: 400;
+      line-height: 1.7; letter-spacing: -0.01em; font-size: 19px;
+    }
+    .page { max-width: 760px; margin: 0 auto; padding: 0 24px 8rem; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: 0.86em; color: var(--accent); background: var(--bg-soft); padding: 0.1em 0.35em; border-radius: 4px; }
+    pre { margin: 1.4em 0; }
+    pre code { display: block; font-size: 0.8em; line-height: 1.6; color: var(--fg); background: var(--paper); border: 1px solid var(--rule); border-radius: 8px; padding: 1.1em 1.3em; overflow-x: auto; }
+    strong { color: var(--accent); font-weight: 700; }
+    em { font-style: normal; color: var(--accent); }
+
+    /* hero */
+    .hero { padding: 5rem 0 2rem; text-align: center; }
+    .eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.22em; color: var(--accent); margin: 0 0 1.4em; }
+    .hero h1 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(3rem, 9vw, 5.5rem); line-height: 0.95; letter-spacing: 0.02em; margin: 0 0 0.3em; }
+    .hero h1 .mono { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: 0.62em; }
+    .hero .subtitle { font-size: 1.2rem; color: var(--muted); max-width: 32ch; margin: 0 auto 2.2em; line-height: 1.4; }
+    .hero-image { width: 100%; border: 1px solid var(--rule); border-radius: 12px; display: block; }
+    .byline { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--muted); letter-spacing: 0.08em; margin-top: 1.6em; }
+
+    /* about strip */
+    .about { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 1.4em 0; margin: 3rem 0; color: var(--muted); font-size: 0.95rem; display: flex; gap: 1.5em; flex-wrap: wrap; justify-content: space-between; font-family: 'JetBrains Mono', monospace; letter-spacing: 0.04em; }
+    .about b { color: var(--accent); font-weight: 500; }
+
+    /* toc */
+    .toc-heading { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--quiet); margin-bottom: 0.8em; }
+    ol.toc { list-style: none; padding: 0; margin: 0 0 4rem; border-top: 1px solid var(--rule); }
+    ol.toc li { border-bottom: 1px solid var(--rule); }
+    ol.toc li a { display: grid; grid-template-columns: 3rem 1fr; gap: 1.2rem; padding: 1rem 0; color: var(--fg); }
+    ol.toc li a:hover { text-decoration: none; }
+    ol.toc li a:hover .t { color: var(--accent); }
+    ol.toc .num { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+    ol.toc .t { font-weight: 700; }
+    ol.toc .b { display: block; font-weight: 400; color: var(--muted); font-size: 0.92rem; }
+
+    /* chapters */
+    .chapter { padding-top: 2rem; margin-bottom: 3.5rem; }
+    .chapter-eyebrow { font-family: 'JetBrains Mono', monospace; text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.72rem; color: var(--accent-dim); margin-bottom: 0.4em; }
+    .chapter h2 { font-family: 'Bebas Neue', sans-serif; font-weight: 400; font-size: clamp(2.2rem, 5vw, 3.2rem); letter-spacing: 0.03em; line-height: 1; margin: 0 0 0.8em; }
+    .chapter h3 { font-weight: 800; font-size: 1.25rem; margin: 2em 0 0.4em; }
+    .pull { border-left: 3px solid var(--accent); padding-left: 1.2em; margin: 1.6em 0; font-size: 1.25rem; line-height: 1.45; color: var(--fg); }
+    figure { margin: 2em 0; }
+    figure img { width: 100%; border: 1px solid var(--rule); border-radius: 10px; display: block; }
+    figcaption { font-family: 'JetBrains Mono', monospace; font-size: 0.72rem; color: var(--quiet); margin-top: 0.7em; text-align: center; letter-spacing: 0.06em; }
+    .rule { border: 0; border-top: 1px solid var(--rule); margin: 3.5rem 0; }
+    ul.tight li { margin-bottom: 0.6em; }
+    .scar { border-left: 3px solid var(--accent-dim); padding: 0.2em 0 0.2em 1.2em; margin: 1.4em 0; }
+    .scar b { color: var(--accent); }
+    .scar .fix { color: var(--muted); font-size: 0.92rem; }
+
+    footer { border-top: 1px solid var(--rule); padding-top: 2rem; margin-top: 4rem; font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 1em; }
+  </style>
+</head>
+<body>
+<main>
+<article class="page">
+
+  <header class="hero">
+    <p class="eyebrow">A Hacker Dojo Talk · Python Meetup</p>
+    <h1>There's no place<br>like <span class="mono">~/</span></h1>
+    <p class="subtitle">Making a Mac reproducible from a git repo — and taming a headless Mac mini.</p>
+    <img class="hero-image" src="assets/hero.svg" alt="Terminal: git clone the dotfiles repo, run bootstrap, and 'there's no place like ~/'">
+    <p class="byline">Micah Alpern · <a href="https://github.com/malpern/dotfiles">github.com/malpern/dotfiles</a></p>
+  </header>
+
+  <div class="about">
+    <span><b>Stack:</b> dotfiles · Homebrew · sops + age · uv · zsh</span>
+    <span><b>Machines:</b> MacBook Air + a headless Mac mini</span>
+  </div>
+
+  <p class="toc-heading">What's inside</p>
+  <ol class="toc">
+    <li><a href="#ch1"><span class="num">01</span><span><span class="t">New laptop, now what?</span><span class="b">The dread, and the quieter problem: drift.</span></span></a></li>
+    <li><a href="#ch2"><span class="num">02</span><span><span class="t">The principle</span><span class="b">Declarative state, a thin bootstrap, secrets out-of-band.</span></span></a></li>
+    <li><a href="#ch3"><span class="num">03</span><span><span class="t">The build</span><span class="b">One self-installing, host-aware script.</span></span></a></li>
+    <li><a href="#ch4"><span class="num">04</span><span><span class="t">Secrets, in git, safely</span><span class="b">sops + age — and why not 1Password.</span></span></a></li>
+    <li><a href="#ch5"><span class="num">05</span><span><span class="t">The fleet</span><span class="b">Driving the mini without it drifting again.</span></span></a></li>
+    <li><a href="#ch6"><span class="num">06</span><span><span class="t">The scars</span><span class="b">Everything that broke. The fun part.</span></span></a></li>
+    <li><a href="#ch7"><span class="num">07</span><span><span class="t">What to steal</span><span class="b">Reproducible ≠ Migration Assistant.</span></span></a></li>
+  </ol>
+
+  <section class="chapter" id="ch1">
+    <p class="chapter-eyebrow">Chapter one</p>
+    <h2>New laptop, now what?</h2>
+    <p>You unbox a new Mac and feel it: two days of "wait… how did I set that up?" Reinstalling tools from memory, hunting down old config, re-pasting API keys from wherever they ended up. The install isn't the hard part — <em>reconstruction from memory</em> is.</p>
+    <p>And there's a quieter, nastier version of the same problem: <strong>drift</strong>. Two machines that started identical and slowly diverged, each accumulating little undocumented tweaks.</p>
+    <p class="pull">My Mac mini — a headless CI runner — had silently let its GitHub Actions runner deregister, and its <code>.gitconfig</code> had ballooned to <strong>2,581 lines</strong> (CI appended a <code>safe.directory</code> entry on every single job). "Works on my machine," at the level of the machine itself.</p>
+    <p>The fix isn't discipline. It's making the machine something you can <em>rebuild</em> — a repo, not a snowflake.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch2">
+    <p class="chapter-eyebrow">Chapter two</p>
+    <h2>The principle</h2>
+    <p>Three rules carry the whole thing:</p>
+    <ul class="tight">
+      <li><strong>Declarative state in git</strong> — <em>what should exist</em>: your dotfiles, a <code>Brewfile</code>, your app configs. This is the source of truth.</li>
+      <li><strong>A thin, idempotent <code>bootstrap.sh</code></strong> — it <em>applies</em> that state, and is safe to run a hundred times. Run it on a fresh Mac and it installs everything; run it on a configured one and it changes nothing.</li>
+      <li><strong>Secrets out-of-band</strong> — never plaintext in the repo (Chapter 4).</li>
+    </ul>
+    <p>Plus one modifier that does a lot of work: <strong>host-aware</strong>. One repo, many machines — each gets the slice it needs.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch3">
+    <p class="chapter-eyebrow">Chapter three</p>
+    <h2>The build</h2>
+    <p>The bootstrap installs its <em>own</em> prerequisites, so it works from a genuinely blank Mac:</p>
+    <pre><code class="language-bash"># Command Line Tools → Homebrew → oh-my-zsh, only if missing
+xcode-select -p &>/dev/null || xcode-select --install
+command -v brew &>/dev/null || /bin/bash -c "$(curl -fsSL …/install.sh)"
+[ -d ~/.oh-my-zsh ]         || RUNZSH=no KEEP_ZSHRC=yes \
+                                sh -c "$(curl -fsSL …/ohmyzsh/install.sh)"
+
+# then: symlink dotfiles, trust taps, brew bundle, uv tool install …</code></pre>
+    <p>Every step is guarded — that's what makes it idempotent. <code>KEEP_ZSHRC=yes</code> matters: without it, the oh-my-zsh installer would clobber the <code>.zshrc</code> you just symlinked in.</p>
+
+    <h3>One repo, two machines</h3>
+    <p>The same script drives a fully-loaded laptop and a lean headless mini. It just checks the hostname:</p>
+    <pre><code class="language-bash">case "$(scutil --get LocalHostName)" in
+  openclaw*) IS_MINI=true ;;          # the headless CI mini
+esac
+
+BREWFILE="Brewfile"                    # laptop: full toolchain + GUI casks
+$IS_MINI && BREWFILE="Brewfile.mini"   # mini: CLI only, no GUI
+brew bundle --file="$BREWFILE"</code></pre>
+    <figure>
+      <img src="assets/host-aware.svg" alt="Diagram: one dotfiles repo feeds a host-aware bootstrap that branches to a full laptop and a CLI-only Mac mini">
+      <figcaption>one repo → many machines, host-aware</figcaption>
+    </figure>
+    <p>The mini isn't a <em>different</em> setup — it's the same one with the GUI parts switched off. There's a third file, <code>Brewfile.apps</code> (App Store + GUI apps), run once by hand on a new laptop so routine syncs don't churn applications.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch4">
+    <p class="chapter-eyebrow">Chapter four</p>
+    <h2>Secrets, in git, safely</h2>
+    <p>The obvious objection to "commit everything" is secrets. You can't put API keys in a repo. Unless they're encrypted — which is exactly what <a href="https://github.com/getsops/sops">sops</a> + <a href="https://github.com/FiloSottile/age">age</a> do.</p>
+    <pre><code class="language-bash"># secrets.env — committed to the (private) repo, values encrypted:
+ANTHROPIC_API_KEY=ENC[AES256_GCM,data:+wTQ9u…,type:str]
+OPENAI_API_KEY=ENC[AES256_GCM,data:wVJ3GN…,type:str]
+
+# .zshrc, interactive shells only:
+set -a; source <(sops -d ~/dotfiles/secrets.env); set +a</code></pre>
+    <p>Key names stay readable; values are AES-256-GCM ciphertext. The whole file lives in git, so it's reproducible by <code>git clone</code>.</p>
+    <figure>
+      <img src="assets/secrets-flow.svg" alt="Diagram: encrypted secrets.env in git plus an age key kept out-of-band, decrypted by sops into the shell at startup">
+      <figcaption>encrypted in git · one key out-of-band · decrypted at shell start</figcaption>
+    </figure>
+    <p><strong>Why not 1Password?</strong> It needs an interactive unlock — it falls over in cron and CI. That's the same reason I'd already moved off the macOS Keychain for non-interactive use. sops + age is file-based and works everywhere a shell does.</p>
+    <p class="pull">The encrypted secrets are reproducible. The one <strong>age key</strong> that decrypts them is not in git — so it's the single thing you actually back up. Keychain, iCloud, and a printed copy. Lose it and the secrets are gone; that's the whole trade.</p>
+    <p>One macOS gotcha cost me an hour: sops looks for the key under <code>~/Library/Application&nbsp;Support/sops/age</code>, not <code>~/.config</code>. Set <code>SOPS_AGE_KEY_FILE</code> explicitly and it just works.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch5">
+    <p class="chapter-eyebrow">Chapter five</p>
+    <h2>The fleet</h2>
+    <p>Drift killed the mini once, so the goal isn't "auto-update everything" — it's <em>visibility</em> plus deliberate, policy-driven updates, all from the laptop:</p>
+    <pre><code class="language-bash">mini-sync      # push my dotfiles to the mini (pull + bootstrap)
+mini-status    # disk · CI runners online? · dotfiles vs origin: N behind
+
+# topgrade, with a DIFFERENT policy per machine:
+#   laptop.toml   → aggressive: latest everything
+#   openclaw.toml → only = ["brew_formula","custom_commands"]   # conservative</code></pre>
+    <p>A <code>pre-push</code> git hook nags me to run <code>mini-sync</code> whenever I push a shared dotfile, so the mini never silently falls behind. And the CI box <em>never</em> auto-updates the OS or chases casks — a surprise <code>brew</code> upgrade mid-build is a genuinely bad day. Conservative-on-the-CI-box is a choice, not an accident.</p>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch6">
+    <p class="chapter-eyebrow">Chapter six</p>
+    <h2>The scars</h2>
+    <p>Everything that went wrong — and what each one taught me.</p>
+    <div class="scar"><b>brew autoremove ate my keyboard's QMK toolchain.</b> An untrusted Homebrew tap made its flashing tools look like orphaned dependencies, so <code>autoremove</code> swept them. <span class="fix">Fix: declare them as explicit leaves; <code>autoremove = false</code> on the CI box.</span></div>
+    <div class="scar"><b>qmk's vendored Python venv broke on the macOS beta.</b> The Homebrew formula shipped a Python that didn't survive the OS bump. <span class="fix">Fix: <code>uv tool install qmk</code> — a clean, isolated interpreter.</span></div>
+    <div class="scar"><b>sops couldn't find its key.</b> macOS looks in <code>~/Library/…</code>, not <code>~/.config</code>. <span class="fix">Fix: set <code>SOPS_AGE_KEY_FILE</code>.</span></div>
+    <div class="scar"><b>GitHub silently deletes idle self-hosted runners.</b> The mini's runner had been deregistered for days and nobody noticed. <span class="fix">Fix: surface runner status in <code>mini-status</code>.</span></div>
+    <div class="scar"><b>"The mini has no Homebrew!"</b> It did. A non-interactive SSH session just doesn't load it onto <code>$PATH</code>. A whole detour built on a false negative. <span class="fix">Fix: <code>eval "$(/opt/homebrew/bin/brew shellenv)"</code> first.</span></div>
+
+    <h3>uv all the way down</h3>
+    <p>The through-line that kept surfacing: <a href="https://docs.astral.sh/uv/">uv</a>. <code>uv tool install</code> is a faster, cleaner pipx — even for non-Python CLIs (my <em>keyboard firmware</em> tool runs on it now). Pair it with <code>mise</code> for pinned, per-project Python and runtime versions, and "works on my machine" stops being a Python problem too.</p>
+    <pre><code class="language-bash">uv tool install qmk        # the pipx successor, for any CLI
+mise use python@3.14       # pinned, reproducible, no system-python roulette</code></pre>
+  </section>
+
+  <hr class="rule">
+
+  <section class="chapter" id="ch7">
+    <p class="chapter-eyebrow">Chapter seven</p>
+    <h2>What to steal</h2>
+    <p>I didn't just hope it would reproduce — I tested it. Clone the repo into a throwaway <code>HOME</code> and run bootstrap against it:</p>
+    <pre><code class="language-bash">TESTHOME=$(mktemp -d)
+git clone -q ~/dotfiles "$TESTHOME/dotfiles"
+HOME="$TESTHOME" bash "$TESTHOME/dotfiles/bootstrap.sh"
+#  → exit 0 · symlinks ✓ · oh-my-zsh ✓ · plugins ✓ · 0 errors</code></pre>
+    <p>A reproducibility claim you haven't tested is a wish.</p>
+    <ul class="tight">
+      <li><strong>Declarative + idempotent</strong> beats a setup doc you'll never keep current.</li>
+      <li><strong>sops + age</strong> lets secrets live in git, safely and non-interactively.</li>
+      <li><strong>Reproducible ≠ Migration Assistant</strong> — you skip the accumulated cruft and keep only the intent.</li>
+      <li>Make <strong>drift visible</strong>. And the whole pattern transfers to any OS or team.</li>
+    </ul>
+    <p>A new MacBook is now: install Command Line Tools, install Homebrew + <code>gh auth login</code>, clone, <code>./bootstrap.sh</code>, drop in the age key. About twenty minutes to a working, themed, secret-loaded machine — that feels like mine.</p>
+  </section>
+
+  <footer>
+    <span>github.com/malpern/dotfiles</span>
+    <span>Hacker Dojo · Python Meetup · 2026</span>
+  </footer>
+
+</article>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+</body>
+</html>

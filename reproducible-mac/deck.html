@@ -111,6 +111,13 @@
     .split { display: flex !important; flex-direction: row; align-items: stretch; gap: 4vw; padding: 4vh 6vw !important; }
     .split .left { flex: 1; display: flex; flex-direction: column; justify-content: center; }
     .split .right { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+    .split .right img, .split .left img { max-width: 100%; max-height: 70vh; border-radius: 8px; border: 1px solid var(--rule); }
+
+    /* FIGURE (full diagram) */
+    .figure { display: flex !important; flex-direction: column; justify-content: center; align-items: center; }
+    .figure img { max-width: 84%; max-height: 76vh; border-radius: 10px; border: 1px solid var(--rule); }
+    .figure .cap { font-family: 'JetBrains Mono', monospace; font-size: 0.46em; color: var(--muted); margin-top: 1em; letter-spacing: 0.08em; }
+    .title-slide img.hero { width: 72%; max-width: 860px; margin-top: 1.2em; border: 1px solid var(--rule); border-radius: 10px; }
 
     /* BIGWORD */
     .bigword { display: flex !important; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
@@ -147,6 +154,7 @@
   <h1>There's no place<br>like <span class="accent" style="font-family:'JetBrains Mono',monospace; font-size:0.82em;">~/</span></h1>
   <p class="subtitle">Making a Mac reproducible from a git repo — and taming a headless Mac mini — with dotfiles, sops, uv, and a few self-inflicted wounds.</p>
   <p class="byline">MICAH ALPERN · github.com/malpern/dotfiles</p>
+  <img class="hero" src="assets/hero.svg" alt="Terminal: git clone the dotfiles repo, run bootstrap, and 'there's no place like ~/'">
   <aside class="notes">The title is the thesis: your machine as something you can clone. ~15 min, 5 chapters, ends with the war stories. Let the title breathe.</aside>
 </section>
 
@@ -230,20 +238,21 @@ command -v brew &>/dev/null    || /bin/bash -c "$(curl -fsSL …/install.sh)"
   <aside class="notes">The trick: every step is guarded. Running it on a fresh Mac installs everything; running it on a set-up Mac changes nothing. That's idempotence.</aside>
 </section>
 
-<section class="tech-marker">
-  <div class="tag">One repo, two machines</div>
-  <h3>Host-aware bootstrap</h3>
-  <pre><code class="language-bash">case "$(scutil --get LocalHostName)" in
-  openclaw*) IS_MINI=true ;;     # the headless CI mini
+<section class="split">
+  <div class="left">
+    <div class="tag">One repo, two machines</div>
+    <h3>Host-aware bootstrap</h3>
+    <pre><code class="language-bash">case "$(scutil --get LocalHostName)" in
+  openclaw*) IS_MINI=true ;;   # headless CI mini
 esac
 
-BREWFILE="Brewfile"                          # laptop: full + GUI casks
-$IS_MINI && BREWFILE="Brewfile.mini"         # mini: CLI only, no GUI
+BREWFILE="Brewfile"            # laptop: full + GUI
+$IS_MINI && BREWFILE="Brewfile.mini"
 brew bundle --file="$BREWFILE"</code></pre>
-  <p style="font-size:0.76em; margin-top:0.5em;">
-    Laptop gets apps, fonts, GUI tools. The mini gets a lean CLI toolchain —
-    and skips the keyboard-remap &amp; window-manager configs it can't use.
-  </p>
+  </div>
+  <div class="right">
+    <img src="assets/host-aware.svg" alt="Diagram: one dotfiles repo, host-aware bootstrap branching to a full laptop and a CLI-only Mac mini">
+  </div>
   <aside class="notes">Same repo drives both. The mini isn't a different setup — it's the same setup with the GUI parts switched off. Brewfile.apps (App Store + GUI) is a third, run-once file.</aside>
 </section>
 
@@ -268,6 +277,12 @@ set -a; source <(sops -d ~/dotfiles/secrets.env); set +a</code></pre>
     interactive unlock — it dies in cron/CI. Same reason I'd ditched Keychain.</span>
   </p>
   <aside class="notes">Key names visible, values encrypted. The whole file is in git. This is the part people assume is impossible. age keys are tiny and file-based — perfect for non-interactive use.</aside>
+</section>
+
+<section class="figure">
+  <img src="assets/secrets-flow.svg" alt="Diagram: encrypted secrets.env lives in git, the age key lives out-of-band, sops decrypts them into the shell at startup">
+  <div class="cap">encrypted in git · one key out-of-band · decrypted at shell start</div>
+  <aside class="notes">Walk the diagram: the encrypted file ships in git; the key never does; sops -d marries them at startup. The key is the only thing you carry to a new machine — and it works in cron/CI.</aside>
 </section>
 
 <section class="split">

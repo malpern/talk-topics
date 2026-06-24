@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Secret That Never Touches Disk — Add Secret</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --bg: #0a0812;
+      --bg-soft: #14101e;
+      --fg: #f0ebe0;
+      --muted: #8a8580;
+      --accent: #e8a634;
+      --accent-dim: #b07a20;
+      --rule: #2a2628;
+    }
+
+    /* ── Base ─────────────────────────────────── */
+    body,
+    .reveal-viewport {
+      background: var(--bg) !important;
+    }
+
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--fg);
+      font-size: 34px;
+    }
+
+    .reveal .slides {
+      text-align: left;
+    }
+
+    .reveal .slides section {
+      height: 100%;
+      padding: 4vh 6vw;
+      box-sizing: border-box;
+    }
+
+    /* ── Headings ─────────────────────────────── */
+    .reveal h1,
+    .reveal h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      color: var(--fg);
+      text-transform: none;
+      margin-bottom: 0.4em;
+    }
+
+    .reveal h1 {
+      font-size: 3.6em;
+    }
+
+    .reveal h2 {
+      font-size: 2.4em;
+    }
+
+    .reveal h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 1.4em;
+      line-height: 1.15;
+      color: var(--fg);
+      text-transform: none;
+      margin-bottom: 0.5em;
+    }
+
+    /* ── Inline styling ───────────────────────── */
+    .reveal em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .reveal strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* ── Code ─────────────────────────────────── */
+    .reveal pre {
+      width: 100%;
+      margin: 0.8em 0;
+      box-shadow: none;
+    }
+
+    .reveal pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65em;
+      line-height: 1.55;
+      background: #000;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 1em 1.2em;
+      max-height: 520px;
+    }
+
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .reveal p code,
+    .reveal li code {
+      color: var(--accent);
+      background: var(--bg-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.88em;
+    }
+
+    /* ── Tag / eyebrow ────────────────────────── */
+    .tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52em;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+      padding: 0.25em 0.7em;
+      border-radius: 3px;
+      margin-bottom: 1.2em;
+    }
+
+    /* ── Tech marker ──────────────────────────── */
+    .tech-marker::after {
+      content: '{ }';
+      position: absolute;
+      top: 4vh;
+      right: 5vw;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6em;
+      color: var(--accent-dim);
+      opacity: 0.5;
+    }
+
+    /* ── Footer ───────────────────────────────── */
+    .footer {
+      position: absolute;
+      bottom: 3vh;
+      left: 6vw;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.48em;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Slide number ─────────────────────────── */
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      color: var(--muted);
+      background: transparent;
+      right: 1.5vw;
+      bottom: 1.5vh;
+    }
+
+    /* ── Progress bar ─────────────────────────── */
+    .reveal .progress {
+      height: 3px;
+      color: var(--accent);
+    }
+
+    .reveal .progress span {
+      background: var(--accent);
+    }
+
+    /* ── TITLE SLIDE ──────────────────────────── */
+    .title-slide {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .title-slide h1 {
+      font-size: 4.4em;
+      margin-bottom: 0.15em;
+    }
+
+    .title-slide .subtitle {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 70%;
+      line-height: 1.5;
+      margin-bottom: 1.5em;
+    }
+
+    .title-slide .byline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5em;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    /* ── DIVIDER ──────────────────────────────── */
+    .divider {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .divider .chapter-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 0.6em;
+    }
+
+    .divider h2 {
+      font-size: 3.2em;
+      margin-bottom: 0.15em;
+    }
+
+    .divider .divider-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 65%;
+      line-height: 1.5;
+    }
+
+    /* ── SPLIT ────────────────────────────────── */
+    .split {
+      display: flex !important;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 4vw;
+      padding: 4vh 6vw !important;
+    }
+
+    .split .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .split .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .split .right img {
+      max-height: 70vh;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    /* ── SPLIT-DIVIDER (divider with poster) ─── */
+    .split-divider {
+      display: flex !important;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 4vw;
+      padding: 4vh 6vw !important;
+    }
+
+    .split-divider .left {
+      flex: 1.3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .split-divider .right {
+      flex: 0.7;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .split-divider .right img {
+      max-height: 60vh;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      opacity: 0.75;
+    }
+
+    .split-divider .chapter-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 0.6em;
+    }
+
+    .split-divider h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em;
+      font-size: 3.2em;
+      line-height: 1.05;
+      margin-bottom: 0.15em;
+    }
+
+    .split-divider .divider-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 90%;
+      line-height: 1.5;
+    }
+
+    /* ── BIGWORD ──────────────────────────────── */
+    .bigword {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .bigword h1 {
+      font-size: 4em;
+    }
+
+    .bigword .muted-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      margin-top: 0.5em;
+    }
+
+    /* ── PULLQUOTE ────────────────────────────── */
+    .pullquote {
+      border-left: 4px solid var(--accent);
+      padding-left: 1.2em;
+      margin: 1.2em 0;
+      font-size: 1.15em;
+      line-height: 1.5;
+      color: var(--fg);
+    }
+
+    /* ── STEPS list ───────────────────────────── */
+    .steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 2.4em;
+      margin-bottom: 0.9em;
+      line-height: 1.5;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0.05em;
+      width: 1.5em;
+      height: 1.5em;
+      background: var(--accent-dim);
+      color: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.8em;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── CLUES list ───────────────────────────── */
+    .clues {
+      list-style: none;
+      padding: 0;
+    }
+
+    .clues li {
+      padding: 0.5em 0;
+      border-bottom: 1px solid var(--rule);
+      line-height: 1.5;
+    }
+
+    .clues li:last-child {
+      border-bottom: none;
+    }
+
+    /* ── Date list ────────────────────────────── */
+    .date-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .date-list li {
+      padding: 0.6em 0;
+      border-bottom: 1px solid var(--rule);
+      font-size: 1em;
+      line-height: 1.6;
+    }
+
+    .date-list li:last-child {
+      border-bottom: none;
+    }
+
+    .date-list .date {
+      color: var(--accent);
+      font-weight: 600;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9em;
+    }
+
+    .date-list .title-ref {
+      color: var(--muted);
+      margin-left: 0.3em;
+    }
+
+    .date-list .note {
+      color: var(--accent-dim);
+      font-size: 0.78em;
+      font-style: normal;
+    }
+
+    /* ── Table ────────────────────────────────── */
+    .reveal table {
+      border-collapse: collapse;
+      font-size: 0.72em;
+      width: 100%;
+    }
+
+    .reveal table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border-bottom: 2px solid var(--rule);
+      padding: 0.5em 0.8em;
+      text-align: left;
+    }
+
+    .reveal table td {
+      padding: 0.5em 0.8em;
+      border-bottom: 1px solid var(--rule);
+      color: var(--fg);
+    }
+
+    .reveal table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ── Infomercial slide ────────────────────── */
+    .infomercial-slide {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    /* ── Misc helpers ─────────────────────────── */
+    .small {
+      font-size: 0.65em;
+    }
+
+    .v-spacer {
+      margin-top: 1.2em;
+    }
+
+    .reveal a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .reveal a:hover {
+      text-decoration: underline;
+    }
+
+    .reveal ul,
+    .reveal ol {
+      margin-left: 0;
+    }
+
+    .reveal section p {
+      line-height: 1.6;
+      margin-bottom: 0.6em;
+    }
+
+    /* ── Poster float (for inline slides) ─────── */
+    .poster-float {
+      float: right;
+      margin-left: 2em;
+      max-height: 55vh;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- TITLE SLIDE                                                   -->
+<!-- ============================================================ -->
+<section class="title-slide">
+  <div class="tag">MICAH ALPERN · 2026</div>
+  <h1>The secret that<br>never touches <span class="accent">disk</span>.</h1>
+  <p class="subtitle">A Swift macOS app for handing a secret from a human to an AI agent — safely. The value goes from a password field straight into encrypted storage, and the agent never sees it.</p>
+  <p class="byline">SWIFTUI · SOPS + AGE · GITHUB.COM/MALPERN/DOTFILES</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 01 DIVIDER                                            -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER · 01</div>
+  <h2>The <span class="accent">problem</span>.</h2>
+  <p class="divider-sub">Your agent needs an API key. You have it. How do you hand it over without leaking it?</p>
+</section>
+
+<!-- ── 01 · why not just paste it ──────────────────────────────── -->
+<section class="tech-marker">
+  <div class="tag">THE NAIVE WAY</div>
+  <h3>"Just paste the key in chat."</h3>
+  <p style="font-size:0.85em; line-height:1.6;">The obvious move is also the leak. The moment a secret becomes text the agent can read, it's everywhere the text goes:</p>
+  <ul class="clues" style="margin-top:0.8em;">
+    <li><strong>The transcript</strong> — every message is logged, summarized, and often shipped to a model provider. Your key rides along.</li>
+    <li><strong>The process list</strong> — pass it as an argument and <code>ps aux</code> shows it to every user on the box.</li>
+    <li><strong>Shell history</strong> — <code>export KEY=…</code> lands in <code>~/.zsh_history</code> in plaintext, forever.</li>
+  </ul>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 01 · three failure modes ────────────────────────────────── -->
+<section>
+  <div class="tag">THREE FAILURE MODES</div>
+  <h3>Every easy path is a leak.</h3>
+  <table style="margin-top:1em;">
+    <thead>
+      <tr><th>Where it goes</th><th>Why it leaks</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><strong>In the prompt</strong></td><td>Captured in the transcript → logs, model provider, summaries</td></tr>
+      <tr><td><strong>In a file</strong></td><td>Plaintext on disk → backups, Spotlight, a stray <code>git add .</code></td></tr>
+      <tr><td><strong>In env / argv</strong></td><td>Visible in <code>ps</code>, inherited by child processes, lands in history</td></tr>
+    </tbody>
+  </table>
+  <p class="muted v-spacer" style="font-size:0.8em;">The common thread: the secret became a <em>string the agent handled</em>. To be safe, it never can.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 01 · what we need ───────────────────────────────────────── -->
+<section>
+  <div class="tag">THE REQUIREMENT</div>
+  <h3>The value enters a <span class="accent">SecureField</span> — and stops there.</h3>
+  <p style="font-size:0.85em; line-height:1.6;">What we actually need is narrow and precise:</p>
+  <ul class="clues" style="margin-top:0.8em;">
+    <li>A human types the secret into a native macOS <code>SecureField</code> — no clipboard, no chat.</li>
+    <li>It flows <strong>directly into encryption</strong> and never becomes a string the agent can read.</li>
+    <li>The agent <strong>can still drive the whole thing</strong> — pre-fill the key name, launch, read the outcome.</li>
+  </ul>
+  <p class="pullquote" style="font-size:0.95em;">The agent orchestrates. The human supplies the one thing the agent must never see.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 02 DIVIDER                                            -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER · 02</div>
+  <h2>The <span class="accent">stack</span>.</h2>
+  <p class="divider-sub">Encrypted secrets, committed to git, decryptable on every machine — without a Keychain or an interactive shell.</p>
+</section>
+
+<!-- ── 02 · sops + age ─────────────────────────────────────────── -->
+<section class="tech-marker">
+  <div class="tag">FOUNDATIONS</div>
+  <h3>sops + age</h3>
+  <ul class="clues" style="margin-top:1em;">
+    <li><strong>age</strong> — a tiny, modern file-encryption tool. One keypair. The private key lives at <code>~/.config/sops/age/keys.txt</code> (chmod 600, never committed).</li>
+    <li><strong>sops</strong> — encrypts <em>values</em> in a structured file while leaving the <em>keys</em> readable. So a dotenv stays diff-able and reviewable; only the secrets are ciphertext.</li>
+  </ul>
+  <p class="muted v-spacer" style="font-size:0.8em;">The encrypted file is committed to a <strong>private git repo</strong>. The repo is the source of truth; the age key is the only thing that decrypts it.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 02 · secrets.env shape ──────────────────────────────────── -->
+<section>
+  <div class="tag">~/DOTFILES/SECRETS.ENV</div>
+  <h3>Key names visible. Values encrypted.</h3>
+  <pre><code class="language-bash"># ~/dotfiles/secrets.env  — committed to git, encrypted by sops
+ANTHROPIC_API_KEY=ENC[AES256_GCM,data:9Hk2…tA==,iv:5f…,tag:1c…,type:str]
+LINEAR_API_KEY_WORK=ENC[AES256_GCM,data:pQ7…vM==,iv:bd…,tag:9a…,type:str]
+FIGMA_TOKEN_PERSONAL=ENC[AES256_GCM,data:Lm0…xY==,iv:e1…,tag:77…,type:str]
+# sops metadata (age recipient, MAC) lives in a trailing block</code></pre>
+  <p class="muted" style="font-size:0.8em;">You can read the diff, see <em>which</em> keys changed, and review a PR — without any value ever appearing in plaintext.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 02 · wrappers self-decrypt ──────────────────────────────── -->
+<section>
+  <div class="tag">CONSUMPTION</div>
+  <h3>Every wrapper self-decrypts.</h3>
+  <pre><code class="language-bash"># inside ~/.local/bin/lin, gmailq, notion, figma… each tool decrypts itself:
+KEY=$(sops -d ~/dotfiles/secrets.env | grep '^LINEAR_API_KEY_WORK=' | cut -d= -f2-)</code></pre>
+  <ul class="clues" style="margin-top:0.6em;">
+    <li><strong>No Keychain</strong> — it fails in non-interactive shells and can wipe creds.</li>
+    <li><strong>No interactive unlock</strong> — the age key is found on disk; sops never prompts.</li>
+    <li><strong>Works anywhere</strong> — agent shell, <code>cron</code>, SSH, a launchd job. Same path, every time.</li>
+  </ul>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 03 DIVIDER                                            -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER · 03</div>
+  <h2>The <span class="accent">app</span>.</h2>
+  <p class="divider-sub">~450 lines of SwiftUI. Three phases, one pipeline, one result file. No Xcode.</p>
+</section>
+
+<!-- ── 03 · three phases ───────────────────────────────────────── -->
+<section class="tech-marker">
+  <div class="tag">SWIFTUI · ENUM PHASE</div>
+  <h3>Three phases, three views.</h3>
+  <table style="margin-top:1em;">
+    <thead>
+      <tr><th>Phase</th><th>View</th><th>What happens</th></tr>
+    </thead>
+    <tbody>
+      <tr><td><code>.input</code></td><td><code>inputView</code></td><td>Key-name field + <code>SecureField</code> for the value</td></tr>
+      <tr><td><code>.working</code></td><td><code>workingView</code></td><td>Live status line as the pipeline runs</td></tr>
+      <tr><td><code>.done</code></td><td><code>resultView</code></td><td>Per-step checklist; success or failure</td></tr>
+    </tbody>
+  </table>
+  <pre><code class="language-swift">enum Phase { case input, working, done }
+switch phase {
+case .input:   inputView
+case .working: workingView
+case .done:    resultView
+}</code></pre>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 03 · the pipeline in code ───────────────────────────────── -->
+<section>
+  <div class="tag">ADDSECRET.SWIFT</div>
+  <h3>The pipeline — value flows as <span class="accent">stdin</span>, never argv.</h3>
+  <pre><code class="language-swift">// decrypt → modify in memory → re-encrypt via stdin → write → commit → sync
+let dec = run(SOPS, ["-d", SECRETS])              // 1. decrypt to memory
+var lines = dec.out.split(separator: "\n").map(String.init)
+// …find-or-append  key=value  in `lines`…
+let plaintext = lines.joined(separator: "\n") + "\n"
+
+// 2. re-encrypt. THE secret rides stdin — it is never an argument:
+let enc = run(SOPS, ["-e", "--input-type", "dotenv",
+                     "--output-type", "dotenv",
+                     "--age", AGE_PUB, "/dev/stdin"], stdin: plaintext)
+
+try enc.out.write(toFile: SECRETS, atomically: true, encoding: .utf8)  // 3.
+run(GIT, ["-C", DOTFILES, "commit", "-m", "secrets: set \(key)"])      // 4.
+run(GIT, ["-C", DOTFILES, "push"])                                     // 5. → SSH sync</code></pre>
+  <p class="muted" style="font-size:0.78em;"><code>/dev/stdin</code> is the whole trick: the plaintext never appears in <code>argv</code>, so it never shows up in <code>ps</code>.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 03 · writeStatus / result.json ──────────────────────────── -->
+<section>
+  <div class="tag">~/.CONFIG/ADD-SECRET/RESULT.JSON</div>
+  <h3>A result file with <span class="accent">no secret in it</span>.</h3>
+  <pre><code class="language-json">{
+  "status": "success",
+  "key": "ANTHROPIC_API_KEY",
+  "timestamp": "2026-06-23T14:02:11Z",
+  "steps": [
+    { "step": "Added ANTHROPIC_API_KEY (encrypted)", "ok": true,  "detail": "" },
+    { "step": "Pushed to GitHub",                     "ok": true,  "detail": "" },
+    { "step": "mini · clawd",                          "ok": true,  "detail": "" }
+  ]
+}</code></pre>
+  <p class="muted" style="font-size:0.8em;">Dir <code>0700</code>, file <code>0600</code>. Just metadata — key name, timestamp, per-step status. <strong>Never the value.</strong> This is the one thing the agent reads.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 03 · build with no Xcode ────────────────────────────────── -->
+<section>
+  <div class="tag">BUILD.SH</div>
+  <h3>No Xcode. One <code>swiftc</code> line.</h3>
+  <pre><code class="language-bash">swiftc -O -parse-as-library \
+  -framework SwiftUI -framework AppKit \
+  -o "Add Secret.app/Contents/MacOS/AddSecret" AddSecret.swift
+
+codesign --force --sign - "Add Secret.app"   # ad-hoc sign
+ln -sfn "$(pwd)/Add Secret.app" "/Applications/Add Secret.app"</code></pre>
+  <p style="font-size:0.82em; line-height:1.6;"><code>build.sh</code> hand-assembles the <code>.app</code> bundle — <code>Info.plist</code>, a rendered icon, the compiled binary — then symlinks it into <code>/Applications</code> so Spotlight and <code>open -a</code> find it. The <code>.app</code> is gitignored; rebuild anywhere with <code>./build.sh</code>.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 04 DIVIDER                                            -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER · 04</div>
+  <h2>The agent <span class="accent">protocol</span>.</h2>
+  <p class="divider-sub">How an AI agent asks for a secret it must never see — launch, block, poll, move on.</p>
+</section>
+
+<!-- ── 04 · blocking launch ────────────────────────────────────── -->
+<section class="tech-marker">
+  <div class="tag">STEP 1 · LAUNCH &amp; BLOCK</div>
+  <h3>Open the app, pre-filled, and wait.</h3>
+  <pre><code class="language-bash">open -W -n "/Applications/Add Secret.app" --args --key ANTHROPIC_API_KEY</code></pre>
+  <ul class="clues" style="margin-top:0.8em;">
+    <li><code>--key</code> pre-fills the key name so the human only types the value.</li>
+    <li><code>-W</code> makes <code>open</code> <strong>block until the window closes</strong> — the app quits on Done <em>or</em> close, so the call always returns.</li>
+    <li><code>-n</code> forces a fresh instance. One Bash call, in and out.</li>
+  </ul>
+  <p class="muted v-spacer" style="font-size:0.8em;">The agent is now parked on a single blocking command while a human does the one private part.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 04 · poll the result ────────────────────────────────────── -->
+<section>
+  <div class="tag">STEP 2 · READ THE OUTCOME</div>
+  <h3>Three statuses, one file.</h3>
+  <pre><code class="language-bash">cat ~/.config/add-secret/result.json   # written 0600 by the app</code></pre>
+  <table style="margin-top:0.8em;">
+    <thead><tr><th>status</th><th>meaning</th><th>agent does</th></tr></thead>
+    <tbody>
+      <tr><td><code>pending</code></td><td>written at launch; human hasn't finished</td><td>treat as cancelled</td></tr>
+      <tr><td><code>success</code></td><td>encrypted, pushed, synced</td><td>continue — key is live</td></tr>
+      <tr><td><code>failure</code></td><td>a step failed</td><td>read <code>steps[]</code> for which</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:0.78em;"><code>pending</code> is the clever bit — it's written <em>before</em> the human acts, so the agent can tell "finished" from "closed the window."</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 04 · the sync chain ─────────────────────────────────────── -->
+<section>
+  <div class="tag">STEP 3 · FAN-OUT</div>
+  <h3>One action, every machine.</h3>
+  <pre><code class="language-bash"># on success the app, in order:
+git -C ~/dotfiles commit -m "secrets: set KEY"   # 1. commit ciphertext
+git -C ~/dotfiles push                            # 2. push to GitHub
+ssh openclaw          'cd ~/dotfiles && git pull --ff-only'   # 3. mini · clawd
+ssh malpern@openclaw.local 'cd ~/dotfiles && git pull --ff-only' # 4. mini · malpern</code></pre>
+  <p style="font-size:0.82em; line-height:1.6;">From one click on one Mac, the encrypted key is committed, pushed to GitHub, and pulled onto both Mac mini accounts over SSH. Every machine that runs an agent now has the key — and each <code>ssh</code> result becomes a step in <code>result.json</code>.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 04 · what the agent never sees ──────────────────────────── -->
+<section>
+  <div class="tag">THE INVARIANT</div>
+  <h3>What the agent <span class="accent">never</span> sees.</h3>
+  <p style="font-size:0.9em; line-height:1.7; margin-top:0.5em;">
+    The value's entire life is:
+  </p>
+  <p class="pullquote" style="font-size:1.05em;">
+    <code>SecureField</code> &nbsp;→&nbsp; <code>sops</code> stdin &nbsp;→&nbsp; <code>ENC[AES256_GCM,…]</code>
+  </p>
+  <ul class="clues" style="margin-top:0.6em;">
+    <li>It never becomes a Swift <code>String</code> the agent's transcript could capture.</li>
+    <li>It never enters <code>argv</code>, so it never appears in <code>ps</code>.</li>
+    <li>It never hits disk in plaintext — only as ciphertext in the repo.</li>
+    <li>The agent reads <strong>only</strong> <code>result.json</code>, which contains no value.</li>
+  </ul>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 05 DIVIDER                                            -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER · 05</div>
+  <h2>Status.</h2>
+  <p class="divider-sub">It's live. Here's where it lives and how to add a key in the next thirty seconds.</p>
+</section>
+
+<!-- ── 05 · what's live ────────────────────────────────────────── -->
+<section>
+  <div class="tag">SHIPPING</div>
+  <h3>What's live</h3>
+  <ul class="clues" style="margin-top:1em;">
+    <li>Source at <code>~/dotfiles/secret-adder/</code> — <code>AddSecret.swift</code>, <code>build.sh</code>, <code>makeicon.swift</code></li>
+    <li>The built <code>.app</code> is symlinked into <code>/Applications</code> (Spotlight + Dock find it)</li>
+    <li>Rebuilt automatically by <code>bootstrap.sh</code> whenever the source changes</li>
+    <li>Repo: <a href="https://github.com/malpern/dotfiles">github.com/malpern/dotfiles</a> (private)</li>
+  </ul>
+  <p class="muted v-spacer" style="font-size:0.8em;">SwiftUI · AppKit · macOS Liquid Glass · sops + age · ~450 lines</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 05 · add a secret right now ─────────────────────────────── -->
+<section>
+  <div class="tag">DO IT NOW</div>
+  <h3>Three commands</h3>
+  <ol class="steps" style="margin-top:1.2em;">
+    <li><code>./build.sh</code></li>
+    <li><code>open -W -n "Add Secret.app" --args --key MY_KEY</code></li>
+    <li><code>cat ~/.config/add-secret/result.json</code></li>
+  </ol>
+  <p class="muted v-spacer" style="font-size:0.8em;">Build it, type the value into the box, read the outcome. The key is now encrypted, pushed, and on every Mac.</p>
+  <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── FINAL ───────────────────────────────────────────────────── -->
+<section class="bigword">
+  <h1>Secrets stay <span class="accent">secrets</span>.</h1>
+  <p class="muted-sub" style="font-size:0.7em; margin-top:1em;">
+    <a href="https://github.com/malpern/dotfiles">github.com/malpern/dotfiles</a><br>
+    <span class="muted">Micah Alpern · 2026</span>
+  </p>
+</section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    controls: false,
+    progress: true,
+    center: false,
+    width: 1400,
+    height: 850,
+    margin: 0.02,
+    minScale: 0.3,
+    maxScale: 2.0,
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+</script>
+
+</body>
+</html>

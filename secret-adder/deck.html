@@ -660,6 +660,19 @@ case .done:    resultView
   <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
 </section>
 
+<!-- ── 03 · the input view (screenshot) ────────────────────────── -->
+<section class="split">
+  <div class="left">
+    <div class="tag">PHASE · INPUT</div>
+    <h3>The input view.</h3>
+    <p style="font-size:0.82em; line-height:1.6;">The agent pre-filled the key name — <code>ANTHROPIC_API_KEY</code>. The human types the value into a native <code>SecureField</code>; it renders as dots and never becomes plaintext.</p>
+    <p style="font-size:0.82em; line-height:1.6; margin-top:0.8em;">The toggle fans the encrypted key out to every Mac. One button: <strong>Encrypt &amp; Add</strong>.</p>
+  </div>
+  <div class="right">
+    <img src="assets/app-input.png" alt="Add Secret input window — key name field, a SecureField showing dots, a Sync to Mac mini toggle, and an Encrypt & Add button">
+  </div>
+</section>
+
 <!-- ── 03 · the pipeline in code ───────────────────────────────── -->
 <section>
   <div class="tag">ADDSECRET.SWIFT</div>
@@ -698,6 +711,19 @@ run(GIT, ["-C", DOTFILES, "push"])                                     // 5. →
 }</code></pre>
   <p class="muted" style="font-size:0.8em;">Dir <code>0700</code>, file <code>0600</code>. Just metadata — key name, timestamp, per-step status. <strong>Never the value.</strong> This is the one thing the agent reads.</p>
   <div class="footer">Add Secret · sops + age · github.com/malpern/dotfiles</div>
+</section>
+
+<!-- ── 03 · the done view (screenshot) ─────────────────────────── -->
+<section class="split">
+  <div class="left">
+    <div class="tag">PHASE · DONE</div>
+    <h3>The success view.</h3>
+    <p style="font-size:0.82em; line-height:1.6;">Same data the agent reads from <code>result.json</code>, shown to the human: the key was encrypted, committed, and pushed — each step a green check.</p>
+    <p class="muted" style="font-size:0.8em; line-height:1.6; margin-top:0.8em;">Closing the window quits the app, so an agent's <code>open -W</code> always returns.</p>
+  </div>
+  <div class="right">
+    <img src="assets/app-success.png" alt="Add Secret success window — a green checkmark, the heading Secret Added, the key name, and a checklist showing Added (encrypted) and Pushed to GitHub">
+  </div>
 </section>
 
 <!-- ── 03 · build with no Xcode ────────────────────────────────── -->

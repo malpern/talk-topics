@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Six Hundred Pages on a Four-Inch Screen — PDF → EPUB</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/monokai.css">
+
+  <style>
+    :root {
+      --bg: #12141a;
+      --bg-soft: #191c24;
+      --fg: #eef1f4;
+      --muted: #858b97;
+      --accent: #74b8c7;
+      --accent-dim: #4d8693;
+      --rule: #262a33;
+      --eink: #f3f1ea;
+    }
+
+    /* ── Base ─────────────────────────────────── */
+    body,
+    .reveal-viewport {
+      background: var(--bg) !important;
+    }
+
+    .reveal {
+      font-family: 'Inter', sans-serif;
+      font-weight: 400;
+      color: var(--fg);
+      font-size: 34px;
+    }
+
+    .reveal .slides {
+      text-align: left;
+    }
+
+    .reveal .slides section {
+      height: 100%;
+      padding: 4vh 6vw;
+      box-sizing: border-box;
+    }
+
+    /* ── Headings ─────────────────────────────── */
+    .reveal h1,
+    .reveal h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em;
+      line-height: 1.05;
+      color: var(--fg);
+      text-transform: none;
+      margin-bottom: 0.4em;
+    }
+
+    .reveal h1 {
+      font-size: 3.6em;
+    }
+
+    .reveal h2 {
+      font-size: 2.4em;
+    }
+
+    .reveal h3 {
+      font-family: 'Inter', sans-serif;
+      font-weight: 800;
+      font-size: 1.4em;
+      line-height: 1.15;
+      color: var(--fg);
+      text-transform: none;
+      margin-bottom: 0.5em;
+    }
+
+    /* ── Inline styling ───────────────────────── */
+    .reveal em {
+      font-style: normal;
+      color: var(--accent);
+    }
+
+    .reveal strong {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    .accent {
+      color: var(--accent);
+    }
+
+    .muted {
+      color: var(--muted);
+    }
+
+    /* ── Code ─────────────────────────────────── */
+    .reveal pre {
+      width: 100%;
+      margin: 0.8em 0;
+      box-shadow: none;
+    }
+
+    .reveal pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62em;
+      line-height: 1.55;
+      background: #0b0c10;
+      border: 1px solid var(--rule);
+      border-radius: 6px;
+      padding: 1em 1.2em;
+      max-height: 520px;
+    }
+
+    .reveal code {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .reveal p code,
+    .reveal li code {
+      color: var(--accent);
+      background: var(--bg-soft);
+      padding: 0.1em 0.35em;
+      border-radius: 4px;
+      font-size: 0.88em;
+    }
+
+    /* ── Tag / eyebrow ────────────────────────── */
+    .tag {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.52em;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      border: 1px solid var(--accent-dim);
+      padding: 0.25em 0.7em;
+      border-radius: 3px;
+      margin-bottom: 1.2em;
+    }
+
+    /* ── Tech marker ──────────────────────────── */
+    .tech-marker::after {
+      content: '< / >';
+      position: absolute;
+      top: 4vh;
+      right: 5vw;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6em;
+      color: var(--accent-dim);
+      opacity: 0.5;
+    }
+
+    /* ── Footer ───────────────────────────────── */
+    .footer {
+      position: absolute;
+      bottom: 3vh;
+      left: 6vw;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.48em;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Slide number ─────────────────────────── */
+    .reveal .slide-number {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      color: var(--muted);
+      background: transparent;
+      right: 1.5vw;
+      bottom: 1.5vh;
+    }
+
+    /* ── Progress bar ─────────────────────────── */
+    .reveal .progress {
+      height: 3px;
+      color: var(--accent);
+    }
+
+    .reveal .progress span {
+      background: var(--accent);
+    }
+
+    /* ── TITLE SLIDE ──────────────────────────── */
+    .title-slide {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .title-slide h1 {
+      font-size: 4.2em;
+      margin-bottom: 0.15em;
+    }
+
+    .title-slide .subtitle {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 70%;
+      line-height: 1.5;
+      margin-bottom: 1.5em;
+    }
+
+    .title-slide .byline {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.5em;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+    }
+
+    /* ── DIVIDER ──────────────────────────────── */
+    .divider {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .divider .chapter-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 0.6em;
+    }
+
+    .divider h2 {
+      font-size: 3.2em;
+      margin-bottom: 0.15em;
+    }
+
+    .divider .divider-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 65%;
+      line-height: 1.5;
+    }
+
+    /* ── SPLIT ────────────────────────────────── */
+    .split {
+      display: flex !important;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 4vw;
+      padding: 4vh 6vw !important;
+    }
+
+    .split .left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .split .right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .split .right img {
+      max-height: 70vh;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+    }
+
+    /* ── SPLIT-DIVIDER (divider with figure) ─── */
+    .split-divider {
+      display: flex !important;
+      flex-direction: row;
+      align-items: stretch;
+      gap: 4vw;
+      padding: 4vh 6vw !important;
+    }
+
+    .split-divider .left {
+      flex: 1.3;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .split-divider .right {
+      flex: 0.7;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .split-divider .right img {
+      max-height: 58vh;
+      border-radius: 6px;
+      background: #f4f4f2;
+      padding: 1.2em;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      opacity: 0.9;
+    }
+
+    .split-divider .chapter-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--accent-dim);
+      margin-bottom: 0.6em;
+    }
+
+    .split-divider h2 {
+      font-family: 'Bebas Neue', sans-serif;
+      letter-spacing: 0.04em;
+      font-size: 3.2em;
+      line-height: 1.05;
+      margin-bottom: 0.15em;
+    }
+
+    .split-divider .divider-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      max-width: 90%;
+      line-height: 1.5;
+    }
+
+    /* ── BIGWORD ──────────────────────────────── */
+    .bigword {
+      display: flex !important;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    .bigword h1 {
+      font-size: 4em;
+    }
+
+    .bigword .muted-sub {
+      font-size: 0.82em;
+      color: var(--muted);
+      margin-top: 0.5em;
+    }
+
+    /* ── PULLQUOTE ────────────────────────────── */
+    .pullquote {
+      border-left: 4px solid var(--accent);
+      padding-left: 1.2em;
+      margin: 1.2em 0;
+      font-size: 1.15em;
+      line-height: 1.5;
+      color: var(--fg);
+    }
+
+    /* ── STEPS list ───────────────────────────── */
+    .steps {
+      list-style: none;
+      padding: 0;
+      counter-reset: step;
+    }
+
+    .steps li {
+      counter-increment: step;
+      position: relative;
+      padding-left: 2.4em;
+      margin-bottom: 0.9em;
+      line-height: 1.5;
+    }
+
+    .steps li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0.05em;
+      width: 1.5em;
+      height: 1.5em;
+      background: var(--accent-dim);
+      color: var(--bg);
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 0.8em;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ── CLUES list ───────────────────────────── */
+    .clues {
+      list-style: none;
+      padding: 0;
+    }
+
+    .clues li {
+      padding: 0.5em 0;
+      border-bottom: 1px solid var(--rule);
+      line-height: 1.5;
+    }
+
+    .clues li:last-child {
+      border-bottom: none;
+    }
+
+    /* ── Table ────────────────────────────────── */
+    .reveal table {
+      border-collapse: collapse;
+      font-size: 0.72em;
+      width: 100%;
+    }
+
+    .reveal table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent);
+      border-bottom: 2px solid var(--rule);
+      padding: 0.5em 0.8em;
+      text-align: left;
+    }
+
+    .reveal table td {
+      padding: 0.5em 0.8em;
+      border-bottom: 1px solid var(--rule);
+      color: var(--fg);
+    }
+
+    .reveal table tr:last-child td {
+      border-bottom: none;
+    }
+
+    /* ── Misc helpers ─────────────────────────── */
+    .small {
+      font-size: 0.65em;
+    }
+
+    .v-spacer {
+      margin-top: 1.2em;
+    }
+
+    .reveal a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .reveal a:hover {
+      text-decoration: underline;
+    }
+
+    .reveal ul,
+    .reveal ol {
+      margin-left: 0;
+    }
+
+    .reveal section p {
+      line-height: 1.6;
+      margin-bottom: 0.6em;
+    }
+
+    /* ── Spec chips ───────────────────────────── */
+    .specs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5em;
+      margin: 1em 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .specs span {
+      font-size: 0.6em;
+      color: var(--accent);
+      background: rgba(116,184,199,0.12);
+      border: 1px solid var(--rule);
+      padding: 0.3em 0.7em;
+      border-radius: 999px;
+    }
+
+    /* ── E-ink device mockup ──────────────────── */
+    .device {
+      width: 100%;
+      max-width: 280px;
+      margin: 0 auto;
+      background: #15171c;
+      border-radius: 18px;
+      padding: 14px 14px 34px;
+      box-shadow: 0 14px 40px rgba(0,0,0,0.55);
+      position: relative;
+      border: 1px solid #2c2f37;
+    }
+
+    .device .screen {
+      background: var(--eink);
+      color: #1b1b1b;
+      border-radius: 3px;
+      padding: 14px 13px;
+      height: 400px;
+      overflow: hidden;
+      font-family: 'Iowan Old Style', Georgia, serif;
+      line-height: 1.45;
+      position: relative;
+    }
+
+    .device .screen h4 {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.42em;
+      margin-bottom: 0.5em;
+      color: #111;
+    }
+
+    .device .screen p {
+      font-size: 0.38em;
+      text-align: justify;
+      margin-bottom: 0.6em;
+      color: #1b1b1b;
+      hyphens: auto;
+      line-height: 1.5;
+    }
+
+    .device .screen math {
+      font-size: 0.42em;
+      color: #111;
+    }
+
+    .device .screen .mini-eyebrow {
+      font-family: 'Helvetica Neue', Arial, sans-serif;
+      font-size: 0.32em;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #777;
+      margin-bottom: 0.6em;
+    }
+
+    .device .screen::after {
+      content: "47";
+      position: absolute;
+      bottom: 6px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      font-family: 'Helvetica Neue', sans-serif;
+      font-size: 0.3em;
+      color: #999;
+    }
+
+    .device .btns {
+      position: absolute;
+      bottom: 12px;
+      left: 0;
+      right: 0;
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .device .btns span {
+      width: 30px;
+      height: 6px;
+      border-radius: 3px;
+      background: #2c2f37;
+    }
+
+    .compare-cap {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.55em;
+      color: var(--muted);
+      text-align: center;
+      margin-top: 0.8em;
+      letter-spacing: 0.04em;
+    }
+
+    .arrow-big {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-size: 2.4em;
+      align-self: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+<!-- ============================================================ -->
+<!-- TITLE SLIDE                                                   -->
+<!-- ============================================================ -->
+<section class="title-slide">
+  <div class="tag">HACKER DOJO &middot; PYTHON MEETUP &middot; 2026</div>
+  <h1>SIX HUNDRED PAGES<br>ON A <span class="accent">FOUR-INCH</span> SCREEN.</h1>
+  <p class="subtitle">Turning MIT's 320-page 6.01 textbook into a clean, reflowable EPUB for a pocket e-ink reader — with Marker, pandoc, and a 150-line cleanup script.</p>
+  <p class="byline">MICAH ALPERN &middot; <span class="accent">@malpern</span> &middot; github.com/malpern/mit6-01-eink-epub</p>
+  <aside class="notes">Open with the absurdity: a US-Letter textbook on a screen the size of a credit card. The whole talk is the recipe to make that readable.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE HOOK — THE READER                                         -->
+<!-- ============================================================ -->
+<section class="split">
+  <div class="left">
+    <h1 style="font-size:3em;">A reader the size of<br>a <span class="accent">credit card.</span></h1>
+    <p class="muted" style="font-size:0.78em; margin-top:0.6em;">4.3 inches. 800&times;480. Roughly $55. No backlight, no notifications, two-week battery.</p>
+    <div class="specs">
+      <span>4.3″ E Ink</span><span>800×480 · 220ppi</span><span>74 g</span><span>5.9 mm</span><span>~14-day battery</span><span>≈ $55</span>
+    </div>
+  </div>
+  <div class="right">
+    <img src="assets/x4-reader.jpg" alt="The Xteink X4 pocket e-ink reader" style="background:#fff; padding:1.6em; border-radius:14px; max-height:64vh;">
+  </div>
+  <aside class="notes">The Xteink X4. Part of a wave of tiny cheap e-readers having a moment. Frictionless reading — but one catch.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE HOOK — THE CATCH                                          -->
+<!-- ============================================================ -->
+<section class="bigword">
+  <h1>PDFs <span class="accent">DON'T</span><br>REFLOW.</h1>
+  <p class="muted-sub">A 320-page textbook laid out for US&nbsp;Letter, squeezed onto a 480-pixel screen, is a pinch-zoom nightmare.</p>
+  <aside class="notes">This is the problem statement. Fixed layout is the enemy of a tiny screen. The whole talk is how to escape it.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- THE GOAL — REFLOWABLE EPUB                                    -->
+<!-- ============================================================ -->
+<section class="bigword">
+  <h1>BUILD A<br><span class="accent">REFLOWABLE</span> EPUB.</h1>
+  <p class="muted-sub">Text that rewraps to the screen. Resizable fonts. Real math. The whole recipe fits in an afternoon.</p>
+  <aside class="notes">Mission statement. Reflowable EPUB = text rewraps, fonts resize, equations are real MathML. Now let's build it.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 01 DIVIDER — BEFORE & AFTER                           -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER &middot; 01</div>
+  <h2>Before &amp; <span class="accent">after</span>.</h2>
+  <p class="divider-sub">Same chapter, two formats. Where we start, and where we end up.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 01 — THE COMPARISON                                   -->
+<!-- ============================================================ -->
+<section class="split">
+  <div class="left" style="align-items:center;">
+    <img src="assets/source-page.png" alt="Original MIT 6.01 PDF page" style="max-height:64vh; border-radius:4px; border:1px solid var(--rule); box-shadow:0 8px 40px rgba(0,0,0,0.5);">
+    <div class="compare-cap">SOURCE PDF — fixed layout,<br>page furniture, doesn't reflow</div>
+  </div>
+  <div class="arrow-big">&rarr;</div>
+  <div class="right">
+    <div class="device" role="img" aria-label="The produced EPUB on the Xteink X4">
+      <div class="screen">
+        <div class="mini-eyebrow">Chapter 1 · Course Overview</div>
+        <h4>1.3 &nbsp;Voltage dividers</h4>
+        <p>We can use the abstraction of a voltage divider to find the voltage across a component. For two resistors in series,</p>
+        <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>V</mi><mtext mathvariant="normal">out</mtext></msub><mo>=</mo><mfrac><msub><mi>R</mi><mi>B</mi></msub><mrow><msub><mi>R</mi><mi>A</mi></msub><mo>+</mo><msub><mi>R</mi><mi>B</mi></msub></mrow></mfrac><msub><mi>V</mi><mtext mathvariant="normal">in</mtext></msub><mspace width="0.222em"></mspace><mi>.</mi></mrow></semantics></math>
+        <p>The output voltage is the input scaled by the ratio of the resistances — the building block for the rest of the chapter.</p>
+      </div>
+      <div class="btns" aria-hidden="true"><span></span><span></span><span></span></div>
+    </div>
+    <div class="compare-cap">PRODUCED EPUB on the X4 — reflowed,<br>furniture stripped, real MathML</div>
+  </div>
+  <aside class="notes">Left: original PDF, running header "6.01 — Spring 2011", page number, fixed columns. Right: live mockup using the actual text and real MathML from the generated EPUB. Furniture gone, text reflows, equation scales.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 02 DIVIDER — THE PIPELINE                             -->
+<!-- ============================================================ -->
+<section class="split-divider">
+  <div class="left">
+    <div class="chapter-num">CHAPTER &middot; 02</div>
+    <h2>The <span class="accent">pipeline</span>.</h2>
+    <p class="divider-sub">Three tools do the heavy lifting. The hard part is turning a fixed PDF into structured text.</p>
+  </div>
+  <div class="right">
+    <img src="assets/_page_114_Figure_3.jpeg" alt="A figure extracted from the textbook">
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 02 — THE THREE TOOLS                                  -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">THE TOOLCHAIN</div>
+  <h3>Three tools, in order</h3>
+  <ol class="steps" style="margin-top:0.8em;">
+    <li><strong>Marker</strong> — an ML document parser. Detects layout, reading order, tables, figures, and equations. <span class="muted">The hard part.</span></li>
+    <li><strong>pandoc</strong> — builds the reflowable EPUB3, turns LaTeX math into MathML. <span class="muted">The assembler.</span></li>
+    <li><strong>epubcheck</strong> — validates the output. <span class="muted">0 errors = ship it.</span></li>
+  </ol>
+  <p class="muted v-spacer" style="font-size:0.78em;">Plus a ~150-line Python script in the middle to clean up the raw Markdown. That's the whole stack.</p>
+  <aside class="notes">Marker does the genuinely hard ML work. pandoc and epubcheck are off-the-shelf. The glue is a small, book-specific cleanup script.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 02 — THE FLOW                                         -->
+<!-- ============================================================ -->
+<section class="tech-marker">
+  <div class="tag">THE FLOW</div>
+  <h3>PDF in, EPUB out</h3>
+  <pre><code class="language-text">book.pdf
+   │  marker_single  (ML layout + OCR + equations)
+   ▼
+raw.md  +  figures/
+   │  02_clean.py    (strip furniture, fix headings, fix OCR)
+   ▼
+clean.md
+   │  pandoc --epub3 --mathml --toc --split-level=1
+   ▼
+book.epub
+   │  epubcheck
+   ▼
+✓ 0 errors / 0 warnings</code></pre>
+  <p class="muted" style="font-size:0.74em; margin-top:0.4em;">Point it at any PDF and run one command per stage.</p>
+  <aside class="notes">Walk the pipeline top to bottom. The two off-the-shelf tools bookend a small custom cleanup. This diagram is the mental model for the rest of the talk.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 03 DIVIDER — THE RECIPE                               -->
+<!-- ============================================================ -->
+<section class="divider">
+  <div class="chapter-num">CHAPTER &middot; 03</div>
+  <h2>The <span class="accent">recipe</span>.</h2>
+  <p class="divider-sub">Five steps. Convert your own PDF this afternoon.</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 03 — STEP 1 & 2                                       -->
+<!-- ============================================================ -->
+<section class="tech-marker">
+  <div class="tag">STEPS 1–2</div>
+  <h3>Install, then extract</h3>
+  <pre><code class="language-bash"># 1. Install. Marker needs Python 3.12+
+brew install pandoc epubcheck
+python3.12 -m venv .venv && source .venv/bin/activate
+pip install marker-pdf pillow
+
+# 2. Extract PDF → Markdown (+ one image per figure)
+#    On Apple Silicon: TORCH_DEVICE=mps
+marker_single book.pdf --output_dir out --output_format markdown</code></pre>
+  <p class="muted" style="font-size:0.74em; margin-top:0.4em;">Marker isn't fast — a 320-page book took ~90 minutes. It's doing real ML inference on every page.</p>
+  <aside class="notes">Python 3.12+ matters — older wheels hit a dyld/SciPy loader bug on current macOS. Marker is slow but that's the cost of good structure extraction.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 03 — STEP 3                                           -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">STEP 3</div>
+  <h3>Clean up the Markdown</h3>
+  <p style="font-size:0.84em; line-height:1.6;">The raw output needs light repair. A ~150-line Python script (<code>02_clean.py</code>) handles it:</p>
+  <ul class="clues" style="margin-top:0.6em;">
+    <li>Strip running headers &amp; page numbers</li>
+    <li>Fix heading levels</li>
+    <li>Reattach <em>"Figure N"</em> captions to their images</li>
+    <li>Tidy equations</li>
+  </ul>
+  <p class="muted v-spacer" style="font-size:0.78em;">The patterns are book-specific but small. Most of the work is regex against the page furniture.</p>
+  <aside class="notes">This is the only custom code. It's small and tailored to one book's quirks. Don't over-engineer it — match the patterns you actually see.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 03 — STEP 4 & 5                                       -->
+<!-- ============================================================ -->
+<section class="tech-marker">
+  <div class="tag">STEPS 4–5</div>
+  <h3>Build, then validate</h3>
+  <pre><code class="language-bash"># 4. Build a reflowable EPUB3 — math becomes MathML
+pandoc clean.md \
+  --from=markdown-raw_html+tex_math_dollars+superscript+subscript \
+  --to=epub3 --mathml --toc --toc-depth=3 --split-level=1 \
+  --css=epub.css --epub-cover-image=cover.png \
+  -o book.epub
+
+# 5. Validate, then copy to the reader over USB-C
+epubcheck book.epub   # 0 errors / 0 warnings = ship it</code></pre>
+  <p class="muted" style="font-size:0.74em; margin-top:0.4em;"><code>--mathml</code> makes equations scale with the font instead of being a fixed image. <code>-raw_html</code> keeps stray OCR tags from breaking the file.</p>
+  <aside class="notes">The pandoc flags are the heart of it: epub3 + mathml + split-level for chapter files + disabling raw HTML so OCR junk tags don't corrupt the EPUB.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 04 DIVIDER — LESSONS                                  -->
+<!-- ============================================================ -->
+<section class="split-divider">
+  <div class="left">
+    <div class="chapter-num">CHAPTER &middot; 04</div>
+    <h2>What to <span class="accent">watch for</span>.</h2>
+    <p class="divider-sub">The gotchas that cost me time, so they don't cost you any.</p>
+  </div>
+  <div class="right">
+    <img src="assets/_page_57_Figure_3.jpeg" alt="A figure extracted from the textbook">
+  </div>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 04 — THE OCR BUG                                      -->
+<!-- ============================================================ -->
+<section class="tech-marker">
+  <div class="tag">THE GOTCHA</div>
+  <h3>The model misread one symbol<br><span class="accent">322 times</span></h3>
+  <p style="font-size:0.82em; line-height:1.6;">
+    In the Signals chapter, Marker read the <em>R</em> (delay) operator as <code>\Re</code> — the "real part" symbol &#8476; — in <strong>322 equations</strong>.
+  </p>
+  <pre><code class="language-bash">sed -i '' 's/\\Re/R/g' clean.md   # one line, 322 fixes</code></pre>
+  <div class="pullquote v-spacer">
+    Trust the model. <span class="accent">Verify the OCR.</span>
+  </div>
+  <p class="muted" style="font-size:0.74em;">The find-replace was safe only because I read the text and confirmed the book never means "real part."</p>
+  <aside class="notes">This is the laugh-and-wince moment. ML extraction is great until it confidently makes the same mistake hundreds of times. You have to actually read the output to catch it.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CHAPTER 04 — THE LESSONS LIST                                 -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">LESSONS</div>
+  <h3>Five things to watch</h3>
+  <ul class="clues" style="margin-top:0.6em; font-size:0.82em;">
+    <li><strong>Use Python 3.12+.</strong> Older Marker wheels fail to load on current macOS (<code>dyld</code> / SciPy).</li>
+    <li><strong>Verify the OCR.</strong> The model can repeat one mistake hundreds of times. Read the output.</li>
+    <li><strong>Equations are MathML.</strong> Good readers render it beautifully; weak ones ignore it — fall back to images.</li>
+    <li><strong>Grayscale &amp; shrink images.</strong> Screen is gray and ~480px wide. Cap the long edge ~760px.</li>
+    <li><strong>GitHub Pages?</strong> Add <code>.nojekyll</code>, or any asset starting with <code>_</code> silently 404s.</li>
+  </ul>
+  <aside class="notes">The .nojekyll one bit me directly — Marker names every figure _page_NN_Figure.jpeg, and Jekyll hides underscore-prefixed files. Whole talk's hero images vanished until I added the file.</aside>
+</section>
+
+<!-- ============================================================ -->
+<!-- CLOSING — WHAT YOU GET                                        -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">THE RESULT</div>
+  <h3>What you get</h3>
+  <ul class="clues" style="margin-top:1em;">
+    <li><strong>Per-chapter EPUBs</strong> plus a complete-book version</li>
+    <li><strong>Reflowable text</strong> — rewraps to any screen, resizable fonts</li>
+    <li><strong>Real MathML equations</strong> — scale with the font, not fixed images</li>
+    <li><strong>Grayscale, downscaled figures</strong> — small files, sharp on e-ink</li>
+    <li><strong>A clean epubcheck</strong> — 0 errors, 0 warnings</li>
+  </ul>
+  <p class="muted v-spacer" style="font-size:0.78em;">Marker (Surya OCR) &middot; pandoc &middot; epubcheck &middot; Python 3.12 &middot; Pillow</p>
+</section>
+
+<!-- ============================================================ -->
+<!-- GETTING STARTED                                               -->
+<!-- ============================================================ -->
+<section>
+  <div class="tag">GET STARTED</div>
+  <h3>Point it at any PDF</h3>
+  <ol class="steps" style="margin-top:1.2em;">
+    <li><code>git clone git@github.com:malpern/mit6-01-eink-epub.git</code></li>
+    <li><code>brew install pandoc epubcheck &amp;&amp; pip install marker-pdf pillow</code></li>
+    <li><code>marker_single book.pdf …</code> &rarr; clean &rarr; <code>pandoc … -o book.epub</code></li>
+  </ol>
+  <p class="muted v-spacer" style="font-size:0.78em;">
+    Full pipeline — scripts, the e-ink CSS, and a quality report — on GitHub. Source text: MIT 6.01SC OpenCourseWare, CC BY-NC-SA.
+  </p>
+  <div class="footer">Micah Alpern · @malpern · github.com/malpern/mit6-01-eink-epub</div>
+</section>
+
+<!-- ============================================================ -->
+<!-- Q&A                                                           -->
+<!-- ============================================================ -->
+<section class="bigword">
+  <h1 class="muted">Q <span class="accent">&amp;</span> A</h1>
+  <p style="margin-top:1em; font-size:0.6em;">
+    <a href="https://github.com/malpern/mit6-01-eink-epub">github.com/malpern/mit6-01-eink-epub</a><br>
+    <span class="muted">Micah Alpern · @malpern · Hacker Dojo Python Meetup, 2026</span>
+  </p>
+</section>
+
+</div><!-- .slides -->
+</div><!-- .reveal -->
+
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/highlight/highlight.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+
+<script>
+  Reveal.initialize({
+    hash: true,
+    slideNumber: 'c/t',
+    transition: 'fade',
+    transitionSpeed: 'fast',
+    backgroundTransition: 'fade',
+    controls: false,
+    progress: true,
+    center: false,
+    width: 1400,
+    height: 850,
+    margin: 0.02,
+    minScale: 0.3,
+    maxScale: 2.0,
+    plugins: [ RevealHighlight, RevealNotes ],
+  });
+</script>
+
+</body>
+</html>

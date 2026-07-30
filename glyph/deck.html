@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Page Numbers Are a Lie — Glyph</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"><link rel="stylesheet" href="../shared/deck.css">
+  <style>:root{--bg:#0c0b16;--panel:#171527;--panel-2:#211e37;--accent:#ffb86b;--accent-2:#a89cff}.phone-pair{display:grid;grid-template-columns:1fr 1fr;gap:1vw;background:var(--panel);border:1px solid var(--rule);padding:1vw}.phone-pair img{width:100%;height:65vh;object-fit:contain}.glyph-icon{width:70px!important;height:70px!important;object-fit:contain!important;margin:0 0 .7em!important}.title-copy h1{font-size:3.8em}</style>
+</head>
+<body><div class="reveal"><div class="slides">
+  <section class="title-slide"><div class="title-grid">
+    <div class="title-copy"><img class="glyph-icon" src="assets/glyph-icon.png" alt="Glyph reader app icon"><p class="eyebrow">Glyph · cross-device reading</p><h1>Page Numbers Are a Lie</h1><p class="dek">On a reflowable book, “page 87” changes with the screen. A real reading position has to survive fonts, devices, and four-inch displays.</p><p class="byline">Micah Alpern · Hacker Dojo</p></div>
+    <div class="phone-pair"><img src="assets/device-a.png" alt="Glyph reading position on device A"><img src="assets/device-b.png" alt="The same Glyph reading position on device B"></div>
+  </div></section>
+
+  <section class="statement"><p class="eyebrow">The mismatch</p><h2>Your progress is not 37%.</h2><p>A percentage is useful for a progress bar. It is a poor address: layout changes move it, chapters differ in length, and rounding quietly loses the exact sentence.</p></section>
+
+  <section><p class="eyebrow">Stable address</p><h2>A locator names content, not pixels.</h2><div class="flow">
+    <div class="step"><b>01 · identity</b><span>Derive a stable book ID from the publication itself.</span><small>The same EPUB must look like the same book on every device.</small></div>
+    <div class="step"><b>02 · position</b><span>Store a Readium Locator: resource, progression, and text context.</span><small>The address survives font size and viewport changes.</small></div>
+    <div class="step"><b>03 · reconcile</b><span>Sync a new locator and resolve it inside each device’s renderer.</span><small>Never translate through an imaginary global page number.</small></div>
+  </div></section>
+
+  <section class="split"><div><p class="eyebrow">Actual app</p><h2>The library is local. The position can travel.</h2><p>Glyph imports EPUBs on the reader, derives content identity, and keeps the reading experience native to the device.</p></div><figure><div class="full-image"><img src="assets/library.png" alt="Glyph library screen with imported EPUB books"></div><figcaption class="caption">Actual Glyph library capture</figcaption></figure></section>
+
+  <section><p class="eyebrow">Proof, side by side</p><h2>Different device. Same chapter.</h2><div class="phone-pair"><img src="assets/device-a.png" alt="Device A open to chapter four"><img src="assets/device-b.png" alt="Device B synchronized to chapter four"></div><p class="source-note">Authenticated A → B sync reached the same Chapter IV position</p></section>
+
+  <section><p class="eyebrow">What is actually synchronized</p><table class="truth-table"><thead><tr><th>Tempting value</th><th>Problem</th><th>Durable value</th></tr></thead><tbody>
+    <tr><td>Page number</td><td>Different pagination per screen and type size</td><td>Resource href + progression</td></tr>
+    <tr><td>Global percentage</td><td>Approximate and lossy</td><td>Readium Locator</td></tr>
+    <tr><td>Filename</td><td>Can be renamed or collide</td><td>Content-derived book identity</td></tr>
+    <tr><td>Screenshot</td><td>Evidence, not an address</td><td>Text context for verification</td></tr>
+  </tbody></table></section>
+
+  <section class="split reverse"><figure><div class="full-image"><img src="assets/settings.png" alt="Glyph settings screen"></div><figcaption class="caption">Actual Glyph settings capture</figcaption></figure><div><p class="eyebrow">The honest boundary</p><h2>Phone-to-phone is proven. The X4 is the next physical gate.</h2><p>The app, locator model, and authenticated sync path exist. A real-device run on the compact e-ink hardware remains the proof that matters for the original use case.</p></div></section>
+
+  <section class="statement"><p class="eyebrow">Takeaway</p><p class="quote">A reading position is an address in the book—not a coordinate on the glass.</p><p class="footer">Glyph · content identity over page illusion</p></section>
+</div></div><script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script><script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade'});</script></body>
+</html>

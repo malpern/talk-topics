@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tap to Remember — Calendar Puck</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"><link rel="stylesheet" href="../shared/deck.css">
+  <style>:root{--bg:#f2f4ef;--panel:#ffffff;--panel-2:#e7ece7;--fg:#111a18;--muted:#62716d;--accent:#0a7c66;--accent-2:#d96834;--rule:rgba(17,26,24,.18)}body,.reveal-viewport{background:var(--bg)!important}.device-photo{background:#fff}.device-photo img{object-fit:contain;padding:6%}.concept-note{border:2px solid var(--accent-2);color:var(--accent-2);font-family:'JetBrains Mono',monospace;font-size:.38em!important;letter-spacing:.1em;padding:.55em .7em;text-transform:uppercase;display:inline-block}</style>
+</head>
+<body><div class="reveal"><div class="slides">
+  <section class="title-slide"><div class="title-grid">
+    <div class="title-copy"><p class="eyebrow">Calendar Puck · hardware concept</p><h1>Tap to Remember</h1><p class="dek">A one-purpose desk object that turns a tap into a calendar note—without asking someone to install an app, join Wi-Fi, or understand the machinery behind it.</p><p class="concept-note">Prototype story · physical NFC path not yet proven</p><p class="byline">Micah Alpern · Hacker Dojo</p></div>
+    <div class="hero-frame device-photo"><img src="assets/esp32-s3-touch-lcd-1.69-crop.jpg" alt="Official product image of the ESP32-S3 Touch LCD 1.69 development board"></div>
+  </div></section>
+
+  <section class="statement"><p class="eyebrow">The job</p><h2>“Put this on my calendar” should not become a setup flow.</h2><p>The experience is for a shared room, not a personal gadget. The object should be legible, local, and calm enough that anyone can use it once.</p></section>
+
+  <section><p class="eyebrow">Experience contract</p><div class="evidence-grid">
+    <article class="evidence"><p class="kicker">No app</p><h3>Borrow the phone</h3><p>Use capabilities already present on the device instead of requiring a companion install.</p></article>
+    <article class="evidence"><p class="kicker">No cloud</p><h3>Keep the host local</h3><p>A nearby Mac performs calendar work; the puck stays thin and purpose-built.</p></article>
+    <article class="evidence"><p class="kicker">No mystery</p><h3>Show the state</h3><p>The display must make ready, transfer, success, and failure unmistakable.</p></article>
+  </div></section>
+
+  <section class="split"><div><p class="eyebrow">Selected hardware</p><h2>A screen, touch, NFC ambitions, and strict constraints.</h2><p>The development board provides a 1.69-inch touch display and ESP32-S3 platform. It is a real component—not evidence that the final offline handoff already works.</p><p class="caption"><a href="https://www.waveshare.com/esp32-s3-lcd-1.69.htm">Official Waveshare product page ↗</a></p></div><figure><div class="full-image device-photo"><img src="assets/esp32-s3-touch-lcd-1.69-crop.jpg" alt="ESP32-S3 touch display development board"></div><figcaption class="caption">Official Waveshare product image</figcaption></figure></section>
+
+  <section><p class="eyebrow">Architecture</p><h2>Thin puck. Capable host.</h2><div class="flow">
+    <div class="step"><b>01 · puck</b><span>Captures intent and presents a short, visible interaction.</span><small>Hardware owns immediacy—not account credentials.</small></div>
+    <div class="step"><b>02 · local handoff</b><span>Transfers a narrowly scoped request without internet dependency.</span><small>The exact app-free NFC mechanism is the experiment.</small></div>
+    <div class="step"><b>03 · Mac host</b><span>Uses the already-authenticated calendar environment and returns a result.</span><small>Complexity lives where updateability and credentials already exist.</small></div>
+  </div></section>
+
+  <section class="split reverse"><figure><div class="full-image device-photo"><img src="assets/esp32-s3-touch-lcd-1.69-crop.jpg" alt="The selected ESP32-S3 touch display development board"></div><figcaption class="caption">Selected component · the final enclosure does not exist yet</figcaption></figure><div><p class="eyebrow">Physical truth</p><h2>The form is still a hypothesis.</h2><p>The selected board is real. The round desk object is not. Industrial design should follow proof of the radio path, tap semantics, phone behavior, and failure recovery on physical devices.</p></div></section>
+
+  <section><p class="eyebrow">Evidence ledger</p><h2>Do not let a beautiful render outrun the prototype.</h2><table class="truth-table"><thead><tr><th>Claim</th><th>Status</th><th>Next evidence</th></tr></thead><tbody>
+    <tr><td>Local Mac can own calendar credentials</td><td class="yes">Architecture established</td><td>End-to-end host demo</td></tr>
+    <tr><td>LAN HTTP diagnostic path</td><td class="yes">Useful for development</td><td>Keep explicitly non-final</td></tr>
+    <tr><td>App-free, offline, near-one-tap handoff</td><td class="pending">Hypothesis</td><td>Physical NFC/phone matrix</td></tr>
+    <tr><td>Final puck interaction</td><td class="pending">Concept</td><td>Usability test on real enclosure</td></tr>
+  </tbody></table></section>
+
+  <section class="statement"><p class="eyebrow">Takeaway</p><p class="quote">The simpler the object feels, the more honest its prototype evidence must be.</p><p class="footer">Calendar Puck · concept status is part of the design</p></section>
+</div></div><script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script><script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade'});</script></body>
+</html>

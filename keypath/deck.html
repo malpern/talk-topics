@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>How Do You Test a Keyboard Remapper? — KeyPath</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../shared/deck.css">
+  <style>:root{--bg:#090c0e;--panel:#12171a;--panel-2:#1b2327;--accent:#75ddc4;--accent-2:#ff9b54}.title-grid{grid-template-columns:.92fr 1.08fr}.title-copy h1{font-size:3.75em}</style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <section class="title-slide">
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">KeyPath · physical systems</p>
+        <h1>How Do You Test a Keyboard Remapper?</h1>
+        <p class="dek">A visual test can show the idea. Only an independent keyboard fixture can prove what crossed the USB boundary.</p>
+        <p class="byline">Micah Alpern · Hacker Dojo</p>
+      </div>
+      <div class="hero-stack" aria-label="Real KeyPath application and test captures">
+        <img src="assets/rules-window.png" alt="KeyPath rules window showing keyboard remapping rules">
+        <img src="assets/caps-to-escape.png" alt="KeyPath onboarding snapshot for a Caps Lock to Escape rule">
+        <img src="assets/live-overlay.png" alt="KeyPath live overlay snapshot">
+      </div>
+    </div>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">The trap</p>
+    <h2>A remapper can look correct while emitting the wrong thing.</h2>
+    <p>UI snapshots prove the explanation. Unit tests prove transformations. Neither proves the host received the intended key sequence at the intended timing.</p>
+  </section>
+
+  <section>
+    <p class="eyebrow">Three different claims</p>
+    <div class="evidence-grid">
+      <article class="evidence"><p class="kicker">01 · explanation</p><img src="assets/caps-to-escape.png" alt="KeyPath rule preview"><h3>The rule reads correctly</h3><p>The visual model communicates the mapping and its scope.</p></article>
+      <article class="evidence"><p class="kicker">02 · software</p><img src="assets/live-overlay.png" alt="KeyPath live overlay"><h3>The app reports correctly</h3><p>Focused tests and overlays agree about the transformation.</p></article>
+      <article class="evidence"><p class="kicker">03 · boundary</p><img src="assets/keypath-poster-hor.png" alt="KeyPath application poster"><h3>The host receives correctly</h3><p>An external fixture records expected text, received text, timing, and release.</p></article>
+    </div>
+  </section>
+
+  <section class="split">
+    <div>
+      <p class="eyebrow">The real product surface</p>
+      <h2>Make the rule legible before making it powerful.</h2>
+      <p>KeyPath shows the keyboard, the trigger, and the output together. The testing story follows the same principle: every layer needs visible evidence.</p>
+    </div>
+    <figure>
+      <div class="full-image crop"><img src="assets/rules-window.png" alt="KeyPath rule editor with visual keyboard"></div>
+      <figcaption class="caption">Actual KeyPath UI capture · rule editor</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="eyebrow">Fixture loop</p>
+    <h2>Separate the actor from the witness.</h2>
+    <div class="flow">
+      <div class="step"><b>01 · drive</b><span>Independent USB keyboard sends a deterministic sequence.</span><small>Wi-Fi control keeps the fixture outside the remapper’s process.</small></div>
+      <div class="step"><b>02 · observe</b><span>Focused host captures the actual text and event timing.</span><small>Focus ownership is recorded because the right keys in the wrong app are still a failed run.</small></div>
+      <div class="step"><b>03 · compare</b><span>Expected, received, trace, and release state travel together.</span><small>A partial capture stays partial; the report does not promote it to proof.</small></div>
+    </div>
+  </section>
+
+  <section>
+    <p class="eyebrow">Evidence taxonomy</p>
+    <h2>Green is not one color.</h2>
+    <table class="truth-table">
+      <thead><tr><th>Result</th><th>What it establishes</th><th>What it does not establish</th></tr></thead>
+      <tbody>
+        <tr><td class="yes">Snapshot passes</td><td>Layout and explanation remain stable</td><td>USB emission or timing</td></tr>
+        <tr><td class="yes">Focused software tests pass</td><td>Transformation logic matches the specification</td><td>Physical device-to-host behavior</td></tr>
+        <tr><td class="pending">Showroom demo passes</td><td>The interaction can be demonstrated</td><td>Strict admission or comparison control</td></tr>
+        <tr><td class="yes">Fixture report completes</td><td>Expected/received/trace/release evidence is coherent</td><td>Every untested keyboard or host</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="split reverse">
+    <figure>
+      <div class="full-image"><img src="assets/keypath-poster-hor.png" alt="KeyPath app poster featuring a laptop keyboard"></div>
+      <figcaption class="caption">Real KeyPath project artwork</figcaption>
+    </figure>
+    <div>
+      <p class="eyebrow">The design lesson</p>
+      <h2>Trust comes from named boundaries.</h2>
+      <p>“Looks right,” “logic passed,” and “hardware verified” should never collapse into one status. A trustworthy tool tells you exactly which claim you earned.</p>
+    </div>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">Takeaway</p>
+    <p class="quote">Test the explanation. Test the transformation. Then test the wire.</p>
+    <p class="footer">KeyPath · physical evidence over implied certainty</p>
+  </section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade',backgroundTransition:'fade'});</script>
+</body>
+</html>

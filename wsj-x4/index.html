@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Newspaper on a Credit Card — WSJ → X4</title>
+  <meta name="description" content="A personal-use pipeline that turns a logged-in newspaper edition into a clean EPUB for a four-inch e-ink reader.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/article.css">
+  <style>:root{--bg:#ebe8df;--paper:#f8f5ec;--accent:#9d5527;--dark:#171a1c}</style>
+</head>
+<body>
+  <header class="masthead"><a href="../index.html">Talk Topics</a><span>Field Note 01 · Python</span></header>
+  <section class="article-hero">
+    <div class="hero-copy"><p class="kicker">WSJ → X4 · a personal reading pipeline</p><h1>The Newspaper on a Credit Card</h1><p class="lede">A daily edition is designed for paper, desktop, and phone. I wanted the whole thing on a four-inch e-ink reader—with the hierarchy intact and no password hiding inside the script.</p><p class="meta">Micah Alpern · Hacker Dojo<br>Local project · source not publicly listed</p></div>
+    <figure class="hero-art contain"><img src="assets/x4-reader.jpg" alt="A compact X4 e-ink reader on a white background"><figcaption class="hero-label">Actual X4 device · four-inch display</figcaption></figure>
+  </section>
+  <nav class="toc" aria-label="Article chapters"><a href="#problem">01 · The mismatch</a><a href="#pipeline">02 · The pipeline</a><a href="#trust">03 · The boundary</a><a href="#epub">04 · The artifact</a><a href="#failure">05 · Failure</a><a href="#lesson">06 · The lesson</a></nav>
+
+  <article>
+    <section class="chapter" id="problem"><div class="chapter-no">01</div><div class="chapter-copy"><p class="kicker">The mismatch</p><h2>The site is not the edition.</h2><p>A newspaper homepage is a constantly changing surface. The object I wanted was different: one day’s finite set of stories, in editorial order, with enough structure to browse offline. An EPUB is excellent at that job—but only if the pipeline preserves the edition’s shape instead of dumping a pile of pages into a zip file.</p><div class="callout"><p><strong>The design question:</strong> How do you turn a subscriber’s authenticated, dynamic reading experience into a calm, bounded personal artifact without storing the subscriber’s credentials?</p></div></div></section>
+
+    <section class="chapter" id="pipeline"><div class="chapter-no">02</div><div class="chapter-copy"><p class="kicker">The pipeline</p><h2>One command. Six explicit stages.</h2><p>The pipeline discovers the current edition, deduplicates story URLs, attaches to the already logged-in Chrome session, extracts readable article content, builds a standards-shaped EPUB, and delivers it over WebDAV. Each stage leaves evidence the next stage can inspect.</p><div class="pipeline"><div><b>Discover</b><span>Find the day’s edition and preserve its ordering.</span></div><div><b>Authenticate</b><span>Reuse the human’s live browser session; never serialize a password or cookie into the repository.</span></div><div><b>Extract</b><span>Keep headline, byline, body, and useful image relationships.</span></div><div><b>Clean</b><span>Remove navigation and page furniture without flattening the article.</span></div><div><b>Package</b><span>Emit EPUB 3 navigation plus the compatibility NCX older readers still expect.</span></div><div><b>Deliver</b><span>Upload to the reader and remember the edition in a local seen cache.</span></div></div></div></section>
+
+    <section class="chapter" id="trust"><div class="chapter-no">03</div><div class="chapter-copy"><p class="kicker">The boundary</p><h2>The login stays with the human.</h2><p>The code does not bypass a paywall and does not contain a credential. It operates in the user’s real, authenticated browser context for personal reading. That constraint makes the automation less convenient—and materially more trustworthy.</p><div class="status"><div><h3>Repository contains</h3><p>Discovery, extraction, packaging, delivery logic, and reproducible dependencies.</p></div><div><h3>Repository does not contain</h3><p>Passwords, exported cookies, subscription content, or a public redistribution mechanism.</p></div></div><div class="callout"><p>This remains a personal-use workflow. A technically possible extraction is not blanket permission to redistribute subscription content.</p></div></div></section>
+
+    <section class="chapter" id="epub"><div class="chapter-no">04</div><div class="chapter-copy"><p class="kicker">The artifact</p><h2>EPUB is a tiny website with stricter manners.</h2><p>The book needs deterministic filenames, a manifest, a spine, navigation, media types, and valid XHTML. The most useful design work is restraint: typography that reflows, images that fit, sections that remain navigable, and no web chrome competing with a four-inch screen.</p><figure class="proof"><img src="assets/x4-reader.jpg" alt="The compact X4 e-ink reader"><figcaption>The target is a real device with a constrained display, not an abstract responsive breakpoint.</figcaption></figure></div></section>
+
+    <section class="chapter" id="failure"><div class="chapter-no">05</div><div class="chapter-copy"><p class="kicker">Failure modes</p><h2>A successful download can still be a bad newspaper.</h2><p>Duplicate URLs create repeated stories. Lazy-loaded images disappear. A browser session expires. A malformed story can poison packaging. The seen cache can mistake a partial run for completion. The pipeline therefore needs stage-level checks and a final artifact inspection—not just a zero exit code.</p><ul><li>Discovery count and ordering are visible.</li><li>Authentication failure stops loudly.</li><li>Individual extraction failures are named.</li><li>The EPUB is validated before upload.</li><li>The edition is marked seen only after delivery succeeds.</li></ul></div></section>
+
+    <section class="chapter" id="lesson"><div class="chapter-no">06</div><div class="chapter-copy"><p class="kicker">The lesson</p><h2>Automation is interface design.</h2><p>The CLI is the interface, the browser session is a trust boundary, the EPUB is the product, and the reader is the environment. Treating those as one end-to-end experience led to a better result than treating the project as “scraping some pages.”</p><div class="callout"><p><strong>What I would teach:</strong> start with the artifact you want to hold, then design every stage backward from what that artifact must preserve.</p></div></div></section>
+  </article>
+  <footer class="endnote"><h2>A finite edition for a tiny screen.</h2><p>Discover honestly. Preserve structure. Deliver a real book.</p></footer>
+</body>
+</html>

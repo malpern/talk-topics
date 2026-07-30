@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Your Meetings Are Not a Search Box — Meeting Memory</title>
+  <meta name="description" content="A local-first case study in turning meeting history into a durable, searchable corpus.">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/article.css">
+  <style>:root{--bg:#e7eee8;--paper:#f5f7f0;--accent:#176d58;--dark:#10251f}.hero-art img{width:100%;height:100%;object-fit:contain}.hero-art{background:#1b1b1d}.privacy{color:#176d58!important}</style>
+</head>
+<body>
+  <header class="masthead"><a href="../index.html">Talk Topics</a><span>Case Study 02 · Python + SQLite</span></header>
+  <section class="article-hero">
+    <div class="hero-copy"><p class="kicker">Meeting Memory · local-first infrastructure</p><h1>Your Meetings Are Not a Search Box</h1><p class="lede">Search is only useful after the history is durable. This system treats Markdown as the record, SQLite as a disposable index, and every generated claim as something that must point back to evidence.</p><p class="meta">Micah Alpern · Hacker Dojo<br><span class="privacy">All screens and examples use synthetic data.</span></p></div>
+    <figure class="hero-art"><img src="assets/meeting-synthetic-crop.jpg" alt="Actual Meeting Memory meeting detail interface using synthetic Project Lantern data"><figcaption class="hero-label">Actual UI · synthetic data</figcaption></figure>
+  </section>
+  <nav class="toc" aria-label="Article chapters"><a href="#problem">01 · The loss</a><a href="#source">02 · Source of truth</a><a href="#index">03 · Derived search</a><a href="#provenance">04 · Provenance</a><a href="#interface">05 · Interface</a><a href="#lesson">06 · The lesson</a></nav>
+
+  <article>
+    <section class="chapter" id="problem"><div class="chapter-no">01</div><div class="chapter-copy"><p class="kicker">The loss</p><h2>A meeting disappears twice.</h2><p>First, the conversation ends. Then the context fragments across a transcript, calendar event, email thread, attachment, and someone’s memory of what was decided. A conventional search box can retrieve strings; it cannot by itself preserve the relationships that make those strings useful.</p><div class="callout"><p><strong>The product thesis:</strong> the durable asset is the corpus of conversations. Search, summaries, dashboards, and agent tools are replaceable views over that asset.</p></div></div></section>
+
+    <section class="chapter" id="source"><div class="chapter-no">02</div><div class="chapter-copy"><p class="kicker">Source of truth</p><h2>Markdown survives the app.</h2><p>Every captured meeting becomes a plain-text document with front matter for date, source identity, attendees, and enrichment links. The transcript and notes remain readable without the dashboard, index, model provider, or even the original codebase.</p><div class="pipeline"><div><b>Capture</b><span>Import notes and transcript idempotently.</span></div><div><b>Preserve</b><span>Never destroy a captured transcript when an upstream service changes.</span></div><div><b>Enrich</b><span>Attach calendar, email, and document context as reviewed metadata.</span></div></div><p>The real meeting vault is intentionally git-ignored. Code can be shared; private conversations cannot.</p></div></section>
+
+    <section class="chapter" id="index"><div class="chapter-no">03</div><div class="chapter-copy"><p class="kicker">Derived search</p><h2>Delete the database. Rebuild it.</h2><p>SQLite FTS5 makes the corpus fast to search, but it is deliberately not authoritative. If the schema changes, the index can be recreated from the Markdown vault. That asymmetry keeps the durable format simple and the query layer replaceable.</p><div class="status"><div><h3>Durable</h3><p>Markdown meeting records, transcript text, reviewed links, and explicit metadata.</p></div><div><h3>Rebuildable</h3><p>FTS index, generated dashboards, review views, summaries, timelines, and agent-facing projections.</p></div></div></div></section>
+
+    <section class="chapter" id="provenance"><div class="chapter-no">04</div><div class="chapter-copy"><p class="kicker">Provenance</p><h2>A useful insight can show its work.</h2><p>Actions, decisions, partner updates, and open loops are more valuable when each one carries a source reference, supporting quote, and confidence. Generation does not erase uncertainty; it organizes it for review.</p><div class="callout"><p><strong>Design rule:</strong> if a claim cannot point back to a note, transcript, email, or attachment, it does not get promoted into memory as fact.</p></div></div></section>
+
+    <section class="chapter" id="interface"><div class="chapter-no">05</div><div class="chapter-copy"><p class="kicker">Interfaces</p><h2>One corpus. Several ways in.</h2><p>A local CLI handles capture and maintenance. A server-rendered web dashboard supports browsing and review. An MCP server gives an agent narrowly defined retrieval tools. Each interface reads the same local source rather than creating a new silo.</p><figure class="proof"><img src="assets/meeting-synthetic.png" alt="Meeting Memory meeting detail screen with synthetic Project Lantern notes and transcript"><figcaption>Actual server-rendered Meeting Memory interface populated with a deterministic synthetic meeting. No private meeting data appears in this article.</figcaption></figure><div class="pipeline"><div><b>Human</b><span>Browse meetings and approve or reject extracted items.</span></div><div><b>Operator</b><span>Run doctor, sync, reindex, and explicit enrichment commands.</span></div><div><b>Agent</b><span>Search and retrieve bounded records through MCP.</span></div></div><p>Credentialed steps fail loudly. Missing access should stop enrichment, not fabricate a reassuring empty result.</p></div></section>
+
+    <section class="chapter" id="lesson"><div class="chapter-no">06</div><div class="chapter-copy"><p class="kicker">The lesson</p><h2>Memory is a data model, not a summary.</h2><p>A summary is useful for a moment. A durable memory system must preserve raw evidence, separate source from derivation, survive tool changes, and let a future reader audit why a claim exists.</p><div class="callout"><p><strong>What I would teach:</strong> before adding an AI layer, choose the record you are willing to keep for ten years—and make everything intelligent rebuildable from it.</p></div></div></section>
+  </article>
+  <footer class="endnote"><h2>Keep the record. Rebuild the intelligence.</h2><p>Local-first does not mean isolated. It means the user owns the durable layer.</p></footer>
+</body>
+</html>

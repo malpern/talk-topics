@@ -3,49 +3,161 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>The Typo That Refused to Stay Fixed — Typover</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <title>Redesigning Spell Check — Typover</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css"><link rel="stylesheet" href="../shared/deck.css">
-  <style>:root{--bg:#0d1020;--panel:#161a2d;--panel-2:#202642;--accent:#9cc7ff;--accent-2:#ff8c7c}.title-copy h1{font-size:3.35em}.hero-icon{width:min(28vw,400px)!important;height:min(28vw,400px)!important;object-fit:contain!important;filter:drop-shadow(0 34px 60px rgba(0,0,0,.35))}</style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../shared/deck.css">
+  <style>
+    :root{--bg:#0d1020;--panel:#161a2d;--panel-2:#202642;--accent:#9cc7ff;--accent-2:#ff8c7c;--quiet:#a9adb8}
+    .title-grid{grid-template-columns:.64fr 1.36fr;gap:3.5vw}.title-copy h1{font-size:3em}.title-copy .dek{max-width:31ch}
+    .product-shot{height:55vh;background:#090b12;border:1px solid var(--rule);overflow:hidden}.product-shot img{width:100%;height:100%;object-fit:contain}
+    .legacy-slide h2{font-size:2.5em;max-width:16ch;margin-bottom:.35em}
+    .legacy-copy{font-size:1.22em!important;line-height:1.6!important;max-width:30ch!important;color:var(--fg)!important}
+    .legacy-copy .wrong{text-decoration:underline wavy #ff574d 2px;text-underline-offset:7px}
+    .legacy-steps{font-family:'JetBrains Mono',monospace;font-size:.42em!important;color:var(--muted)!important;letter-spacing:.04em;max-width:none!important;margin-top:2em!important}
+    .thesis h2{font-size:3.65em;max-width:15ch}.thesis p{font-size:.76em;max-width:43ch}
+    .contract-slide h2{font-size:2.28em;max-width:none;margin-bottom:.55em}
+    .contract{display:grid;grid-template-columns:repeat(3,1fr);gap:2.2vw}
+    .contract .verb{padding-top:.65em;border-top:3px solid var(--accent)}
+    .contract b{display:block;font:400 1.72em/.95 'Bebas Neue',sans-serif;color:var(--fg);margin-bottom:.28em}
+    .contract p{font-size:.56em;color:var(--muted);max-width:24ch}
+    .correction-slide{grid-template-columns:1.3fr .7fr;gap:4vw}.correction-slide h2{font-size:2.5em;max-width:10ch}
+    .correction-slide .product-shot{height:71vh}.correction-slide .caption{margin-bottom:0!important}
+    .menu-slide h2{font-size:2.35em;max-width:12ch}.menu-list{margin-top:1.1em;border-top:1px solid var(--rule)}
+    .menu-list p{font-family:'JetBrains Mono',monospace;font-size:.49em;line-height:1.25;margin:0!important;padding:.72em .15em;border-bottom:1px solid var(--rule);color:var(--muted)}
+    .menu-list p:first-child{color:var(--accent);font-weight:700}.menu-slide .product-shot{height:65vh}
+    .confidence-slide h2{font-size:2.15em;max-width:none;margin-bottom:.35em}.confidence-slide .truth-table td:first-child{width:22%;font-family:'JetBrains Mono',monospace;color:var(--accent)}
+    .confidence-slide .truth-table td:nth-child(2){width:28%;font-weight:700}.confidence-slide .truth-table th,.confidence-slide .truth-table td{padding:.58em .68em}
+    .code-slide h2{font-size:2.2em;max-width:none;margin-bottom:.4em}.code-layout{display:grid;grid-template-columns:.7fr 1.3fr;gap:3vw;align-items:center}
+    .code-panel{background:#080a11;border:1px solid rgba(156,199,255,.28);padding:1.1em 1.25em}
+    .code-panel .path{display:block;color:var(--accent-2);font:700 .31em/1.4 'JetBrains Mono',monospace;letter-spacing:.05em;margin-bottom:1em}
+    .code-panel pre{margin:0;white-space:pre-wrap}.code-panel code{font-size:.44em;line-height:1.55;color:#d9deeb}.code-panel .hl{color:var(--accent);font-weight:700}.code-panel .warm{color:var(--accent-2);font-weight:700}
+    .evidence-slide h2{font-size:2.15em;max-width:none;margin-bottom:.4em}.evidence-split{display:grid;grid-template-columns:1fr 1fr;gap:3vw}.evidence-split article{border-top:3px solid var(--accent);padding-top:.8em}.evidence-split article:last-child{border-color:var(--accent-2)}.evidence-split h3{font-size:1.05em}.evidence-split p{font-size:.56em;color:var(--muted)}
+  </style>
 </head>
 <body>
 <div class="reveal"><div class="slides">
-  <section class="title-slide"><div class="title-grid">
-    <div class="title-copy"><p class="eyebrow">Typover · macOS accessibility</p><h1>The Typo That Refused to Stay Fixed</h1><p class="dek">The difficult part of autocorrect is not spotting <code>teh</code>. It is changing exactly three characters without disturbing everything around them.</p><p class="byline">Micah Alpern · Hacker Dojo</p></div>
-    <div class="hero-frame contain"><img class="hero-icon" src="assets/typover-icon.png" alt="Typover application icon"></div>
-  </div></section>
+  <section class="title-slide">
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">Typover · a new writing primitive</p>
+        <h1>Redesigning Spell Check</h1>
+        <p class="dek">Let people get the thought out. Correct the obvious. Mark every change. Make reversal immediate.</p>
+        <p class="byline">Micah Alpern · Hacker Dojo</p>
+      </div>
+      <figure>
+        <div class="product-shot"><img src="assets/typover-two-corrections.jpg" alt="Actual Typover controlled editor with two automatically corrected words marked by light-gray squiggles"></div>
+        <figcaption class="caption">Actual Typover controlled editor · two proactive corrections remain visibly reversible</figcaption>
+      </figure>
+    </div>
+  </section>
 
-  <section class="statement"><p class="eyebrow">The dangerous shortcut</p><h2>Read the whole field. Fix one word. Write the whole field back.</h2><p>It works in a demo—and quietly moves the cursor, erases rich text, breaks undo, or races the next keystroke.</p></section>
+  <section class="statement legacy-slide">
+    <p class="eyebrow">The old interaction</p>
+    <h2>Every red squiggle asks the writer to stop.</h2>
+    <p class="legacy-copy">I want <span class="wrong">ot</span> get my <span class="wrong">ieas</span> out <span class="wrong">quikly</span>—but first I have to repair each word.</p>
+    <p class="legacy-steps">notice → interrupt thought → right-click → scan suggestions + unrelated commands → choose → repeat</p>
+  </section>
 
-  <section><p class="eyebrow">A smaller contract</p><h2>Change less.</h2><div class="flow">
-    <div class="step"><b>01 · detect</b><span>Wait for a word boundary, then inspect the token that just ended.</span><small>No speculative rewrite while the user is still composing.</small></div>
-    <div class="step"><b>02 · replace</b><span>Target the smallest exact accessibility range.</span><small>Preserve surrounding text, selection, and the user’s momentum.</small></div>
-    <div class="step"><b>03 · reveal</b><span>Mark the correction subtly and make “Change Back” immediate.</span><small>Automation should be visible, reversible, and quiet.</small></div>
-  </div></section>
+  <section class="statement thesis">
+    <p class="eyebrow">The premise</p>
+    <h2>The model probably knows what you meant.</h2>
+    <p>The design problem is no longer finding a possible correction. It is earning permission to act without taking authorship away from the writer.</p>
+  </section>
 
-  <section class="center-slide"><div style="width:100%"><p class="eyebrow">The interaction, not a mock product UI</p><h2 style="max-width:none">A correction should feel like a reversible edit.</h2><div class="evidence-grid">
-    <article class="evidence"><p class="kicker">Before</p><h3>I typed <span style="text-decoration:underline;text-decoration-color:var(--accent-2)">teh</span> address.</h3><p>The token is complete only after the following boundary.</p></article>
-    <article class="evidence"><p class="kicker">After</p><h3>I typed <strong>the</strong> address.</h3><p>Only the exact three-character range changes.</p></article>
-    <article class="evidence"><p class="kicker">Agency</p><h3>Change Back</h3><p>The replacement retains enough provenance to undo itself—not the user’s next thought.</p></article>
-  </div></div></section>
+  <section class="contract-slide">
+    <p class="eyebrow">The new contract</p>
+    <h2>Correct first. Explain quietly. Revert instantly.</h2>
+    <div class="contract">
+      <div class="verb"><b>Apply</b><p>Use context to fix clear, objective mistakes as soon as the word or sentence is complete.</p></div>
+      <div class="verb"><b>Mark</b><p>Leave a low-salience gray squiggle under every automatic change.</p></div>
+      <div class="verb"><b>Return control</b><p>One click restores the original or chooses another correction—without undoing the next thought.</p></div>
+    </div>
+  </section>
 
-  <section><p class="eyebrow">Why this gets hard</p><h2>Text fields are not one thing.</h2><table class="truth-table"><thead><tr><th>Surface</th><th>Risk</th><th>Design response</th></tr></thead><tbody>
-    <tr><td>Plain native fields</td><td>Selection drift</td><td>Exact-range replacement and cursor verification</td></tr>
-    <tr><td>Rich editors</td><td>Formatting loss</td><td>Never rewrite the entire document value</td></tr>
-    <tr><td>Browser/Electron editors</td><td>Accessibility behavior varies</td><td>Detect capability; fail small and visibly</td></tr>
-    <tr><td>Rapid typing</td><td>Correction races new input</td><td>Revalidate target and surrounding context</td></tr>
-  </tbody></table></section>
+  <section class="split reverse correction-slide">
+    <figure>
+      <div class="product-shot"><img src="assets/typover-two-corrections.jpg" alt="Actual Typover editor after correcting ot to to and ieas to ideas"></div>
+      <figcaption class="caption">Live controlled-editor capture · “ot” → “to” and “ieas” → “ideas”</figcaption>
+    </figure>
+    <div>
+      <p class="eyebrow">The writer keeps moving</p>
+      <h2>The clean sentence arrives behind the thought.</h2>
+      <p>Typover corrects completed tokens while the caret moves forward. The marks remain; the interruption does not.</p>
+    </div>
+  </section>
 
-  <section class="split"><div><p class="eyebrow">A system responsibility</p><h2>The cursor belongs to the writer.</h2><p>The app’s strongest behavior is often restraint: if the range is ambiguous, the field is protected, or the user has moved on, do nothing.</p></div><div class="hero-frame contain"><img class="hero-icon" src="assets/typover-icon.png" alt="Typover application icon on a dark field"></div></section>
+  <section class="split menu-slide">
+    <div>
+      <p class="eyebrow">The gray squiggle</p>
+      <h2>“I changed this for you.”</h2>
+      <p>Clicking the quiet mark exposes the original first, followed by bounded alternatives. No generic context-menu junk.</p>
+      <div class="menu-list" aria-label="Actual Typover correction menu items">
+        <p>Revert to “ieas”</p>
+        <p>teas</p><p>seas</p><p>peas</p><p>yeas</p>
+      </div>
+    </div>
+    <figure>
+      <div class="product-shot"><img src="assets/typover-corrected.jpg" alt="Actual Typover editor with ideas automatically corrected and marked by a gray squiggle"></div>
+      <figcaption class="caption">Actual correction state · menu labels captured from the live control</figcaption>
+    </figure>
+  </section>
 
-  <section><p class="eyebrow">Current evidence</p><h2>Say what passed—and what remains.</h2><div class="status">
-    <div><h3>Established</h3><p>Focused correction tests, Bear exact-range behavior, overlay placement, and an ordinary <code>teh</code> correction have been exercised.</p></div>
-    <div><h3>Still worth live validation</h3><p>Multiple corrections under rapid typing, durable Undo semantics, and broader editor coverage remain the confidence frontier.</p></div>
-  </div></section>
+  <section class="confidence-slide">
+    <p class="eyebrow">Aggressive, not reckless</p>
+    <h2>Confidence buys initiative. Reversibility protects authorship.</h2>
+    <table class="truth-table">
+      <thead><tr><th>Signal</th><th>Typover does</th><th>The writer experiences</th></tr></thead>
+      <tbody>
+        <tr><td>Clear typo</td><td>Correct immediately</td><td>Clean text with a quiet gray mark</td></tr>
+        <tr><td>Objective context error</td><td>Change the smallest exact range</td><td>The sentence improves without changing voice</td></tr>
+        <tr><td>Ambiguous or stylistic</td><td>Leave it alone</td><td>No invisible rewrite of intent</td></tr>
+        <tr><td>User reverts</td><td>Restore immediately and learn locally</td><td>Their preference wins next time</td></tr>
+      </tbody>
+    </table>
+  </section>
 
-  <section class="statement"><p class="eyebrow">Takeaway</p><p class="quote">Good autocorrect does not take over the sentence. It borrows three characters—and gives them back on request.</p><p class="footer">Typover · small changes, explicit agency</p></section>
+  <section class="code-slide">
+    <p class="eyebrow">Intelligence with a narrow job</p>
+    <h2>Ask for the smallest correction—not “better” prose.</h2>
+    <div class="code-layout">
+      <div>
+        <p>The language model sees enough nearby context to resolve obvious intent. Its output is still constrained: no tone changes, no added facts, no broad rewrite, and no correction when uncertain.</p>
+      </div>
+      <div class="code-panel">
+        <span class="path">AppleContextualCorrectionEngine.swift · actual model contract</span>
+        <pre><code>Do not rewrite, rephrase, improve style,
+change tone, or add facts.
+
+Return <span class="warm">no correction</span> when the sentence
+is acceptable or when you are uncertain.
+
+original must be the <span class="hl">smallest exact
+contiguous substring</span> copied verbatim,
+and replacement must be its minimal correction.</code></pre>
+      </div>
+    </div>
+  </section>
+
+  <section class="evidence-slide">
+    <p class="eyebrow">What the prototype proves</p>
+    <h2>The interaction works. Compatibility is the frontier.</h2>
+    <div class="evidence-split">
+      <article><h3>Established</h3><p>Automatic word-boundary correction in the controlled editor; exact-range Bear replacement; clickable light-gray annotations; independent Change Back; bounded alternatives; continued typing preserved on one side.</p></article>
+      <article><h3>Still earning confidence</h3><p>Installed multi-correction behavior in Bear, composition, Undo/Redo semantics, rapid-typing stress, and consistent geometry across more editors still require permissioned live validation.</p></article>
+    </div>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">Takeaway</p>
+    <p class="quote">Do not make writers triage mistakes. Fix the obvious. Mark the change. Give it back.</p>
+    <p class="footer">Typover · intelligence without interruption</p>
+  </section>
 </div></div>
-<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script><script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade'});</script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade',backgroundTransition:'fade'});</script>
 </body>
 </html>

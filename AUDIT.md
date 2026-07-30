@@ -32,13 +32,18 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 
 ## 27 · Typover
 
-- **Creative audit:** The first title was too tall at the 1280×720 presentation viewport and pushed
-  the premise below the fold.
-- **Content audit:** The story now centers on exact-range replacement, cursor ownership, reversible
-  correction, and editor capability differences. Current live evidence and remaining validation are
-  stated separately.
-- **Iteration:** Reduced title and icon scale, restored the complete premise on slide one, and added
-  an explicitly labeled interaction model rather than a fabricated product screenshot.
+- **Creative audit:** The earlier deck opened on a narrow implementation problem and repeated the app
+  icon instead of showing the writing experience. The reframed deck now opens with a fresh capture of
+  the real Typover controlled editor, uses the old red-squiggle interruption as the contrast, and lets
+  the gray correction marks carry the visual identity.
+- **Content audit:** The new story defines spell check as a proactive, reversible editing system:
+  apply clear corrections, mark them quietly, expose the original first, and decline ambiguous or
+  stylistic rewrites. It distinguishes controlled-editor proof from the remaining Bear compatibility
+  matrix and does not promote deterministic tests into universal editor support.
+- **Iteration:** Renamed the talk to **Redesigning Spell Check**, replaced the exact-range-first arc
+  with interruption → initiative → agency → safety, added two authentic Typover correction captures,
+  included the actual Revert menu content and contextual-model contract, and tightened the close to
+  “Fix the obvious. Mark the change. Give it back.”
 
 ## 26 · Glyph
 

@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Roadmap That Stopped Being a Spreadsheet — YARM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../shared/deck.css">
+  <style>
+    :root{--bg:#112426;--panel:#183135;--panel-2:#203c3f;--fg:#f5f7f2;--muted:#a8b7b5;--accent:#c7ff89;--accent-2:#ffc867;--rule:rgba(213,241,224,.18)}
+    .title-grid{grid-template-columns:1.05fr .95fr;gap:2.5vw}
+    .title-copy h1{font-size:2.05em;max-width:none}
+    .title-copy h1 span{display:block;white-space:nowrap}
+    .app-shot{border:1px solid var(--rule);background:var(--panel);overflow:hidden;box-shadow:0 2.5vh 6vh rgba(0,0,0,.25)}
+    .app-shot img{display:block;width:100%;height:64vh;object-fit:cover;object-position:top}
+    .title-slide figure{width:100%}
+    .title-slide .app-shot img{height:auto;aspect-ratio:16/9;object-fit:contain}
+    .full-image.app-shot{height:54vh}
+    .full-image.app-shot img{height:100%;object-fit:contain!important}
+    .calendar-shot img{object-position:center}
+    .artifact-label{display:inline-block;margin-top:.9em;padding:.55em .75em;border:1px solid var(--accent);color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:.32em!important;letter-spacing:.1em;text-transform:uppercase}
+    .role-list{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2vw;margin-top:1.2em}
+    .role-list article{border-top:3px solid var(--accent);background:var(--panel);padding:1em 1.1em;min-height:17vh}
+    .role-list h3{margin:0 0 .35em;font-size:.8em}
+    .role-list p{color:var(--muted);font-size:.52em;margin:0}
+    .title-slide .caption{margin-top:.7em!important}
+  </style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <section class="title-slide">
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">YARM · roadmap systems</p>
+        <h1><span>The Roadmap</span><span>That Stopped Being</span><span>a Spreadsheet</span></h1>
+        <p class="dek">A Sheet was a good place to begin. It was a terrible place to hold edits, views, history, and concurrent work.</p>
+        <p class="artifact-label">Real YARM UI · sanitized talk fixture</p>
+        <p class="byline">Micah Alpern · Hacker Dojo</p>
+      </div>
+      <figure>
+        <div class="app-shot"><img src="assets/timeline.png" alt="YARM timeline view showing Explore, Build, and Deliver phases with a sanitized product roadmap"></div>
+        <figcaption class="caption">Actual YARM timeline · synthetic project data</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">The pressure test</p>
+    <h2>One spreadsheet was doing four different jobs.</h2>
+    <div class="role-list">
+      <article><h3>Source</h3><p>People needed a familiar place to bring roadmap data in and take it back out.</p></article>
+      <article><h3>Editor</h3><p>Changes needed validation, conflict handling, and a deliberate save boundary.</p></article>
+      <article><h3>History</h3><p>Every revision needed an accountable state—not a trail of duplicated tabs.</p></article>
+      <article><h3>Presentation</h3><p>Timeline, table, and calendar views needed the same facts without the same shape.</p></article>
+    </div>
+  </section>
+
+  <section class="split">
+    <div>
+      <p class="eyebrow">Timeline view</p>
+      <h2>A roadmap is an argument about time.</h2>
+      <p>The timeline makes sequence, overlap, and phase boundaries legible. It does not pretend that the visual arrangement is the underlying record.</p>
+    </div>
+    <figure>
+      <div class="full-image crop app-shot"><img src="assets/timeline.png" alt="YARM timeline with month cards and phase rail"></div>
+      <figcaption class="caption">Actual YARM timeline · synthetic project data</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="eyebrow">The boundary</p>
+    <h2>Import is not synchronization.</h2>
+    <div class="flow">
+      <div class="step"><b>01 · Sheets</b><span>A familiar import and export surface.</span><small>Useful at the boundary; never silently authoritative after import.</small></div>
+      <div class="step"><b>02 · PostgreSQL</b><span>The current roadmap and its revisions.</span><small>Version checks reject stale edits instead of letting the last writer quietly win.</small></div>
+      <div class="step"><b>03 · YARM</b><span>Purpose-built views over one stored state.</span><small>Timeline, table, and calendar can disagree in presentation without disagreeing in facts.</small></div>
+    </div>
+  </section>
+
+  <section class="split reverse">
+    <figure>
+      <div class="full-image crop app-shot"><img src="assets/table.png" alt="YARM table view showing sanitized roadmap items and dates"></div>
+      <figcaption class="caption">Actual YARM table · synthetic project data</figcaption>
+    </figure>
+    <div>
+      <p class="eyebrow">Table view</p>
+      <h2>Keep the source-shaped structure visible.</h2>
+      <p>The table is where completeness becomes inspectable: titles, owners, status, dates, and stable IDs remain explicit instead of hiding behind pixels.</p>
+    </div>
+  </section>
+
+  <section class="split">
+    <div>
+      <p class="eyebrow">Calendar view</p>
+      <h2>Dates deserve a calendar, not a column hack.</h2>
+      <p>Events keep real dates and arbitrary years. The calendar view exposes collisions and quiet weeks without changing the underlying roadmap.</p>
+    </div>
+    <figure>
+      <div class="full-image app-shot calendar-shot"><img src="assets/calendar.png" alt="YARM August 2026 calendar showing a Prototype review milestone on August 21"></div>
+      <figcaption class="caption">Actual YARM calendar · synthetic project data</figcaption>
+    </figure>
+  </section>
+
+  <section>
+    <p class="eyebrow">Safety model</p>
+    <h2>Make every destructive ambiguity explicit.</h2>
+    <table class="truth-table">
+      <thead><tr><th>Moment</th><th>Tempting shortcut</th><th>YARM’s boundary</th></tr></thead>
+      <tbody>
+        <tr><td>Import</td><td>Treat the Sheet as a live mirror</td><td>Preview, then deliberately replace stored state</td></tr>
+        <tr><td>Edit</td><td>Let the last request win</td><td>Require the version the editor actually saw</td></tr>
+        <tr><td>History</td><td>Overwrite the only copy</td><td>Write a revision with every accepted state</td></tr>
+        <tr><td>Presentation</td><td>Store layout as truth</td><td>Preserve view overrides separately from roadmap facts</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">Takeaway</p>
+    <p class="quote">A roadmap is not a picture. It is a versioned argument about time.</p>
+    <p class="footer">YARM · a clear boundary between source, state, and view</p>
+  </section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade',backgroundTransition:'fade'});</script>
+</body>
+</html>

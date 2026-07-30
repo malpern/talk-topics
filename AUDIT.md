@@ -1,8 +1,20 @@
 # New topic audit — 2026-07-29
 
-This pass covers topics 23–28. Every hero and supporting image is derived from a real project asset,
+This pass covers topics 23–29. Every hero and supporting image is derived from a real project asset,
 an actual project UI capture, an actual device image, or an official product image. No generated
-lifestyle scene is used. Meeting Memory screenshots use deterministic synthetic data.
+lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic synthetic data.
+
+## 29 · YARM
+
+- **Creative audit:** A generic roadmap illustration would hide the exact thing that makes the project
+  interesting: one real data model rendered three different ways. The deck instead uses the actual YARM
+  timeline, table, and calendar, captured from an isolated database with a sanitized talk fixture.
+- **Content audit:** The story distinguishes Google Sheets import/export, PostgreSQL authority, revision
+  history, optimistic conflict checks, and presentation overrides. It does not describe import as live
+  synchronization or expose a private roadmap.
+- **Iteration:** Reframed the title around the spreadsheet-to-system transition, used YARM's own deep-teal
+  and lime visual language, moved a real August milestone into the calendar frame, and labeled every UI
+  capture as synthetic project data.
 
 ## 28 · KeyPath
 
@@ -67,7 +79,7 @@ lifestyle scene is used. Meeting Memory screenshots use deterministic synthetic 
 
 - All local `href` and `src` references resolve.
 - Every image has non-empty alternative text.
-- All six finished pages render without horizontal overflow at the 1280×720 audit viewport.
+- All seven finished pages render without horizontal overflow at the 1280×720 audit viewport.
 - Reduced-motion fallbacks are present in the shared deck and article systems.
 - Calendar Puck’s hardware source link returns HTTP 200.
 - Hero and internal-section screenshots are in `audit/`.

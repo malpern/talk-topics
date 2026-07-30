@@ -65,13 +65,15 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 
 ## 24 · Calendar Puck
 
-- **Creative audit:** An existing concept render read like generic lifestyle stock and could be
-  mistaken for physical progress.
+- **Creative audit:** The watch-face development-board photo made the project look like it used an
+  Apple Watch and implied a hardware direction that does not exist. The original dentist-office
+  concept image communicates the intended tap moment much more clearly.
 - **Content audit:** The final deck calls the app-free offline handoff a hypothesis, identifies the LAN
-  path as diagnostic, and makes physical NFC/phone testing the next evidence gate.
-- **Iteration:** Removed the lifestyle render entirely. The deck now uses only the selected board’s
-  official product image, cropped for the presentation slot, and states that the enclosure does not
-  exist yet.
+  path as diagnostic, makes physical NFC/phone testing the next evidence gate, and now distinguishes
+  the software/protocol prototype from nonexistent industrial design.
+- **Iteration:** Removed every watch-like hardware image. Restored the project’s own concept image as
+  the hero, labeled it as a visualization, and added an explicit inventory of what exists, what does
+  not, and what physical evidence comes next.
 
 ## 23 · Meeting Memory
 

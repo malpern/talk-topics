@@ -18,14 +18,17 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 
 ## 28 · KeyPath
 
-- **Creative audit:** The first title treatment left too little room for the real UI captures. The
-  final grid gives the evidence column more width, keeps the existing dark Hacker Dojo visual system,
-  and treats the real rules window as proof rather than decoration.
-- **Content audit:** The deck now separates UI explanation, software correctness, showroom evidence,
-  and physical fixture evidence. It does not promote an incomplete or demo-only capture to hardware
-  acceptance.
-- **Iteration:** Tightened the title scale, enlarged the evidence column, removed figure overflow,
-  and added a three-part fixture loop plus evidence taxonomy.
+- **Creative audit:** The first revision still treated physical validation as text around KeyPath app
+  screenshots. The revised title and rig sequence now center the actual ESP32-S3 hardware and a fresh
+  capture of the real AppKit HID Capture Jig. The device photo is an official image of the selected
+  board, not a fabricated enclosure or lifestyle scene.
+- **Content audit:** The deck names the actor/witness boundary, shows the exact firmware strings that
+  refuse to self-certify, explains device-local timing, and shows the Jig's fail-closed focus, exact
+  match, repeat, modifier, and all-keys-released checks. The Jig image is explicitly labeled as a
+  controlled demo arm with no physical keys emitted; it is not presented as a completed validation run.
+- **Iteration:** Replaced generic KeyPath project art with a real rig hero, added dedicated ESP32 screen
+  and scheduler-code sections, added the actual Jig UI and classifier code, and ended with the four-part
+  joined artifact required to call one bounded physical run passed.
 
 ## 27 · Typover
 

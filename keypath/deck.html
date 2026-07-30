@@ -10,7 +10,44 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
   <link rel="stylesheet" href="../shared/deck.css">
-  <style>:root{--bg:#090c0e;--panel:#12171a;--panel-2:#1b2327;--accent:#75ddc4;--accent-2:#ff9b54}.title-grid{grid-template-columns:.92fr 1.08fr}.title-copy h1{font-size:3.75em}</style>
+  <style>
+    :root{--bg:#090c0e;--panel:#12171a;--panel-2:#1b2327;--accent:#75ddc4;--accent-2:#ff9b54}
+    .title-grid{grid-template-columns:.82fr 1.18fr;gap:3.5vw}.title-copy h1{font-size:3.45em}
+    .rig-hero{display:grid;grid-template-rows:.72fr 1.28fr;gap:1vw;height:70vh}
+    .rig-hero figure{position:relative;background:var(--panel);border:1px solid var(--rule);overflow:hidden;min-height:0}
+    .rig-hero img{width:100%;height:42vh;object-fit:contain;background:#050708}
+    .rig-hero .device img{height:24vh;object-fit:contain;background:#fff}
+    .rig-hero figcaption{position:absolute;left:0;right:0;bottom:0;padding:1.05em 1.2em;background:rgba(9,12,14,.9);color:var(--muted);font:700 .34em/1.35 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase}
+    .triptych-slide h2{font-size:2.2em;max-width:none;margin-bottom:.28em}
+    .triptych{display:grid;grid-template-columns:.92fr .62fr 1.12fr;gap:1vw}
+    .proof-card{background:var(--panel);border-top:3px solid var(--accent);padding:.7em;min-height:48vh}
+    .proof-card img{width:100%;height:23vh;object-fit:contain;background:#050708}.proof-card.device img{background:#fff;object-fit:cover}
+    .proof-card h3{margin:.75em 0 .35em}.proof-card p{font-size:.52em;color:var(--muted)}
+    .source-grid{display:grid;grid-template-columns:.78fr 1.22fr;gap:3vw;align-items:center}
+    .source-code-slide h2{font-size:2.15em;max-width:none;margin-bottom:.38em}
+    .source-code-slide .source-grid p{font-size:.62em;line-height:1.42}
+    .source-code-slide .code-panel code{font-size:.41em;line-height:1.46}
+    .device-stage{background:#fff;border:1px solid var(--rule);height:69vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+    .device-stage img{width:100%;height:100%;object-fit:cover}
+    .code-panel{background:#070a0c;border:1px solid rgba(117,221,196,.28);padding:1.05em 1.15em;box-shadow:inset 0 0 0 1px rgba(255,255,255,.02)}
+    .code-panel .path{display:block;color:var(--accent-2);font:700 .31em/1.4 'JetBrains Mono',monospace;letter-spacing:.05em;margin-bottom:1em}
+    .code-panel pre{margin:0;white-space:pre-wrap}.code-panel code{font-size:.47em;line-height:1.55;color:#d7dedc}
+    .code-panel .hl{color:var(--accent);font-weight:700}.code-panel .warm{color:var(--accent-2);font-weight:700}
+    .screen-copy h2{max-width:10ch}.screen-copy .claim{border-left:4px solid var(--accent-2);padding-left:1em;color:var(--muted);max-width:34ch}
+    .device-boundary .screen-copy h2{font-size:2.35em;max-width:12ch;margin-bottom:.3em}
+    .device-boundary .screen-copy p{font-size:.62em;line-height:1.38}
+    .device-boundary .code-panel code{font-size:.43em}
+    .jig-shot{height:72vh;background:#050708;border:1px solid var(--rule);overflow:hidden}.jig-shot img{width:100%;height:100%;object-fit:contain}
+    .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1vw;margin-top:1.2em}
+    .metric{background:var(--panel);border-top:3px solid var(--accent);padding:.8em}.metric b{display:block;color:var(--accent);font:700 .55em/1.2 'JetBrains Mono',monospace}.metric span{display:block;color:var(--muted);font-size:.45em;line-height:1.4;margin-top:.55em}
+    .truth-table .actor{color:var(--accent-2)}
+    .artifact-slide h2{font-size:2.1em;max-width:none;margin-bottom:.35em}
+    .artifact-slide .metrics{margin-top:.4em}
+    .artifact-slide .metric{padding:.62em}
+    .artifact-slide .truth-table{margin-top:.72em!important}
+    .artifact-slide .truth-table th,.artifact-slide .truth-table td{padding:.48em .6em;font-size:.48em}
+    .artifact-slide .truth-table th{font-size:.36em}
+  </style>
 </head>
 <body>
 <div class="reveal"><div class="slides">
@@ -19,13 +56,12 @@
       <div class="title-copy">
         <p class="eyebrow">KeyPath · physical systems</p>
         <h1>How Do You Test a Keyboard Remapper?</h1>
-        <p class="dek">A visual test can show the idea. Only an independent keyboard fixture can prove what crossed the USB boundary.</p>
+        <p class="dek">Build a keyboard that acts, a Jig that witnesses, and an evidence artifact that refuses to bluff.</p>
         <p class="byline">Micah Alpern · Hacker Dojo</p>
       </div>
-      <div class="hero-stack" aria-label="Real KeyPath application and test captures">
-        <img src="assets/rules-window.png" alt="KeyPath rules window showing keyboard remapping rules">
-        <img src="assets/caps-to-escape.png" alt="KeyPath onboarding snapshot for a Caps Lock to Escape rule">
-        <img src="assets/live-overlay.png" alt="KeyPath live overlay snapshot">
+      <div class="rig-hero" aria-label="The real KeyPath physical test rig">
+        <figure class="device"><img src="assets/esp32-s3-touch-lcd-1.69.jpg" alt="Waveshare ESP32-S3 Touch LCD board used by the KeyPath HID fixture"><figcaption>Actor · ESP32-S3 fixture</figcaption></figure>
+        <figure><img src="assets/hid-capture-jig.png" alt="Actual KeyPath HID Capture Jig armed and focused"><figcaption>Witness · actual HID Capture Jig</figcaption></figure>
       </div>
     </div>
   </section>
@@ -33,69 +69,127 @@
   <section class="statement">
     <p class="eyebrow">The trap</p>
     <h2>A remapper can look correct while emitting the wrong thing.</h2>
-    <p>UI snapshots prove the explanation. Unit tests prove transformations. Neither proves the host received the intended key sequence at the intended timing.</p>
+    <p>UI snapshots prove the explanation. Unit tests prove transformations. Neither proves what crossed USB—or whether the last key was released.</p>
   </section>
 
-  <section>
-    <p class="eyebrow">Three different claims</p>
-    <div class="evidence-grid">
-      <article class="evidence"><p class="kicker">01 · explanation</p><img src="assets/caps-to-escape.png" alt="KeyPath rule preview"><h3>The rule reads correctly</h3><p>The visual model communicates the mapping and its scope.</p></article>
-      <article class="evidence"><p class="kicker">02 · software</p><img src="assets/live-overlay.png" alt="KeyPath live overlay"><h3>The app reports correctly</h3><p>Focused tests and overlays agree about the transformation.</p></article>
-      <article class="evidence"><p class="kicker">03 · boundary</p><img src="assets/keypath-poster-hor.png" alt="KeyPath application poster"><h3>The host receives correctly</h3><p>An external fixture records expected text, received text, timing, and release.</p></article>
+  <section class="triptych-slide">
+    <p class="eyebrow">The whole rig</p>
+    <h2>Three surfaces. Three different jobs.</h2>
+    <div class="triptych">
+      <article class="proof-card"><img src="assets/rules-window.png" alt="Actual KeyPath rules window"><h3>KeyPath explains</h3><p>The rule, trigger, scope, and output are legible before the run.</p></article>
+      <article class="proof-card device"><img src="assets/esp32-s3-touch-lcd-1.69.jpg" alt="Waveshare ESP32-S3 Touch LCD fixture hardware"><h3>ESP32 acts</h3><p>The fixture schedules deterministic USB HID reports locally.</p></article>
+      <article class="proof-card"><img src="assets/hid-capture-jig.png" alt="Actual KeyPath HID Capture Jig"><h3>The Jig witnesses</h3><p>The focused host records what macOS actually received.</p></article>
     </div>
   </section>
 
-  <section class="split">
-    <div>
-      <p class="eyebrow">The real product surface</p>
-      <h2>Make the rule legible before making it powerful.</h2>
-      <p>KeyPath shows the keyboard, the trigger, and the output together. The testing story follows the same principle: every layer needs visible evidence.</p>
+  <section class="split device-boundary">
+    <div class="screen-copy">
+      <p class="eyebrow">On the ESP32 screen</p>
+      <h2>The actor cannot declare itself correct.</h2>
+      <p class="claim">The physical screen ends with <em>HID SENT</em> and <em>CHECK JIG FOR RESULT</em>—never “passed.”</p>
+      <p>The 240×280 touch display exposes run state and timing pressure. Touch and the physical button remain available for abort; the motion governor sheds display work before it competes with HID delivery.</p>
     </div>
-    <figure>
-      <div class="full-image crop"><img src="assets/rules-window.png" alt="KeyPath rule editor with visual keyboard"></div>
-      <figcaption class="caption">Actual KeyPath UI capture · rule editor</figcaption>
-    </figure>
+    <div class="code-panel">
+      <span class="path">fixture_runtime.c · on-device result boundary</span>
+      <pre><code>presentation.phase = FIXTURE_PRESENT_RESULT;
+presentation.result = <span class="warm">FIXTURE_RESULT_INCONCLUSIVE</span>;
+presentation.progress_per_mille = 1000u;
+
+snprintf(presentation.title,
+         sizeof(presentation.title),
+         <span class="hl">"HID SENT"</span>);
+snprintf(presentation.detail,
+         sizeof(presentation.detail),
+         <span class="hl">"CHECK JIG FOR RESULT"</span>);</code></pre>
+    </div>
   </section>
 
-  <section>
-    <p class="eyebrow">Fixture loop</p>
-    <h2>Separate the actor from the witness.</h2>
-    <div class="flow">
-      <div class="step"><b>01 · drive</b><span>Independent USB keyboard sends a deterministic sequence.</span><small>Wi-Fi control keeps the fixture outside the remapper’s process.</small></div>
-      <div class="step"><b>02 · observe</b><span>Focused host captures the actual text and event timing.</span><small>Focus ownership is recorded because the right keys in the wrong app are still a failed run.</small></div>
-      <div class="step"><b>03 · compare</b><span>Expected, received, trace, and release state travel together.</span><small>A partial capture stays partial; the report does not promote it to proof.</small></div>
-    </div>
-  </section>
+  <section class="source-code-slide">
+    <p class="eyebrow">Inside the ESP32</p>
+    <h2>Timing belongs on the device.</h2>
+    <div class="source-grid">
+      <div>
+        <p>Wi-Fi loads and arms a bounded script. After start, the ESP32 schedules each press and release locally, so network jitter cannot alter inter-key timing.</p>
+        <p>The scheduler yields when it has room, then precision-spins near the next report deadline. USB service, control, sound, and display stay off the HID core.</p>
+      </div>
+      <div class="code-panel">
+        <span class="path">fixture_runtime.c · cooperative HID scheduler</span>
+        <pre><code>wait_us = fixture_time_until_next_action_us(
+    &amp;fixture, now_us);
 
-  <section>
-    <p class="eyebrow">Evidence taxonomy</p>
-    <h2>Green is not one color.</h2>
-    <table class="truth-table">
-      <thead><tr><th>Result</th><th>What it establishes</th><th>What it does not establish</th></tr></thead>
-      <tbody>
-        <tr><td class="yes">Snapshot passes</td><td>Layout and explanation remain stable</td><td>USB emission or timing</td></tr>
-        <tr><td class="yes">Focused software tests pass</td><td>Transformation logic matches the specification</td><td>Physical device-to-host behavior</td></tr>
-        <tr><td class="pending">Showroom demo passes</td><td>The interaction can be demonstrated</td><td>Strict admission or comparison control</td></tr>
-        <tr><td class="yes">Fixture report completes</td><td>Expected/received/trace/release evidence is coherent</td><td>Every untested keyboard or host</td></tr>
-      </tbody>
-    </table>
+if (!running) {
+    vTaskDelay(pdMS_TO_TICKS(5));
+} else if (wait_us &gt; 1500u) {
+    uint32_t sleep_ms = (wait_us - 1000u) / 1000u;
+    if (sleep_ms &gt; 10u) sleep_ms = 10u;
+    <span class="hl">vTaskDelay(pdMS_TO_TICKS(sleep_ms));</span>
+} else {
+    <span class="warm">esp_rom_delay_us(25u);</span>
+}</code></pre>
+      </div>
+    </div>
   </section>
 
   <section class="split reverse">
     <figure>
-      <div class="full-image"><img src="assets/keypath-poster-hor.png" alt="KeyPath app poster featuring a laptop keyboard"></div>
-      <figcaption class="caption">Real KeyPath project artwork</figcaption>
+      <div class="jig-shot"><img src="assets/hid-capture-jig.png" alt="Actual KeyPath HID Capture Jig armed for a 240-character run"></div>
+      <figcaption class="caption">Actual AppKit Jig capture · controlled demo arm · no physical keys emitted</figcaption>
     </figure>
     <div>
-      <p class="eyebrow">The design lesson</p>
-      <h2>Trust comes from named boundaries.</h2>
-      <p>“Looks right,” “logic passed,” and “hardware verified” should never collapse into one status. A trustworthy tool tells you exactly which claim you earned.</p>
+      <p class="eyebrow">The independent witness</p>
+      <h2>The Jig fails closed.</h2>
+      <p><strong>FOCUSED</strong> is evidence, not decoration. Moving focus invalidates the run. Expected and received text stay side by side; the live keycap stack preserves fast event order; partial evidence stays partial.</p>
     </div>
+  </section>
+
+  <section class="source-code-slide">
+    <p class="eyebrow">Inside the Jig</p>
+    <h2>“Passed” is a conjunction.</h2>
+    <div class="source-grid">
+      <div class="code-panel">
+        <span class="path">CaptureSession.swift · terminal classification</span>
+        <pre><code>if focusLost || repeatEvents &gt; 0 ||
+   duplicateDownEvents &gt; 0 ||
+   unmatchedUpEvents &gt; 0 ||
+   mismatchIndex() != nil {
+    state = <span class="warm">.failed</span>
+}
+
+if received == expected,
+   pressedKeyCodes.isEmpty,
+   activeModifiers == 0 {
+    state = <span class="hl">.passed</span>
+}</code></pre>
+      </div>
+      <div>
+        <p>The oracle checks exact characters, order, repeats, duplicate downs, unmatched ups, modifiers, release state, timeout, and focus ownership.</p>
+        <p>That turns a foreground demo into a machine-readable result with a timestamped event ledger and persisted JSON.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="artifact-slide">
+    <p class="eyebrow">The joined artifact</p>
+    <h2>One run should answer four questions.</h2>
+    <div class="metrics">
+      <div class="metric"><b>EXPECTED = RECEIVED</b><span>Exact characters and order—not “looks close.”</span></div>
+      <div class="metric"><b>FOCUS HELD</b><span>The intended oracle owned the foreground throughout.</span></div>
+      <div class="metric"><b>ALL KEYS RELEASED</b><span>No stuck keys or active modifiers at the boundary.</span></div>
+      <div class="metric"><b>TRACE COMPLETE</b><span>ESP32 timing and report counts travel with host events.</span></div>
+    </div>
+    <table class="truth-table" style="margin-top:1.25em">
+      <thead><tr><th>Surface</th><th>Allowed to claim</th><th>Not allowed to claim</th></tr></thead>
+      <tbody>
+        <tr><td class="actor">ESP32 screen</td><td>Reports were scheduled and sent</td><td>macOS received the right result</td></tr>
+        <tr><td class="yes">Host Jig</td><td>Exact capture, focus, release, event ledger</td><td>Every untested host or keyboard</td></tr>
+        <tr><td class="yes">Joined report</td><td>This bounded physical run passed</td><td>Universal correctness</td></tr>
+      </tbody>
+    </table>
   </section>
 
   <section class="statement">
     <p class="eyebrow">Takeaway</p>
-    <p class="quote">Test the explanation. Test the transformation. Then test the wire.</p>
+    <p class="quote">Let the keyboard act. Let the Jig judge.</p>
     <p class="footer">KeyPath · physical evidence over implied certainty</p>
   </section>
 </div></div>

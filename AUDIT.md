@@ -1,8 +1,20 @@
-# New topic audit — 2026-07-29
+# New topic audit — updated 2026-07-31
 
-This pass covers topics 23–29. Every hero and supporting image is derived from a real project asset,
+This living audit covers topics 23–30. Every hero and supporting image is derived from a real project asset,
 an actual project UI capture, an actual device image, or an official product image. No generated
 lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic synthetic data.
+
+## 30 · Card Clash
+
+- **Creative audit:** The family story is the project, so the deck opens on an authentic game capture
+  and quickly moves to the 7- and 5-year-old collaborators whose curiosity defined the experience.
+  The cyan, yellow, and magenta treatment borrows the game’s visual energy without turning every slide
+  into another game screen.
+- **Content audit:** The deck says what is currently true: the full-screen guessing loop, hidden-price
+  reveal, countdown, and finale exist; the complete twenty-card image/value/source audit does not.
+  Prototype screenshots carry that caveat instead of presenting the catalog as settled research.
+- **Iteration:** Reduced the initial feature inventory to one cumulative story: cousins → question →
+  three-beat game loop → room-scale design requirements → evidence boundary → family-project takeaway.
 
 ## 29 · YARM
 
@@ -89,7 +101,7 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 
 - All local `href` and `src` references resolve.
 - Every image has non-empty alternative text.
-- All seven finished pages render without horizontal overflow at the 1280×720 audit viewport.
+- All eight finished pages render without horizontal overflow at the 1280×720 audit viewport.
 - Reduced-motion fallbacks are present in the shared deck and article systems.
 - Calendar Puck’s hardware source link returns HTTP 200.
 - Hero and internal-section screenshots are in `audit/`.

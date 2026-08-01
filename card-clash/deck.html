@@ -50,6 +50,42 @@
     .title-slide .byline { margin-top: 1.35em !important; }
     .title-slide .game-frame { min-height: 0; }
     .title-slide .game-frame img { height: auto; object-fit: contain; }
+    .game-link {
+      display: block;
+      position: relative;
+      width: 100%;
+    }
+    .full-image .game-link { height: 100%; }
+    .game-link::after {
+      background: var(--accent-2);
+      bottom: .8em;
+      color: var(--bg);
+      content: 'PLAY THE GAME →';
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .3em;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: .65em .9em;
+      position: absolute;
+      right: .8em;
+    }
+    .play-cta {
+      background: var(--accent-2);
+      border: 3px solid var(--fg);
+      box-shadow: 6px 6px 0 var(--pink);
+      color: var(--bg) !important;
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .45em;
+      font-weight: 800;
+      letter-spacing: .06em;
+      margin-top: .45em;
+      padding: .75em 1em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .play-cta:hover,
+    .play-cta:focus-visible { transform: translate(-2px, -2px); box-shadow: 9px 9px 0 var(--pink); }
     .prototype-note {
       color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
@@ -132,10 +168,11 @@
         <h1>Card Clash</h1>
         <p class="title-question"><span class="sports">Sports cards</span> vs. <span class="pokemon">Pokémon cards</span>—which wins?</p>
         <p class="dek">A price-guessing game I made with my 7- and 5-year-old cousins—because comparing cardboard treasures is much more fun when nobody knows the answer yet.</p>
+        <a class="play-cta" href="./" target="_blank" rel="noopener">Play Card Clash →</a>
         <p class="byline">Micah Alpern · Hacker Dojo</p>
       </div>
       <figure>
-        <div class="hero-frame game-frame"><img src="assets/card-clash-round-20.jpg" alt="Card Clash prototype showing a sports card and a Pokémon card facing off with both prices hidden"></div>
+        <div class="hero-frame game-frame"><a class="game-link" href="./" target="_blank" rel="noopener" aria-label="Play Card Clash"><img src="assets/card-clash-round-20.jpg" alt="Card Clash prototype showing a sports card and a Pokémon card facing off with both prices hidden"></a></div>
         <figcaption class="prototype-note">Authentic prototype screen · card artwork and value data remain subject to a full audit</figcaption>
       </figure>
     </div>
@@ -167,7 +204,7 @@
   </section>
 
   <section class="split reverse">
-    <div class="full-image crop"><img src="assets/card-clash-reveal.jpg" alt="Card Clash prototype mid-countdown with two large collectible cards ready for a price guess"></div>
+    <div class="full-image crop"><a class="game-link" href="./" target="_blank" rel="noopener" aria-label="Play Card Clash"><img src="assets/card-clash-reveal.jpg" alt="Card Clash prototype mid-countdown with two large collectible cards ready for a price guess"></a></div>
     <div class="reaction-copy">
       <p class="eyebrow">Designed for playing together</p>
       <h2>The reaction is part of the interface.</h2>
@@ -205,6 +242,7 @@
     <p class="eyebrow">Takeaway</p>
     <p class="quote">A good family project starts with a question everyone wants to answer out loud.</p>
     <p>The technology was HTML, CSS, and JavaScript. The product was curiosity → guess → reveal → “one more.”</p>
+    <p><a class="play-cta" href="./" target="_blank" rel="noopener">Play Card Clash →</a></p>
     <p class="footer">Card Clash · built with my 7- and 5-year-old cousins</p>
   </section>
 </div></div>

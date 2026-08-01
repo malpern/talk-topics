@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Touchline Heat — Football Sings Back</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../shared/deck.css">
+  <style>
+    :root {
+      --bg: #0c0f0b;
+      --panel: #171b16;
+      --panel-2: #22271f;
+      --fg: #f4f1e9;
+      --muted: #a8aa9f;
+      --accent: #ceff45;
+      --accent-2: #ff6437;
+      --rule: rgba(244, 241, 233, .2);
+    }
+    body, .reveal-viewport {
+      background:
+        linear-gradient(115deg, transparent 0 68%, rgba(206, 255, 69, .035) 68% 69%, transparent 69% 100%),
+        repeating-linear-gradient(101deg, transparent 0 9vw, rgba(244, 241, 233, .025) 9vw 9.1vw),
+        var(--bg) !important;
+    }
+    .reveal .slides section { padding: 3.5vh 5vw; }
+    .reveal h1, .reveal h2 { text-transform: uppercase; }
+    .reveal h1 { font-size: 4.25em; line-height: .78; }
+    .reveal h2 { font-size: 3em; max-width: 14ch; }
+    .reveal .eyebrow { color: var(--accent); }
+    .reveal .slide-number { color: var(--accent); }
+    .title-slide .title-grid { grid-template-columns: .82fr 1.18fr; gap: 4vw; }
+    .title-slide .title-copy h1 em { color: var(--accent); display: block; font-style: normal; text-shadow: .08em .08em 0 var(--accent-2); }
+    .title-slide .dek { font-size: .66em !important; max-width: 38ch; }
+    .hero-frame {
+      border: 3px solid var(--fg);
+      box-shadow: 11px 11px 0 var(--accent-2);
+      min-height: 0;
+    }
+    .title-slide .hero-frame img { height: auto; object-fit: contain; }
+    .live-link { display: block; position: relative; width: 100%; }
+    .full-image .live-link { height: 100%; }
+    .live-link::after {
+      background: var(--accent);
+      bottom: .8em;
+      color: var(--bg);
+      content: 'PLAY LIVE ↗';
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .28em;
+      font-weight: 700;
+      letter-spacing: .08em;
+      padding: .7em 1em;
+      position: absolute;
+      right: .8em;
+    }
+    .play-cta {
+      background: var(--accent);
+      border: 3px solid var(--fg);
+      box-shadow: 6px 6px 0 var(--accent-2);
+      color: var(--bg) !important;
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .43em;
+      font-weight: 800;
+      letter-spacing: .07em;
+      margin-top: .5em;
+      padding: .8em 1.05em;
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    .play-cta:hover, .play-cta:focus-visible { transform: translate(-2px, -2px); box-shadow: 9px 9px 0 var(--accent-2); }
+    .brief-slide { display: grid !important; grid-template-columns: .62fr 1.38fr; gap: 6vw; align-items: center; }
+    .age-lockup { color: var(--accent); font-family: 'Bebas Neue', sans-serif; font-size: 9em; line-height: .7; text-shadow: .08em .08em 0 var(--accent-2); }
+    .age-lockup small { color: var(--muted); display: block; font-family: 'JetBrains Mono', monospace; font-size: .055em; letter-spacing: .16em; line-height: 1.4; margin-top: 2.3em; text-shadow: none; text-transform: uppercase; }
+    .brief-copy h2 { max-width: 12ch; }
+    .brief-lines { border-top: 1px solid var(--rule); margin-top: 1em; }
+    .brief-lines p { border-bottom: 1px solid var(--rule); color: var(--fg); font-size: .7em; margin: 0; padding: .55em 0; }
+    .brief-lines b { color: var(--accent-2); font-family: 'JetBrains Mono', monospace; font-size: .62em; margin-right: 1.1em; }
+    .battle-slide .full-image { border: 3px solid var(--fg); box-shadow: 10px 10px 0 var(--accent); height: 70vh; }
+    .battle-slide .full-image img { object-fit: contain; object-position: center; }
+    .battle-copy p { color: var(--muted); max-width: 34ch; }
+    .battle-copy strong { color: var(--accent); }
+    .pipeline { display: grid; gap: .42em; margin-top: .72em; max-width: 31em; }
+    .pipeline div { align-items: baseline; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 4.4em 1fr; padding-bottom: .42em; }
+    .pipeline b { color: var(--accent-2); font-family: 'Bebas Neue', sans-serif; font-size: 1.25em; font-weight: 400; }
+    .pipeline span { font-size: .62em; }
+    .api-note { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: .3em !important; margin-top: .72em !important; max-width: none !important; }
+    .track-list { border-top: 1px solid var(--rule); margin-top: 1.05em; }
+    .track { align-items: center; border-bottom: 1px solid var(--rule); display: grid; grid-template-columns: 2.6em 1fr auto; gap: 1em; padding: .58em 0; }
+    .track .num { color: var(--accent-2); font-family: 'Bebas Neue', sans-serif; font-size: 1.55em; }
+    .track strong { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 1.2em; font-weight: 400; }
+    .track span { color: var(--muted); font-family: 'JetBrains Mono', monospace; font-size: .34em; letter-spacing: .06em; text-transform: uppercase; }
+    .track time { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-size: .4em; }
+    .timeline { display: grid; grid-template-columns: repeat(6, 1fr); margin-top: 1.45em; position: relative; }
+    .timeline::before { background: var(--accent); content: ''; height: 3px; left: 0; position: absolute; right: 0; top: .33em; }
+    .beat { padding-right: .55em; position: relative; }
+    .beat::before { background: var(--bg); border: 4px solid var(--accent); border-radius: 50%; content: ''; display: block; height: .7em; margin-bottom: .65em; position: relative; width: .7em; z-index: 1; }
+    .beat b { color: var(--accent-2); display: block; font-family: 'JetBrains Mono', monospace; font-size: .38em; }
+    .beat span { display: block; font-size: .48em; line-height: 1.25; margin-top: .4em; }
+    .iteration .versus { color: var(--accent-2); font-size: .75em; padding: 0 .25em; }
+    .iteration .quote { border-color: var(--accent); max-width: 22ch; }
+    .closing .quote { border-color: var(--accent-2); font-size: 2.28em !important; max-width: 21ch; }
+    .closing .play-cta { margin-top: .1em; }
+    .closing .footer { bottom: 1vh; color: var(--accent); font-size: .27em; }
+    @media (max-width: 900px) {
+      .title-slide .title-grid, .brief-slide { grid-template-columns: 1fr; gap: 2vh; }
+      .age-lockup { font-size: 5em; }
+      .timeline { grid-template-columns: repeat(3, 1fr); gap: 1.2em 0; }
+      .timeline::before { display: none; }
+      .battle-slide .full-image { height: 40vh; }
+    }
+  </style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <section class="title-slide">
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">Touchline Heat · nephew-built</p>
+        <h1>Football <em>sings back.</em></h1>
+        <p class="dek">A soccer rap-battle music video I made with my 7-year-old nephew—starting from his insistence that the players should sing and the action should come with real highlights.</p>
+        <a class="play-cta" href="https://touchline-heat.malpern.chatgpt.site/" target="_blank" rel="noopener">Play Touchline Heat ↗</a>
+        <p class="byline">Micah Alpern · Hacker Dojo</p>
+      </div>
+      <figure>
+        <div class="hero-frame"><a class="live-link" href="https://touchline-heat.malpern.chatgpt.site/" target="_blank" rel="noopener" aria-label="Play Touchline Heat"><img src="assets/touchline-heat-home.jpg" alt="Touchline Heat home screen showing Football Sings Back and three soccer rap battles"></a></div>
+        <figcaption class="api-note">Live product · music-video battles · unofficial parody</figcaption>
+      </figure>
+    </div>
+    <aside class="notes">[Sources]
+- https://touchline-heat.malpern.chatgpt.site/ — live product screenshot and interface copy, accessed 2026-07-31
+- User-provided project context in this task — nephew relationship, age, and original brief
+    </aside>
+  </section>
+
+  <section class="brief-slide">
+    <div class="age-lockup">7<small>years old<br>product director</small></div>
+    <div class="brief-copy">
+      <p class="eyebrow">The brief</p>
+      <h2>A seven-year-old knew exactly what this needed.</h2>
+      <div class="brief-lines">
+        <p><b>01</b>The players need to sing.</p>
+        <p><b>02</b>The battle needs video highlights.</p>
+        <p><b>03</b>The crowd needs someone to root for.</p>
+      </div>
+    </div>
+    <aside class="notes">[Sources]
+- User-provided project context in this task — singing and video-highlight requirements
+    </aside>
+  </section>
+
+  <section class="split reverse battle-slide">
+    <div class="full-image"><a class="live-link" href="https://touchline-heat.malpern.chatgpt.site/" target="_blank" rel="noopener" aria-label="Play Touchline Heat"><img src="assets/touchline-heat-battle.jpg" alt="Touchline Heat battle screen showing Lionel Messi versus Thibaut Courtois over official highlight videos"></a></div>
+    <div class="battle-copy">
+      <p class="eyebrow">The experience</p>
+      <h2>The matchup became a music video.</h2>
+      <p><strong>Two highlight reels.</strong> One original battle track. Timed lyric chapters that hand the spotlight from player to player. A crowd verdict at the end.</p>
+    </div>
+    <aside class="notes">[Sources]
+- https://touchline-heat.malpern.chatgpt.site/ — live battle screenshot and interaction model, accessed 2026-07-31
+    </aside>
+  </section>
+
+  <section class="statement">
+    <p class="eyebrow">The audio engine</p>
+    <h2>ElevenLabs turned the brief into a soundtrack.</h2>
+    <div class="pipeline">
+      <div><b>Brief</b><span>Choose two soccer archetypes and the sound of their showdown.</span></div>
+      <div><b>Plan</b><span>Structure lyrics, alternating verses, choruses, and musical style.</span></div>
+      <div><b>API</b><span>Send the song plan to ElevenLabs Music and receive a full MP3 battle.</span></div>
+      <div><b>Stage</b><span>Synchronize the track with highlights, lyrics, player emphasis, and voting.</span></div>
+    </div>
+    <p class="api-note">Original parody songs · not real quotes or voice clones</p>
+    <aside class="notes">[Sources]
+- Project source: scripts/generate-battle-songs.sh and scripts/song-plans/*.json — ElevenLabs Music API generation flow
+- Project source: app/page.tsx — audio synchronization and parody disclaimer
+    </aside>
+  </section>
+
+  <section>
+    <p class="eyebrow">The lineup</p>
+    <h2>Three battles. Three different sounds.</h2>
+    <div class="track-list">
+      <div class="track"><span class="num">01</span><div><strong>Maestro vs Wall</strong><span>Melodic stadium hip-hop</span></div><time>1:23</time></div>
+      <div class="track"><span class="num">02</span><div><strong>Air Force vs Safe Hands</strong><span>Arena trap anthem</span></div><time>1:23</time></div>
+      <div class="track"><span class="num">03</span><div><strong>Vision vs Fortress</strong><span>Cinematic hip-hop duet</span></div><time>1:23</time></div>
+    </div>
+    <aside class="notes">[Sources]
+- https://touchline-heat.malpern.chatgpt.site/ — current battle titles, genres, and durations, accessed 2026-07-31
+    </aside>
+  </section>
+
+  <section>
+    <p class="eyebrow">The choreography</p>
+    <h2>The interface follows the song.</h2>
+    <div class="timeline">
+      <div class="beat"><b>0:00</b><span>Walkout</span></div>
+      <div class="beat"><b>0:07</b><span>Left verse</span></div>
+      <div class="beat"><b>0:25</b><span>Stadium chorus</span></div>
+      <div class="beat"><b>0:38</b><span>Right verse</span></div>
+      <div class="beat"><b>0:56</b><span>Trade bars</span></div>
+      <div class="beat"><b>1:09</b><span>Final chorus</span></div>
+    </div>
+    <p class="api-note">The active lyrics and visual emphasis change with each chapter while both official highlight embeds stay muted.</p>
+    <aside class="notes">[Sources]
+- Project source: app/page.tsx — chapter timestamps, active-side state, and muted YouTube highlight embeds
+    </aside>
+  </section>
+
+  <section class="statement iteration">
+    <p class="eyebrow">What made it work</p>
+    <p class="quote">Pictures were not enough. Short voice lines were not enough. The product had to feel like a real song over a real match.</p>
+    <p>The bar kept moving toward the thing my nephew could describe immediately: <span class="sports">watch the soccer</span><span class="versus">+</span><span class="pokemon">hear the battle.</span></p>
+    <aside class="notes">[Sources]
+- User-provided project context in this task — singing and video-highlight direction
+- Project iteration history — progression from voiced lines to full vocal songs and official highlight reels
+    </aside>
+  </section>
+
+  <section class="statement closing">
+    <p class="eyebrow">Takeaway</p>
+    <p class="quote">A seven-year-old did not ask for an AI demo. He asked for soccer stars to sing their own showdown.</p>
+    <p>The technology disappeared into the loop: choose a clash → hear the song → watch the highlights → settle it with a vote.</p>
+    <p><a class="play-cta" href="https://touchline-heat.malpern.chatgpt.site/" target="_blank" rel="noopener">Play Touchline Heat ↗</a></p>
+    <p class="footer">Touchline Heat · built with my 7-year-old nephew</p>
+    <aside class="notes">[Sources]
+- User-provided project context in this task — nephew relationship and project origin
+- https://touchline-heat.malpern.chatgpt.site/ — live interaction flow, accessed 2026-07-31
+    </aside>
+  </section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/plugin/notes/notes.js"></script>
+<script>Reveal.initialize({hash:true,slideNumber:'c/t',progress:true,transition:'fade',plugins:[RevealNotes]});</script>
+</body>
+</html>

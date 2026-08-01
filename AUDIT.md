@@ -13,7 +13,7 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 - **Content audit:** The deck says what is currently true: the full-screen guessing loop, hidden-price
   reveal, countdown, and finale exist; the complete twenty-card image/value/source audit does not.
   Prototype screenshots carry that caveat instead of presenting the catalog as settled research.
-- **Iteration:** Reduced the initial feature inventory to one cumulative story: cousins → question →
+- **Iteration:** Reduced the initial feature inventory to one cumulative story: nephews → question →
   three-beat game loop → room-scale design requirements → evidence boundary → family-project takeaway.
 
 ## 29 · YARM

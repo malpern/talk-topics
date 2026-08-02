@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Teaching Chrome Where Text Really Is</title>
+  <meta name="description" content="Why Chrome's macOS accessibility text coordinates matter to KindaVim, Bear automation, and AI agents—and how we are studying the problem before proposing a Chromium fix.">
+  <link rel="icon" type="image/png" href="../hackerdojo-logo.png">
+  <style>
+    :root { --ink:#0b0d12; --paper:#f5f6f8; --muted:#68707d; --blue:#0867f2; --violet:#8056ff; --mint:#54e1b7; --line:rgba(11,13,18,.12); }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Helvetica Neue",sans-serif; -webkit-font-smoothing:antialiased; }
+    a { color:inherit; }
+    code { font-family:"SFMono-Regular",Consolas,monospace; }
+    .nav { height:64px; padding:0 5vw; display:flex; align-items:center; justify-content:space-between; color:white; background:rgba(8,10,16,.82); border-bottom:1px solid rgba(255,255,255,.1); backdrop-filter:blur(18px); position:absolute; inset:0 0 auto; z-index:2; }
+    .nav a { text-decoration:none; font-size:13px; }
+    .brand { display:flex; align-items:center; gap:10px; font-weight:700; }
+    .brand-mark { width:28px; height:28px; border-radius:9px; background:conic-gradient(#4c8cff,#63e5be,#a777ff,#4c8cff); box-shadow:inset 0 0 0 8px #172137; }
+    .hero { min-height:920px; padding:150px 7vw 95px; color:white; background:radial-gradient(circle at 77% 28%,rgba(61,106,255,.31),transparent 27%),radial-gradient(circle at 87% 82%,rgba(137,76,255,.25),transparent 29%),linear-gradient(145deg,#172343,#080a10 50%,#151024); display:grid; grid-template-columns:minmax(0,1.1fr) minmax(380px,.9fr); gap:6vw; align-items:center; overflow:hidden; }
+    .eyebrow { margin:0 0 20px; color:#a8c3ff; font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; }
+    h1 { margin:0; max-width:850px; font-size:clamp(64px,8vw,120px); line-height:.91; letter-spacing:-.07em; }
+    .deck { max-width:720px; margin:34px 0 0; color:rgba(255,255,255,.72); font-size:clamp(19px,1.8vw,26px); line-height:1.48; letter-spacing:-.02em; }
+    .actions { display:flex; align-items:center; flex-wrap:wrap; gap:17px; margin-top:40px; }
+    .cta { display:inline-flex; align-items:center; gap:24px; padding:16px 21px; border-radius:999px; color:#11141b; background:white; text-decoration:none; font-weight:750; box-shadow:0 17px 45px rgba(0,0,0,.28); }
+    .cta span { color:var(--blue); font-size:20px; }
+    .status { color:rgba(255,255,255,.58); font-size:12px; }
+    .status b { color:#71ebc4; }
+    .hero-art { position:relative; height:590px; }
+    .app { position:absolute; width:270px; padding:22px; border-radius:24px; background:linear-gradient(150deg,rgba(255,255,255,.14),rgba(255,255,255,.055)); border:1px solid rgba(255,255,255,.2); box-shadow:0 30px 80px rgba(0,0,0,.32); backdrop-filter:blur(24px); }
+    .app small { display:block; margin-bottom:16px; color:rgba(255,255,255,.48); font-size:10px; font-weight:750; letter-spacing:.13em; text-transform:uppercase; }
+    .app strong { display:block; font-size:20px; letter-spacing:-.03em; }
+    .app p { margin:8px 0 0; color:rgba(255,255,255,.56); font-size:12px; line-height:1.45; }
+    .bear { top:22px; left:0; transform:rotate(-3deg); }
+    .kindavim { top:205px; right:0; transform:rotate(2deg); }
+    .agent { bottom:0; left:18px; transform:rotate(-1deg); }
+    .app-icon { width:35px; height:35px; display:grid; place-items:center; margin-bottom:18px; border-radius:11px; background:rgba(255,255,255,.13); font-weight:850; }
+    .wire { position:absolute; width:155px; height:100px; border-right:1px solid rgba(105,187,255,.65); border-bottom:1px solid rgba(105,187,255,.65); border-radius:0 0 45px; }
+    .wire.one { top:143px; left:165px; }.wire.two { right:175px; bottom:100px; transform:rotate(180deg); }
+    .wire::after { content:""; position:absolute; right:-4px; bottom:-4px; width:8px; height:8px; border-radius:50%; background:#6ce3ff; box-shadow:0 0 20px #6ce3ff; }
+    .section { padding:120px 7vw; }
+    .intro { max-width:940px; margin-bottom:64px; }
+    h2 { margin:0; font-size:clamp(46px,6vw,83px); line-height:.98; letter-spacing:-.055em; }
+    .intro > p:last-child { max-width:790px; color:var(--muted); font-size:20px; line-height:1.58; }
+    .system { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; align-items:stretch; gap:15px; padding:36px; border:1px solid var(--line); border-radius:32px; background:white; box-shadow:0 25px 80px rgba(26,34,60,.08); }
+    .system article { min-height:220px; padding:25px; border-radius:22px; display:flex; flex-direction:column; justify-content:flex-end; }
+    .system article:nth-of-type(1) { background:#e5efff; color:#184a95; }.system article:nth-of-type(2) { background:linear-gradient(145deg,#7250e6,#a25fff); color:white; }.system article:nth-of-type(3) { background:#dff8ee; color:#17654d; }
+    .system small { text-transform:uppercase; letter-spacing:.13em; font-weight:800; font-size:9px; opacity:.7; }.system strong { margin:8px 0; font-size:23px; line-height:1.08; }.system p { margin:0; font-size:12px; line-height:1.5; opacity:.72; }
+    .arrow { align-self:center; color:#9aa1ad; font-size:25px; }
+    .mismatch { margin-top:30px; display:grid; grid-template-columns:1fr 1fr; border-radius:30px; overflow:hidden; border:1px solid var(--line); }
+    .mismatch > div { padding:35px; background:white; }.mismatch > div:last-child { background:#101522; color:white; }
+    .label { display:block; margin-bottom:24px; color:var(--blue); font-size:10px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; }
+    .mismatch code { display:block; font-size:clamp(17px,2.4vw,31px); letter-spacing:-.04em; }.newline { color:var(--violet); font-weight:850; }.mismatch p { color:var(--muted); line-height:1.55; }.mismatch > div:last-child p { color:rgba(255,255,255,.58); }
+    .why { color:white; background:#0a0d14; }
+    .why .intro > p:last-child { color:rgba(255,255,255,.64); }
+    .impact-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:18px; }
+    .impact-grid article { min-height:250px; padding:28px; border:1px solid rgba(255,255,255,.12); border-radius:24px; background:rgba(255,255,255,.055); }
+    .impact-grid b { color:#86adff; font-family:"SFMono-Regular",monospace; font-size:11px; }.impact-grid h3 { margin:40px 0 12px; font-size:24px; }.impact-grid p { margin:0; color:rgba(255,255,255,.58); line-height:1.6; font-size:14px; }
+    .research-grid { display:grid; grid-template-columns:1fr 1fr; gap:22px; }
+    .research-card { padding:34px; border-radius:28px; border:1px solid var(--line); background:white; }
+    .research-card h3 { margin:0 0 18px; font-size:27px; letter-spacing:-.035em; }.research-card li { margin:13px 0; color:#505762; line-height:1.5; }
+    .policy { margin-top:25px; padding:27px; border-radius:24px; color:white; background:linear-gradient(145deg,#0e1e3c,#162b55); }
+    .policy p { max-width:880px; color:rgba(255,255,255,.7); line-height:1.6; }.policy a { color:#a8c6ff; font-weight:700; }
+    .policy strong { color:white; }
+    .final { padding:110px 7vw; text-align:center; color:white; background:linear-gradient(145deg,#0d2250,#16102f); }
+    .final h2 { max-width:950px; margin:0 auto; }.final p { max-width:670px; margin:26px auto 37px; color:rgba(255,255,255,.65); font-size:18px; line-height:1.6; }
+    footer { padding:35px 7vw; display:flex; justify-content:space-between; gap:30px; color:#747b86; background:#080a10; font-size:11px; line-height:1.6; }
+    @media(max-width:900px){ .hero{grid-template-columns:1fr}.hero-art{max-width:620px;width:100%;margin:0 auto}.system{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}.impact-grid{grid-template-columns:1fr}.research-grid{grid-template-columns:1fr} }
+    @media(max-width:620px){ .hero{padding:125px 22px 75px;min-height:auto}.hero h1{font-size:58px}.hero-art{height:560px}.app{width:250px}.section{padding:85px 22px}.mismatch{grid-template-columns:1fr}.system{padding:22px}.final{padding:85px 22px}footer{flex-direction:column} }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span> Hacker Dojo projects</a>
+    <a href="article.html">Open the visual guide →</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <p class="eyebrow">Chromium · macOS accessibility · active investigation</p>
+      <h1>Teaching Chrome where text really is.</h1>
+      <p class="deck">We are studying a coordinate mismatch in Chrome that can make native Mac automation select the wrong text. Fixing the platform contract would help KindaVim, Bear workflows, and any AI agent that edits web text through macOS Accessibility.</p>
+      <div class="actions">
+        <a class="cta" href="article.html">Learn the bug step by step <span>→</span></a>
+        <span class="status"><b>Observed:</b> Chrome 150 + Canary 153 · Safari differential</span>
+      </div>
+    </div>
+    <div class="hero-art" aria-label="Bear, KindaVim, and an AI agent all depend on the same macOS accessibility contract">
+      <div class="app bear"><span class="app-icon">B</span><small>Bear automation</small><strong>Edit text at the intended range</strong><p>Needs native text coordinates to mean what the exposed value says.</p></div>
+      <span class="wire one" aria-hidden="true"></span>
+      <div class="app kindavim"><span class="app-icon">V</span><small>KindaVim</small><strong>Apply Vim motions in Chrome</strong><p>Relies on selection, text, lines, and boundaries.</p></div>
+      <span class="wire two" aria-hidden="true"></span>
+      <div class="app agent"><span class="app-icon">AI</span><small>Mac automation</small><strong>Act on text without a private integration</strong><p>The accessibility layer is the shared platform bridge.</p></div>
+    </div>
+  </header>
+
+  <main>
+    <section class="section">
+      <div class="intro">
+        <p class="eyebrow" style="color:var(--blue)">01 · The shared dependency</p>
+        <h2>Different tools. One native text contract.</h2>
+        <p>A Mac app does not get direct access to a web page’s DOM. It asks Chrome’s macOS accessibility bridge for the field’s value, computes a range in that value, then asks Chrome to select or replace that range.</p>
+      </div>
+      <div class="system">
+        <article><small>Native client</small><strong>Bear · KindaVim · AI agent</strong><p>Computes an action from the text Chrome exposed.</p></article><span class="arrow">→</span>
+        <article><small>Platform contract</small><strong>macOS Accessibility</strong><p><code>AXValue</code> and <code>AXSelectedTextRange</code> must share coordinates.</p></article><span class="arrow">→</span>
+        <article><small>Editable surface</small><strong>Chrome contenteditable</strong><p>Translates native ranges into accessibility-tree and DOM boundaries.</p></article>
+      </div>
+      <div class="mismatch">
+        <div><span class="label">Chrome exposes</span><code>AlphaOwner<span class="newline">↵</span>BravoTarget<span class="newline">↵</span>CharlieOwner</code><p>The accessibility value has 35 UTF-16 units because block boundaries become paragraph separators.</p></div>
+        <div><span class="label" style="color:#8cb6ff">Chrome selects as if</span><code>AlphaOwnerBravoTargetCharlieOwner</code><p>The internal separator-free text has 33 units. After the first boundary, the same number points at different text.</p></div>
+      </div>
+    </section>
+
+    <section class="section why">
+      <div class="intro">
+        <p class="eyebrow">02 · Why it matters</p>
+        <h2>A one-character drift becomes broken automation.</h2>
+        <p>The failure is not specific to one app. It appears wherever a native client trusts the coordinates of the accessible text Chrome itself returned.</p>
+      </div>
+      <div class="impact-grid">
+        <article><b>01 / KindaVim</b><h3>Vim motions target the wrong characters.</h3><p>A command calculated from accessible text can begin late, cross the wrong boundary, or omit the paragraph separator it meant to act on.</p></article>
+        <article><b>02 / Bear workflows</b><h3>Text transfer is no longer dependable.</h3><p>Automation that selects, copies, or replaces Chrome text before moving it into Bear can corrupt the intended slice without an obvious API error.</p></article>
+        <article><b>03 / AI on macOS</b><h3>Agents need a trustworthy universal bridge.</h3><p>Without an app-specific API, Accessibility is how an agent reads and edits ordinary text fields. Honest coordinates are foundational capability, not a special-case feature.</p></article>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="intro">
+        <p class="eyebrow" style="color:var(--violet)">03 · Why we are studying before submitting</p>
+        <h2>Understanding is part of the deliverable.</h2>
+        <p>We are not asking Chromium owners to validate a tool-generated guess. We are building native evidence, reading the code paths, isolating one platform contract, and learning the design well enough to defend every line of a future change.</p>
+      </div>
+      <div class="research-grid">
+        <article class="research-card"><h3>What we can already demonstrate</h3><ul><li>A minimal three-block editable fixture.</li><li>Exact native ranges and selected-text results.</li><li>A control before the boundary and failures at and across it.</li><li>A Safari differential and a patched Chromium proof.</li><li>Observed evidence kept separate from design proposals.</li></ul></article>
+        <article class="research-card"><h3>What must be true before a CL</h3><ul><li>We can explain the exposed-value and DOM coordinate spaces unaided.</li><li>We have read the production path and nearby tests.</li><li>A focused regression fails before the fix.</li><li>The mapping is reversible, snapshot-safe, and fails safely.</li><li>The first change is macOS-only and independently reviewable.</li></ul></article>
+      </div>
+      <div class="policy">
+        <span class="label" style="color:#a8c6ff">Chromium AI coding policy</span>
+        <p>Chromium requires authors to <strong>self-review and understand</strong> every code and documentation update, remain responsible for correctness, design, security, and style, and be able to answer reviewers’ questions. This investigation and tutorial are part of meeting that responsibility honestly—not a substitute for it. Human reviewer feedback will receive a human reply. <a href="https://chromium.googlesource.com/chromium/src.git/+/HEAD/agents/ai_policy.md">Read the official policy ↗</a></p>
+      </div>
+    </section>
+
+    <section class="final">
+      <p class="eyebrow">Next: build the full mental model</p>
+      <h2>See the coordinates drift. Then design the narrow fix.</h2>
+      <p>The interactive article uses the exact fixture, observed results, solution constraints, and five knowledge checks so you can tell whether you genuinely understand the proposal.</p>
+      <a class="cta" href="article.html">Start the visual walkthrough <span>→</span></a>
+    </section>
+  </main>
+
+  <footer><span>Hacker Dojo · Chromium macOS accessibility study</span><span>Observed results and proposed design are labeled separately · Micah Alpern · 2026</span></footer>
+</body>
+</html>

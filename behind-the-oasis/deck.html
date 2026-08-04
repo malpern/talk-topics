@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Behind the Oasis — Reverse-engineering two smart lights</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reset.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.css">
+  <link rel="stylesheet" href="../shared/deck.css">
+  <style>
+    :root{--bg:#080a0b;--panel:#151515;--panel-2:#23201c;--fg:#fff9ef;--muted:#b9aea0;--accent:#ffae52;--accent-2:#76d8ca;--rule:rgba(255,249,239,.16)}
+    .reveal h1,.reveal h2{font-family:'Bebas Neue',sans-serif}.reveal strong{color:var(--accent)}.reveal em,.reveal a{color:var(--accent-2)}
+    .title-grid{grid-template-columns:.82fr 1.18fr;gap:3vw}.title-copy h1{font-size:4em}.hero-frame{min-height:72vh;border:0}.hero-frame img{height:72vh}.hero-frame:after{content:"Official Oasis product photography";position:absolute;right:1.2em;bottom:1em;color:#fff9efaa;font:700 .3em 'JetBrains Mono',monospace;letter-spacing:.06em}
+    .hero-frame{position:relative}
+    .question{font-size:2.55em!important;max-width:17ch!important}.question span{color:var(--accent)}.question-slide>p:last-of-type{font-size:.66em;max-width:52ch}
+    .evidence-grid{grid-template-columns:repeat(4,1fr)}.evidence{min-height:44vh;padding:.85em}.evidence .kicker{color:var(--accent)}.evidence p{font-size:.5em}.evidence .mark{font:400 3.2em/1 'Bebas Neue';color:var(--accent);display:block;margin:.05em 0 .12em}
+    .evidence-slide h2{font-size:1.9em;max-width:100%;margin-bottom:.18em}.evidence-slide .evidence{min-height:38vh;padding:.7em}.evidence-slide .evidence .mark{font-size:2.45em}.evidence-slide .evidence h3{font-size:.9em;margin:.45em 0 .3em}.evidence-slide .evidence p{font-size:.46em}
+    .deadends{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3vw;margin-top:.9em}.deadend{padding:1em;border-top:3px solid var(--accent-2);background:var(--panel)}.deadend b{display:block;font:700 .45em 'JetBrains Mono';color:var(--accent-2);letter-spacing:.08em;text-transform:uppercase}.deadend p{font-size:.57em;color:var(--muted)}
+    .opcode-row{display:grid;grid-template-columns:repeat(6,1fr);gap:.7vw;margin-top:1em}.opcode{background:var(--panel);border-top:3px solid var(--accent);padding:.65em}.opcode code{font-size:.78em;color:var(--accent)}.opcode b{display:block;font-size:.55em;margin:.55em 0}.opcode small{display:block;color:var(--muted);font-size:.4em;line-height:1.3}
+    .proof-strip{display:grid;grid-template-columns:1.05fr .95fr;gap:2vw;align-items:center}.proof-strip figure{height:65vh;background:#fff;overflow:hidden}.proof-strip img{width:100%;height:100%;object-fit:cover}.proof-strip .copy h2{font-size:2.5em;max-width:11ch}.proof-strip .copy p{color:var(--muted)}
+    .timeline{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.2vw;margin-top:1.1em}.phase{position:relative;background:var(--panel);padding:1.05em;border-bottom:5px solid var(--accent)}.phase:nth-child(2){border-color:#ff8a24}.phase:nth-child(3){border-color:#4c3421}.phase time{font:400 2.1em 'Bebas Neue';color:var(--accent)}.phase h3{margin:.4em 0}.phase p{font-size:.53em;color:var(--muted)}
+    .timeline-slide h2{font-size:1.95em;max-width:100%;margin-bottom:.12em}.timeline-slide .timeline{margin-top:.35em}.timeline-slide .phase{padding:.72em}.timeline-slide .phase time{font-size:1.75em}.timeline-slide .phase h3{font-size:.88em;margin:.24em 0}.timeline-slide .phase p{font-size:.47em}.timeline-slide .caption{margin-top:.45em!important}
+    .hardware-grid{display:grid;grid-template-columns:1.1fr .9fr .9fr;gap:1vw}.hardware-grid figure{position:relative;background:#fff;height:54vh;overflow:hidden}.hardware-grid img{width:100%;height:100%;object-fit:cover}.hardware-grid figcaption{position:absolute;left:0;right:0;bottom:0;padding:.9em;background:#080a0be8;color:#fff9ef;font:700 .34em 'JetBrains Mono';letter-spacing:.05em}.hardware-facts{display:grid;grid-template-columns:repeat(4,1fr);gap:1vw;margin-top:.8em}.hardware-facts div{border-top:3px solid var(--accent);padding:.55em;background:var(--panel)}.hardware-facts b{display:block;color:var(--accent);font:700 .52em 'JetBrains Mono'}.hardware-facts span{font-size:.43em;color:var(--muted)}
+    .architecture{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:1.4vw;align-items:stretch;margin-top:1.1em}.arch-node{background:var(--panel);border:1px solid var(--rule);padding:1em;position:relative}.arch-node.middle{border-top:5px solid var(--accent)}.arch-node h3{font-size:.8em}.arch-node p{font-size:.5em;color:var(--muted)}.arch-node code{font-size:.42em}.architecture .arrow{position:absolute;right:-1.15vw;top:46%;color:var(--accent);font-size:1.3em;z-index:3}
+    .architecture-slide h2{font-size:1.9em;max-width:100%;margin-bottom:.12em}.architecture-slide .architecture{margin-top:.25em}.architecture-slide .arch-node{padding:.82em}.architecture-slide .caption{margin-top:.35em!important}
+    .app-slide{display:grid!important;grid-template-columns:.74fr 1.26fr;gap:3vw;align-items:center}.app-slide h2{font-size:2.5em}.app-screen{background:#111;border:1px solid var(--rule);box-shadow:0 24px 60px #0009}.app-screen img{width:100%;height:66vh;object-fit:contain}.app-points{display:grid;gap:.6em}.app-points div{border-left:3px solid var(--accent);padding-left:.7em}.app-points b{display:block;font-size:.58em}.app-points span{display:block;font-size:.47em;color:var(--muted)}
+    .safety-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.2vw;margin-top:1em}.safety-grid div{background:var(--panel);padding:1em;border-left:4px solid var(--accent-2)}.safety-grid h3{font-size:.75em;margin-bottom:.35em}.safety-grid p{font-size:.53em;color:var(--muted)}
+    .safety-slide h2{font-size:1.95em;max-width:100%;margin-bottom:.12em}.safety-slide .safety-grid{margin-top:.35em}.safety-slide .safety-grid div{padding:.72em}.safety-slide .safety-grid h3{font-size:.68em;margin-bottom:.2em}.safety-slide .safety-grid p{font-size:.47em}
+    .status-grid{display:grid;grid-template-columns:1fr 1fr;gap:2vw;margin-top:1em}.status-grid>div{padding:1.1em;background:var(--panel)}.status-grid h3{color:var(--accent);font-size:.8em}.status-grid li{font-size:.5em;color:var(--muted);margin:.45em 0}.status-grid .open h3{color:var(--accent-2)}
+    .status-slide h2{font-size:1.95em;max-width:100%;margin-bottom:.12em}.status-slide .status-grid{margin-top:.35em}.status-slide .status-grid>div{padding:.78em}.status-slide .status-grid li{font-size:.47em;margin:.28em 0}
+    .closing{background:linear-gradient(90deg,#080a0bf2,#080a0b55),url('assets/oasis-ambient-floor.webp') center/cover no-repeat}.closing h2{font-size:2.2em;max-width:19ch;margin-bottom:.2em}.closing p{color:#fff9efcc;max-width:40ch;margin-bottom:.4em}.closing .byline{margin-top:1em!important}
+    @media(max-width:900px){.evidence-grid,.opcode-row,.timeline,.hardware-grid,.hardware-facts,.architecture,.app-slide,.safety-grid,.status-grid{grid-template-columns:1fr}.architecture .arrow{display:none}.hero-frame,.hero-frame img{height:38vh}.app-screen img{height:38vh}}
+  </style>
+</head>
+<body>
+<div class="reveal"><div class="slides">
+  <section class="title-slide">
+    <div class="title-grid">
+      <div class="title-copy">
+        <p class="eyebrow">Oasis lights · protocol archaeology</p>
+        <h1>Behind the Oasis</h1>
+        <p class="dek">How two beautiful smart lights led us through Matter dead ends, Bluetooth Mesh packets, firmware clues, recovered circadian schedules, and a native Mac controller.</p>
+        <p class="byline">Micah Alpern · Hacker Dojo</p>
+      </div>
+      <figure class="hero-frame"><img src="assets/oasis-ambient-books.webp" alt="An Oasis Ambient light glowing on a stack of books"></figure>
+    </div>
+    <aside class="notes">[Sources]\n- https://heyoasis.com/en/shop/ambients (official product photography)</aside>
+  </section>
+
+  <section class="statement question-slide">
+    <p class="eyebrow">The starting question</p>
+    <h2 class="question">Two lights worked perfectly in the Oasis app. <span>Why did Home Assistant see nothing?</span></h2>
+    <p>The assignment sounded like commissioning two Matter devices. The evidence quickly said otherwise: both installed Ambient 2 lights reported Matter disabled, while the official app kept controlling them locally.</p>
+    <aside class="notes">[Sources]\n- Protected read-only Oasis app cache: both devices model ambient2, firmware 2.22.26, is_matter=false\n- Local Home Assistant Matter integration observation: zero commissioned nodes</aside>
+  </section>
+
+  <section class="evidence-slide">
+    <p class="eyebrow">Evidence before intervention</p>
+    <h2>We built an evidence ladder.</h2>
+    <div class="evidence-grid">
+      <article class="evidence"><span class="mark">1</span><p class="kicker">Observe</p><h3>Use the real app</h3><p>Inspect settings, device identity, colors, and Light Cycle screens without changing pairing state.</p></article>
+      <article class="evidence"><span class="mark">2</span><p class="kicker">Correlate</p><h3>Read local artifacts</h3><p>Compare protected iOS cache data with a nearby Android release and redacted diagnostics.</p></article>
+      <article class="evidence"><span class="mark">3</span><p class="kicker">Decode</p><h3>Trace both paths</h3><p>Static analysis revealed vendor BLE Mesh opcodes, RainMaker endpoints, and automation serialization.</p></article>
+      <article class="evidence"><span class="mark">4</span><p class="kicker">Prove</p><h3>Run reversible tests</h3><p>Send bounded commands, watch the physical lights, then restore the observed state.</p></article>
+    </div>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac/blob/main/Research/OASIS_DEVICE_SOFTWARE_MAP.md\n- https://github.com/malpern/oasis-lights-mac/blob/main/Research/OASIS_AUTOMATION_PROTOCOL.md</aside>
+  </section>
+
+  <section>
+    <p class="eyebrow">What failed usefully</p>
+    <h2>The dead ends narrowed the system.</h2>
+    <div class="deadends">
+      <article class="deadend"><b>Matter</b><p>The C6 silicon could support it, but these devices were provisioned as Oasis BLE Mesh nodes and reported <code>is_matter=false</code>.</p></article>
+      <article class="deadend"><b>Google Home</b><p>A cloud integration might add another control surface, but it would not expose the local protocol or make these nodes native Matter devices.</p></article>
+      <article class="deadend"><b>Cloud token</b><p>A terminal OAuth token was rejected by the RainMaker authorizer. We returned to device-local evidence instead of weakening the account boundary.</p></article>
+    </div>
+    <aside class="notes">[Sources]\n- https://www.espressif.com/en/products/socs/esp32-c6\n- Protected Oasis app cache and read-only device inspection</aside>
+  </section>
+
+  <section>
+    <p class="eyebrow">The first physical breakthrough</p>
+    <h2>One byte turned a light off.</h2>
+    <p>The app's native boundary encodes a three-byte vendor access header: opcode plus Oasis company ID <code>0x02E5</code>. A controlled <code>C3 00</code> command switched one light off; <code>C3 01</code> restored it. The same command addressed to the room group controlled both.</p>
+    <div class="opcode-row">
+      <div class="opcode"><code>C3</code><b>Power</b><small>0 or 1</small></div>
+      <div class="opcode"><code>C4</code><b>Brightness</b><small>percent + time</small></div>
+      <div class="opcode"><code>C5</code><b>White</b><small>Kelvin</small></div>
+      <div class="opcode"><code>C6</code><b>RGB</b><small>three channels</small></div>
+      <div class="opcode"><code>CC</code><b>Mode</b><small>color or white</small></div>
+      <div class="opcode"><code>D2</code><b>White + level</b><small>Kelvin + percent</small></div>
+    </div>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac/blob/main/Research/OASIS_DEVICE_SOFTWARE_MAP.md (confirmed vendor-command table)\n- Local reversible physical command observations</aside>
+  </section>
+
+  <section>
+    <div class="proof-strip">
+      <figure><img src="assets/oasis-esp32-board.png" alt="FCC internal photograph showing the exposed ESP32-C6 in an Oasis Ambient light"></figure>
+      <div class="copy"><p class="eyebrow">Inside the sphere</p><h2>The hardware explained the software.</h2><p>FCC photos expose an ESP32-C6, separate AC power board, and metal-backed LED board. An independent UART boot log added 8 MB flash, ESP-IDF 5.4.3, signed secure boot, BLE Mesh, RainMaker, and an SM5235E five-channel light driver.</p></div>
+    </div>
+    <aside class="notes">[Sources]\n- https://fccid.io/2BNDN-OAAMBUS\n- https://www.reddit.com/r/hardwarehacking/comments/1sf3svw/oasis_ambient_light_teardown/\n- FCC internal photograph reproduced from public certification filing</aside>
+  </section>
+
+  <section class="timeline-slide">
+    <p class="eyebrow">The behavior we wanted to preserve</p>
+    <h2>The “natural day” was three ordinary automations.</h2>
+    <div class="timeline">
+      <article class="phase"><time>10:00</time><h3>Neutral morning</h3><p>80% · 3500 K · five-minute fade</p></article>
+      <article class="phase"><time>−30 min</time><h3>Before sunset</h3><p>50% · 2400 K Amber · 30-minute fade</p></article>
+      <article class="phase"><time>23:59</time><h3>Lights out</h3><p>0% · 2400 K · five-minute fade</p></article>
+    </div>
+    <p class="caption">The app writes the Home Group first, then sends the room's complete schedule with RainMaker command 2051. Firmware logs show AutomationManager and SolarCycleStorage loading from device NVS.</p>
+    <aside class="notes">[Sources]\n- Protected August 2 iOS Home Group cache, identifiers and credentials omitted\n- https://github.com/malpern/oasis-lights-mac/blob/main/Research/OASIS_AUTOMATION_PROTOCOL.md\n- https://www.reddit.com/r/hardwarehacking/comments/1sf3svw/oasis_ambient_light_teardown/</aside>
+  </section>
+
+  <section class="architecture-slide">
+    <p class="eyebrow">The system we built</p>
+    <h2>One headless radio owner. Many safe clients.</h2>
+    <div class="architecture">
+      <article class="arch-node"><span class="arrow">→</span><h3>Oasis Lights.app</h3><p>Native SwiftUI controls on the MacBook Air and Mac mini user account.</p><code>on · off · brightness · color</code></article>
+      <article class="arch-node middle"><span class="arrow">→</span><h3>Oasis Bridge.app</h3><p>UI-less login agent under <code>clawd</code>. Owns CoreBluetooth, Mesh keys, encryption, and replay-safe sequence allocation.</p><code>127.0.0.1 only · SSH tunnel</code></article>
+      <article class="arch-node"><h3>Oasis BLE Mesh</h3><p>Individual or room-group commands reach both existing Ambient 2 lights without resetting or re-provisioning them.</p><code>vendor model 0x02E5C00A</code></article>
+    </div>
+    <p class="caption">Home Assistant uses the same narrow semantic bridge API; credential-bearing Mesh configuration stays on the mini.</p>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac\n- Local deployed architecture and installation verification</aside>
+  </section>
+
+  <section class="app-slide">
+    <div>
+      <p class="eyebrow">The native Mac interface</p>
+      <h2>The bridge disappeared. The useful controls did not.</h2>
+      <div class="app-points">
+        <div><b>Per-light and group commands</b><span>Power, brightness, and synchronized room control.</span></div>
+        <div><b>Oasis-compatible whites</b><span>Bright through Candle, matching 4000–2000 K.</span></div>
+        <div><b>More expressive color</b><span>Coral, Sky, Violet, plus the macOS system color picker.</span></div>
+        <div><b>Honest state</b><span>The UI labels state as last-command-sent until authoritative readback exists.</span></div>
+      </div>
+    </div>
+    <figure class="app-screen"><img src="assets/oasis-color-picker.png" alt="Actual Oasis Lights macOS app showing both lights and the color picker"></figure>
+    <aside class="notes">[Sources]\n- Actual local Oasis Lights.app capture, version 0.5.0\n- https://github.com/malpern/oasis-lights-mac/tree/main/Sources/OasisController</aside>
+  </section>
+
+  <section class="safety-slide">
+    <p class="eyebrow">Safety became architecture</p>
+    <h2>Normal control is narrow by design.</h2>
+    <div class="safety-grid">
+      <div><h3>No reset surface</h3><p>Factory reset, provisioning, deprovisioning, room changes, and Matter commissioning never enter the bridge API.</p></div>
+      <div><h3>Credentials stay put</h3><p>Mesh keys remain with the headless bridge on the mini; UI clients receive semantic commands only.</p></div>
+      <div><h3>The official app still works</h3><p>We joined the existing control model rather than creating a replacement account or re-pairing the lights.</p></div>
+      <div><h3>Unknown means unknown</h3><p>Optimistic state, effects, scenes, and future schedule writes remain explicitly bounded until verified.</p></div>
+    </div>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac/blob/main/README.md\n- https://github.com/malpern/oasis-lights-mac/blob/main/NOTICE.md</aside>
+  </section>
+
+  <section class="status-slide">
+    <p class="eyebrow">Where the project stands</p>
+    <h2>Control is real. Compatibility work continues.</h2>
+    <div class="status-grid">
+      <div><h3>Working now</h3><ul><li>Individual and group on/off</li><li>Brightness and 2000–4000 K whites</li><li>RGB presets and custom color</li><li>Native macOS app and headless mini bridge</li><li>Home Assistant integration surface</li></ul></div>
+      <div class="open"><h3>Still being proven</h3><ul><li>Fresh cloud read before any schedule write</li><li>Authoritative device-state readback</li><li>Scene activation semantics</li><li>Effects beyond the decoded command forms</li><li>General setup for rooms beyond the validated two-light system</li></ul></div>
+    </div>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac\n- Local project tests and deployed UI inspection</aside>
+  </section>
+
+  <section class="statement closing">
+    <p class="eyebrow">The lesson</p>
+    <h2>A smart-home protocol is behavior, storage, transport—and restraint.</h2>
+    <p>We did not crack Oasis by finding one magic packet. We learned enough of its model to build a compatible client while preserving the system people already use.</p>
+    <p class="byline">github.com/malpern/oasis-lights-mac</p>
+    <aside class="notes">[Sources]\n- https://github.com/malpern/oasis-lights-mac\n- https://heyoasis.com/en/shop/ambients (official background photography)</aside>
+  </section>
+</div></div>
+<script src="https://cdn.jsdelivr.net/npm/reveal.js@5.1.0/dist/reveal.js"></script>
+<script>Reveal.initialize({hash:true,slideNumber:'c/t',transition:'fade',backgroundTransition:'fade',controls:true,progress:true});</script>
+</body>
+</html>

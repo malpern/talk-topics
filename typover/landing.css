@@ -107,7 +107,7 @@ h1 em { color: var(--blue); font-style: normal; }
 .editor-copy { min-height: 3.2em; margin: 0; border-radius: 8px; font-family: ui-serif, "New York", Georgia, serif; font-size: clamp(28px, 3.5vw, 43px); line-height: 1.6; letter-spacing: -.025em; }
 .editor-copy:focus-visible { outline: 2px solid rgba(23,110,209,.42); outline-offset: 8px; }
 .correction-wrap { position: relative; display: inline-block; }
-.correction { padding: 0 .03em .04em; border: 0; color: inherit; background: transparent; text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: #8d8f8f; text-decoration-thickness: 1.4px; text-underline-offset: .17em; cursor: pointer; transition: text-decoration-color 150ms ease-out, transform 130ms cubic-bezier(.2,.8,.2,1); }
+.correction { padding: 0 .03em .04em; border: 0; color: inherit; background: transparent; text-decoration-line: underline; text-decoration-style: wavy; text-decoration-color: #8d8f8f; text-decoration-thickness: 1.4px; text-underline-offset: .17em; cursor: pointer; transition: text-decoration-color 120ms ease-out, transform 130ms cubic-bezier(.2,.8,.2,1); }
 .correction.mark-hidden { text-decoration-color: transparent; }
 .editor-copy.contextual-review .correction:not(.pending):not(.restored), .correction:focus-visible { text-decoration-color: #8d8f8f; }
 .correction.pending { text-decoration: none; cursor: text; pointer-events: none; }

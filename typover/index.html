@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f1e8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#171714" media="(prefers-color-scheme: dark)">
+  <meta name="description" content="Typover is a macOS writing companion that quietly fixes clear mistakes, marks every change, and makes the original one click away.">
+  <meta property="og:title" content="Typover — keep writing">
+  <meta property="og:description" content="Clear corrections, quietly applied. Every change stays visible and reversible.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="https://malpern.github.io/talk-topics/typover/assets/typover-icon.png">
+  <title>Typover — Keep writing</title>
+  <link rel="icon" href="assets/typover-icon.png">
+  <link rel="apple-touch-icon" href="assets/typover-icon.png">
+  <link rel="stylesheet" href="landing.css">
+  <script src="landing.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header" aria-label="Primary navigation">
+    <a class="brand" href="#top" aria-label="Typover home">
+      <img src="assets/typover-icon.png" alt="" width="40" height="40">
+      <span>Typover</span>
+    </a>
+    <nav>
+      <a href="#why">Why Typover</a>
+      <a href="#roadmap">Roadmap</a>
+      <a href="deck.html">The story</a>
+    </nav>
+    <a class="header-cta" href="https://github.com/malpern/typover/issues/new?template=waitlist.yml">Join the waitlist</a>
+  </header>
+
+  <main id="main">
+    <section class="hero" id="top">
+      <div class="hero-copy reveal">
+        <div class="status-line">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>In development for macOS</span>
+        </div>
+        <h1>Keep writing.<br><em>Typover catches the obvious.</em></h1>
+        <p class="hero-lede">Typover quietly fixes clear spelling and grammar mistakes as you type—then leaves every change visible and one click away from what you originally wrote.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="https://github.com/malpern/typover/issues/new?template=waitlist.yml">
+            Join the waitlist
+            <span aria-hidden="true">→</span>
+          </a>
+          <a class="button button-secondary" href="https://github.com/malpern/typover">View on GitHub</a>
+        </div>
+        <p class="cta-note">Early access will begin with a focused Bear beta. Waitlist signup uses a public GitHub form; never include private writing.</p>
+      </div>
+
+      <div class="hero-stage reveal" aria-label="Interactive Typover correction demonstration">
+        <div class="ambient ambient-one" aria-hidden="true"></div>
+        <div class="ambient ambient-two" aria-hidden="true"></div>
+        <article class="mac-window">
+          <div class="window-bar">
+            <span class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="window-title"><img src="assets/typover-icon.png" alt="" width="22" height="22">Typover</span>
+            <button class="reset-demo" type="button">Reset example</button>
+          </div>
+          <div class="editor-surface">
+            <p class="editor-kicker">A thought, uninterrupted</p>
+            <p class="editor-copy">
+              I want
+              <span class="correction-wrap">
+                <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false">to</button>
+                <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
+                  <small>Typover changed “ot”</small>
+                  <button class="revert-correction" type="button">Change back to “ot”</button>
+                </span>
+              </span>
+              get my
+              <span class="correction-wrap">
+                <button class="correction" type="button" data-original="ieas" data-corrected="ideas" aria-expanded="false">ideas</button>
+                <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
+                  <small>Typover changed “ieas”</small>
+                  <button class="revert-correction" type="button">Change back to “ieas”</button>
+                </span>
+              </span>
+              out
+              <span class="correction-wrap">
+                <button class="correction" type="button" data-original="quikly" data-corrected="quickly" aria-expanded="false">quickly</button>
+                <span class="correction-popover correction-popover-end" role="dialog" aria-label="Correction details" hidden>
+                  <small>Typover changed “quikly”</small>
+                  <button class="revert-correction" type="button">Change back to “quikly”</button>
+                </span>
+              </span>.
+            </p>
+            <p class="editor-hint"><span aria-hidden="true">↖</span> Click a gray squiggle. Your original is always there.</p>
+          </div>
+          <footer class="window-footer">
+            <span><i class="mini-squiggle" aria-hidden="true"></i>3 quiet corrections</span>
+            <span>Processed on this Mac</span>
+          </footer>
+        </article>
+      </div>
+    </section>
+
+    <section class="roadmap-section" id="roadmap" aria-labelledby="roadmap-title">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Where it stands</span>
+        <h2 id="roadmap-title">A working Mac app,<br>now earning trust in the wild.</h2>
+        <p>The interaction is real. The next step is proving that it stays reliable inside the apps where people already write.</p>
+      </div>
+
+      <div class="roadmap-panel reveal">
+        <div class="roadmap-progress">
+          <div>
+            <strong>~90%</strong>
+            <span>to the first Bear beta</span>
+          </div>
+          <div class="progress-track" aria-label="Approximately 90 percent complete toward the first Bear beta" role="img"><span></span></div>
+        </div>
+        <div class="roadmap-steps">
+          <article>
+            <span class="step-state complete">Done</span>
+            <h3>The interaction</h3>
+            <p>Automatic corrections, quiet gray marks, one-click Change Back, learning, local statistics, and a fully native editor.</p>
+          </article>
+          <article>
+            <span class="step-state active">Now</span>
+            <h3>Production evidence</h3>
+            <p>Final physical typing, permission, performance, and recovery checks in Bear against the exact notarized candidate.</p>
+          </article>
+          <article>
+            <span class="step-state later">Next</span>
+            <h3>More places to write</h3>
+            <p>Bounded grammar correction, TextEdit, and careful compatibility research for the macOS ChatGPT and Claude composers.</p>
+          </article>
+        </div>
+        <a class="roadmap-link" href="https://malpern.github.io/typover/plans/roadmap.html">
+          Explore the full visual roadmap
+          <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <section class="value-section" id="why" aria-labelledby="value-title">
+      <div class="section-heading centered reveal">
+        <span class="eyebrow">Why Typover</span>
+        <h2 id="value-title">The best correction is the one that doesn’t break the thought.</h2>
+        <p>Traditional spell check leaves a repair queue. Typover is trying to give writers clean text without quietly taking over the writing.</p>
+      </div>
+      <div class="value-grid">
+        <article class="value-card reveal">
+          <span class="card-number">01</span>
+          <div class="card-icon flow-icon" aria-hidden="true">→</div>
+          <h3>Stay in flow</h3>
+          <p>Clear mistakes are fixed at the word boundary, so your hands and your attention can keep moving forward.</p>
+        </article>
+        <article class="value-card reveal">
+          <span class="card-number">02</span>
+          <div class="card-icon mark-icon" aria-hidden="true">w</div>
+          <h3>See what changed</h3>
+          <p>A low-salience gray squiggle says, “I changed this for you,” without turning the page into an error report.</p>
+        </article>
+        <article class="value-card reveal">
+          <span class="card-number">03</span>
+          <div class="card-icon return-icon" aria-hidden="true">↶</div>
+          <h3>Remain the author</h3>
+          <p>Change Back is immediate. If you prefer your original, Typover remembers locally and gets out of the way next time.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="principle-section" aria-label="Typover product principle">
+      <div class="principle-window reveal">
+        <img src="assets/typover-icon.png" alt="Typover app icon" width="112" height="112">
+        <div>
+          <span class="eyebrow">The product promise</span>
+          <blockquote>“Fix the obvious. Mark the change. Give it back.”</blockquote>
+          <p>Typover acts only when it can verify the smallest exact range. Ambiguous text stays untouched. Apple’s on-device intelligence remains the default.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="apps-section" aria-labelledby="apps-title">
+      <div class="section-heading reveal">
+        <span class="eyebrow">Built for real writing</span>
+        <h2 id="apps-title">Start focused.<br>Expand only with evidence.</h2>
+      </div>
+      <div class="app-path reveal">
+        <article class="app-node current">
+          <span>Reference</span>
+          <h3>Typover Editor</h3>
+          <p>Zero-compromise native behavior in an editor Typover owns.</p>
+        </article>
+        <span class="path-arrow" aria-hidden="true">→</span>
+        <article class="app-node beta">
+          <span>First beta</span>
+          <h3>Bear</h3>
+          <p>Word-level correction after a safe pause, with reversible overlays.</p>
+        </article>
+        <span class="path-arrow" aria-hidden="true">→</span>
+        <article class="app-node research">
+          <span>Research</span>
+          <h3>More Mac apps</h3>
+          <p>TextEdit, ChatGPT, and Claude—only after each app passes its own safety matrix.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="final-cta reveal" aria-labelledby="final-title">
+      <img src="assets/typover-icon.png" alt="" width="88" height="88">
+      <span class="eyebrow">Help shape the beta</span>
+      <h2 id="final-title">Write the thought.<br>Leave the typo to Typover.</h2>
+      <p>Join the early-access list and help test a calmer, more accountable kind of autocorrect for macOS.</p>
+      <div class="hero-actions centered-actions">
+        <a class="button button-primary" href="https://github.com/malpern/typover/issues/new?template=waitlist.yml">Join the waitlist <span aria-hidden="true">→</span></a>
+        <a class="button button-secondary" href="https://github.com/malpern/typover">Follow development</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="#top"><img src="assets/typover-icon.png" alt="" width="34" height="34"><span>Typover</span></a>
+    <p>Designed and built by Micah Alpern in California.</p>
+    <div>
+      <a href="deck.html">Project story</a>
+      <a href="https://malpern.github.io/typover/plans/roadmap.html">Roadmap</a>
+      <a href="https://github.com/malpern/typover">GitHub</a>
+    </div>
+  </footer>
+</body>
+</html>

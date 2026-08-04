@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Teaching Chrome Where Text Really Is</title>
-  <meta name="description" content="Why Chrome's macOS accessibility text coordinates matter to KindaVim, Bear automation, and AI agents—and how we are studying the problem before proposing a Chromium fix.">
+  <meta name="description" content="Why Chrome's macOS accessibility text coordinates matter to KindaVim, Bear automation, and AI agents—and the narrow, locally validated Chromium fix we are preparing for owner review.">
   <link rel="icon" type="image/png" href="../hackerdojo-logo.png">
   <style>
     :root { --ink:#0b0d12; --paper:#f5f6f8; --muted:#68707d; --blue:#0867f2; --violet:#8056ff; --mint:#54e1b7; --line:rgba(11,13,18,.12); }
@@ -78,12 +78,12 @@
 
   <header class="hero">
     <div>
-      <p class="eyebrow">Chromium · macOS accessibility · active investigation</p>
+      <p class="eyebrow">Chromium · macOS accessibility · local candidate ready</p>
       <h1>Teaching Chrome where text really is.</h1>
-      <p class="deck">We are studying a coordinate mismatch in Chrome that can make native Mac automation select the wrong text. Fixing the platform contract would help KindaVim, Bear workflows, and any AI agent that edits web text through macOS Accessibility.</p>
+      <p class="deck">Chrome can expose one string to native Mac software and interpret selections in a different string. We now have a narrow, locally validated fix for that platform contract—work that matters to KindaVim, Bear workflows, and any AI agent that edits web text through macOS Accessibility.</p>
       <div class="actions">
         <a class="cta" href="article.html">Learn the bug step by step <span>→</span></a>
-        <span class="status"><b>Observed:</b> Chrome 150 + Canary 153 · Safari differential</span>
+        <span class="status"><b>Local status:</b> exact baseline 0/8 · candidate 10/10 + browser 1/1 · not submitted</span>
       </div>
     </div>
     <div class="hero-art" aria-label="Bear, KindaVim, and an AI agent all depend on the same macOS accessibility contract">
@@ -128,24 +128,24 @@
 
     <section class="section">
       <div class="intro">
-        <p class="eyebrow" style="color:var(--violet)">03 · Why we are studying before submitting</p>
+        <p class="eyebrow" style="color:var(--violet)">03 · Why we studied before submitting</p>
         <h2>Understanding is part of the deliverable.</h2>
-        <p>We are not asking Chromium owners to validate a tool-generated guess. We are building native evidence, reading the code paths, isolating one platform contract, and learning the design well enough to defend every line of a future change.</p>
+        <p>We will not ask Chromium owners to validate a tool-generated guess. We reproduced the platform defect, read the production paths, refined the architecture after three independent reviews, and built exact red-to-green tests. The candidate remains local and unsubmitted while Micah completes his own review.</p>
       </div>
       <div class="research-grid">
-        <article class="research-card"><h3>What we can already demonstrate</h3><ul><li>A minimal three-block editable fixture.</li><li>Exact native ranges and selected-text results.</li><li>A control before the boundary and failures at and across it.</li><li>A Safari differential and a patched Chromium proof.</li><li>Observed evidence kept separate from design proposals.</li></ul></article>
-        <article class="research-card"><h3>What must be true before a CL</h3><ul><li>We can explain the exposed-value and DOM coordinate spaces unaided.</li><li>We have read the production path and nearby tests.</li><li>A focused regression fails before the fix.</li><li>The mapping is reversible, snapshot-safe, and fails safely.</li><li>The first change is macOS-only and independently reviewable.</li></ul></article>
+        <article class="research-card"><h3>What is observed</h3><ul><li>Official Chrome and Canary select shifted text while Safari follows the exposed value.</li><li>On the pinned current-main base, all eight Cocoa cases fail before the fix.</li><li>The candidate passes 10/10 focused tests and a real multi-block browser test 1/1.</li><li>The old native setter reaches a Blink DCHECK in that browser regression.</li><li>The full 1,452-test accessibility runner succeeds.</li></ul></article>
+        <article class="research-card"><h3>What is proposed—not yet approved</h3><ul><li>One macOS issue for selected range, selected text, and string-for-range.</li><li>Authoritative generated-newline records carry the exact following tree anchor.</li><li>A short-lived Cocoa mapper translates one snapshot and fails closed.</li><li>Two dependent CLs keep shared metadata separate from Cocoa behavior.</li><li>Owner review decides the shared seam, O(document) cost, and ignored-node policy.</li></ul></article>
       </div>
       <div class="policy">
         <span class="label" style="color:#a8c6ff">Chromium AI coding policy</span>
-        <p>Chromium requires authors to <strong>self-review and understand</strong> every code and documentation update, remain responsible for correctness, design, security, and style, and be able to answer reviewers’ questions. This investigation and tutorial are part of meeting that responsibility honestly—not a substitute for it. Human reviewer feedback will receive a human reply. <a href="https://chromium.googlesource.com/chromium/src.git/+/HEAD/agents/ai_policy.md">Read the official policy ↗</a></p>
+        <p>Chromium requires authors to <strong>self-review and understand</strong> every code and documentation update, remain responsible for correctness, design, security, and style, and be able to answer reviewers’ questions. This investigation and tutorial help Micah meet that responsibility honestly; they do not certify understanding or replace it. Micah must review every submitted line and personally handle every human review conversation. <a href="https://chromium.googlesource.com/chromium/src.git/+/HEAD/agents/ai_policy.md">Read the official policy ↗</a></p>
       </div>
     </section>
 
     <section class="final">
       <p class="eyebrow">Next: build the full mental model</p>
-      <h2>See the coordinates drift. Then design the narrow fix.</h2>
-      <p>The interactive article uses the exact fixture, observed results, solution constraints, and five knowledge checks so you can tell whether you genuinely understand the proposal.</p>
+      <h2>See the coordinates drift. Then inspect the actual narrow design.</h2>
+      <p>The interactive article now covers the final refined Option C architecture, why offsets alone fail, exact red-to-green evidence, limitations, the two-CL plan, and five knowledge checks.</p>
       <a class="cta" href="article.html">Start the visual walkthrough <span>→</span></a>
     </section>
   </main>

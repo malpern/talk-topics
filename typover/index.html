@@ -25,7 +25,7 @@
       <span>Typover</span>
     </a>
     <nav>
-      <a href="#why">Why Typover</a>
+      <a href="#difference">The difference</a>
       <a href="#roadmap">Roadmap</a>
       <a href="deck.html">The story</a>
     </nav>
@@ -51,49 +51,106 @@
         <p class="cta-note">Early access will begin with a focused Bear beta. Waitlist signup uses a public GitHub form; never include private writing.</p>
       </div>
 
-      <div class="hero-stage reveal" aria-label="Interactive Typover correction demonstration">
+      <div class="hero-stage reveal" aria-label="Interactive Typover correction demonstration" aria-describedby="demo-description">
         <div class="ambient ambient-one" aria-hidden="true"></div>
         <div class="ambient ambient-two" aria-hidden="true"></div>
         <article class="mac-window">
           <div class="window-bar">
             <span class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></span>
             <span class="window-title"><img src="assets/typover-icon.png" alt="" width="22" height="22">Typover</span>
-            <button class="reset-demo" type="button">Reset example</button>
+            <span class="demo-controls">
+              <button class="demo-control pause-demo" type="button" aria-pressed="false">Pause</button>
+              <button class="demo-control replay-demo" type="button" aria-label="Replay typing demonstration" title="Replay">↻</button>
+            </span>
           </div>
           <div class="editor-surface">
             <p class="editor-kicker">A thought, uninterrupted</p>
             <p class="editor-copy">
-              I want
-              <span class="correction-wrap">
-                <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false">to</button>
+              <span data-demo-text="I want "></span><span class="correction-wrap">
+                <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false" aria-label="Correction: ot became to. Show options"></button>
                 <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
                   <small>Typover changed “ot”</small>
                   <button class="revert-correction" type="button">Change back to “ot”</button>
                 </span>
-              </span>
-              get my
-              <span class="correction-wrap">
-                <button class="correction" type="button" data-original="ieas" data-corrected="ideas" aria-expanded="false">ideas</button>
+              </span><span data-demo-text=" get my "></span><span class="correction-wrap">
+                <button class="correction" type="button" data-original="ieas" data-corrected="ideas" aria-expanded="false" aria-label="Correction: ieas became ideas. Show options"></button>
                 <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
                   <small>Typover changed “ieas”</small>
                   <button class="revert-correction" type="button">Change back to “ieas”</button>
                 </span>
-              </span>
-              out
-              <span class="correction-wrap">
-                <button class="correction" type="button" data-original="quikly" data-corrected="quickly" aria-expanded="false">quickly</button>
+              </span><span data-demo-text=" out "></span><span class="correction-wrap">
+                <button class="correction" type="button" data-original="quikly" data-corrected="quickly" aria-expanded="false" aria-label="Correction: quikly became quickly. Show options"></button>
                 <span class="correction-popover correction-popover-end" role="dialog" aria-label="Correction details" hidden>
                   <small>Typover changed “quikly”</small>
                   <button class="revert-correction" type="button">Change back to “quikly”</button>
                 </span>
-              </span>.
+              </span><span data-demo-text="."></span><span class="demo-caret" aria-hidden="true"></span>
             </p>
-            <p class="editor-hint"><span aria-hidden="true">↖</span> Click a gray squiggle. Your original is always there.</p>
+            <p class="visually-hidden" id="demo-description">Typover demonstrates typing “I want ot get my ieas out quikly,” correcting each mistake after a word boundary, and leaving a gray squiggle under each changed word.</p>
+            <p class="editor-hint"><span class="demo-status-dot" aria-hidden="true"></span><span class="demo-status" aria-live="polite">Typing naturally…</span></p>
           </div>
           <footer class="window-footer">
-            <span><i class="mini-squiggle" aria-hidden="true"></i>3 quiet corrections</span>
+            <span><i class="mini-squiggle" aria-hidden="true"></i><span class="correction-count">0 quiet corrections</span></span>
             <span>Processed on this Mac</span>
           </footer>
+        </article>
+      </div>
+    </section>
+
+    <section class="difference-section" id="difference" aria-labelledby="difference-title">
+      <div class="section-heading centered reveal">
+        <span class="eyebrow">One typo, two experiences</span>
+        <h2 id="difference-title">The correction shouldn’t cost the thought.</h2>
+        <p>Traditional spell check asks you to stop and repair the page. Typover handles the clear case now—and keeps the choice visible.</p>
+      </div>
+
+      <div class="interaction-compare">
+        <article class="interaction-card old-way reveal">
+          <div class="interaction-card-heading">
+            <div>
+              <span class="comparison-label">Traditional spell check</span>
+              <h3>Stop. Find it. Fix it.</h3>
+            </div>
+            <strong>6 steps</strong>
+          </div>
+          <div class="old-demo" aria-hidden="true">
+            <p>I want to get my <span class="old-misspelling">ieas</span> out quickly.</p>
+            <span class="pointer-path"><i></i></span>
+            <div class="spell-menu">
+              <span>ideas</span>
+              <span>idea</span>
+              <span>Ignore Spelling</span>
+              <span>Learn Spelling</span>
+            </div>
+          </div>
+          <ol class="interaction-steps">
+            <li><span>1</span>Notice the red squiggle</li>
+            <li><span>2</span>Stop the sentence</li>
+            <li><span>3</span>Reach for the pointer</li>
+            <li><span>4</span>Right-click the word</li>
+            <li><span>5</span>Scan the menu</li>
+            <li><span>6</span>Choose “ideas” and resume</li>
+          </ol>
+        </article>
+
+        <article class="interaction-card typover-way reveal">
+          <div class="interaction-card-heading">
+            <div>
+              <span class="comparison-label">With Typover</span>
+              <h3>Keep writing.</h3>
+            </div>
+            <strong>0 interruptions</strong>
+          </div>
+          <div class="new-demo" aria-hidden="true">
+            <p>I want to get my <span>ideas</span> out quickly.<i></i></p>
+            <div class="change-note"><span>✓</span>Corrected after the space</div>
+          </div>
+          <ol class="interaction-steps compact-steps">
+            <li><span>1</span>Type the thought</li>
+            <li><span>2</span>See the quiet gray mark</li>
+            <li><span>3</span>Click only if you want the original back</li>
+          </ol>
+          <p class="comparison-footnote">The correction is automatic. Your judgment is not.</p>
         </article>
       </div>
     </section>

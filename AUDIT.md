@@ -1,8 +1,21 @@
-# New topic audit — updated 2026-07-31
+# New topic audit — updated 2026-08-03
 
-This living audit covers topics 23–30. Every hero and supporting image is derived from a real project asset,
+This living audit covers selected topics 23–32. Every hero and supporting image is derived from a real project asset,
 an actual project UI capture, an actual device image, or an official product image. No generated
 lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic synthetic data.
+
+## 32 · Behind the Oasis
+
+- **Creative audit:** The deck uses official Oasis product photography, public FCC board photographs,
+  and fresh captures of the actual native macOS controller. The dark, warm visual language is derived
+  from the product rather than from generic smart-home imagery.
+- **Content audit:** Confirmed device behavior, public firmware evidence, and architectural inference are
+  kept separate. The talk states that the validated lights report Matter disabled, credits public
+  sources, omits keys and private identifiers, and labels readback, effects, and generalized setup as
+  unfinished.
+- **Iteration:** Replaced the requested PowerPoint concept with a twelve-slide Reveal.js presentation,
+  then reduced dense headings and card layouts after rendered-browser inspection so every slide fits at
+  the normal presentation viewport without clipping.
 
 ## 30 · Card Clash
 

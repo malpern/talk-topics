@@ -6,11 +6,40 @@ const demoStatus = document.querySelector('.demo-status');
 const demoStatusDot = document.querySelector('.demo-status-dot');
 const correctionCount = document.querySelector('.correction-count');
 const demoCaret = document.querySelector('.demo-caret');
+const editorCopy = document.querySelector('.editor-copy');
+const reviewPointer = document.querySelector('.demo-review-pointer');
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let runID = 0;
 let paused = false;
 let completedCorrections = 0;
+let manualReview = false;
+let scriptedReview = false;
+let hoverRevealTimer;
+let hoverExitTimer;
+let markFadeTimers = [];
+let pointerAnimation;
+
+function isReviewingSentence() {
+  return paused || manualReview || scriptedReview;
+}
+
+function syncMarkVisibility() {
+  const reviewing = isReviewingSentence();
+  editorCopy.classList.toggle('contextual-review', reviewing);
+  correctionButtons.forEach((button) => {
+    const menuOpen = button.getAttribute('aria-expanded') === 'true';
+    const shouldHide = button.dataset.markExpired === 'true'
+      && !reviewing
+      && !menuOpen;
+    button.classList.toggle('mark-hidden', shouldHide);
+  });
+}
+
+function clearMarkFadeTimers() {
+  markFadeTimers.forEach((timer) => window.clearTimeout(timer));
+  markFadeTimers = [];
+}
 
 function closePopovers(except) {
   correctionButtons.forEach((button) => {
@@ -18,6 +47,7 @@ function closePopovers(except) {
     button.setAttribute('aria-expanded', 'false');
     button.parentElement.querySelector('.correction-popover').hidden = true;
   });
+  syncMarkVisibility();
 }
 
 function updateCorrectionCount() {
@@ -30,40 +60,63 @@ function setStatus(message, settled = false) {
   demoStatusDot.classList.toggle('settled', settled);
 }
 
+function allMarksHaveFaded() {
+  return correctionButtons
+    .filter((button) => !button.classList.contains('restored'))
+    .every((button) => button.dataset.markExpired === 'true');
+}
+
 function setPaused(nextPaused) {
   paused = nextPaused;
   pauseButton.textContent = paused ? 'Resume' : 'Pause';
   pauseButton.setAttribute('aria-pressed', String(paused));
-  if (paused) setStatus('Paused — explore any gray squiggle');
+  syncMarkVisibility();
+  if (paused) setStatus('Paused — every correction is available for review');
 }
 
 function clearDemo() {
   closePopovers();
+  clearMarkFadeTimers();
+  pointerAnimation?.cancel();
+  reviewPointer.hidden = true;
+  manualReview = false;
+  scriptedReview = false;
   completedCorrections = 0;
   updateCorrectionCount();
   textSegments.forEach((segment) => { segment.textContent = ''; });
   correctionButtons.forEach((button) => {
     button.textContent = '';
     button.disabled = true;
-    button.classList.remove('restored', 'just-corrected');
+    button.dataset.markExpired = 'false';
+    button.classList.remove('restored', 'just-corrected', 'mark-hidden');
     button.classList.add('pending');
     button.setAttribute('aria-expanded', 'false');
   });
+  editorCopy.classList.remove('contextual-review');
   demoCaret.hidden = false;
   setStatus('Typing naturally…');
 }
 
 function renderFinishedDemo() {
-  textSegments.forEach((segment) => { segment.textContent = segment.dataset.demoText; });
+  clearMarkFadeTimers();
+  textSegments.forEach((segment) => {
+    segment.textContent = segment.dataset.demoText;
+  });
   correctionButtons.forEach((button) => {
     button.textContent = button.dataset.corrected;
     button.disabled = false;
-    button.classList.remove('pending', 'restored', 'just-corrected');
+    button.dataset.markExpired = 'false';
+    button.classList.remove(
+      'pending',
+      'restored',
+      'just-corrected',
+      'mark-hidden'
+    );
   });
   completedCorrections = correctionButtons.length;
   updateCorrectionCount();
   demoCaret.hidden = true;
-  setStatus('Done — click a gray squiggle to see the original', true);
+  setStatus('Three visible, reversible corrections', true);
 }
 
 function rawDelay(milliseconds) {
@@ -94,18 +147,73 @@ async function typeText(element, text, activeRun) {
   return true;
 }
 
+function scheduleMarkFade(button, activeRun) {
+  const timer = window.setTimeout(() => {
+    if (activeRun !== runID) return;
+    button.dataset.markExpired = 'true';
+    syncMarkVisibility();
+  }, 4000);
+  markFadeTimers.push(timer);
+}
+
 async function applyCorrection(button, activeRun) {
   if (!await delay(135, activeRun)) return false;
   button.textContent = button.dataset.corrected;
   button.disabled = false;
-  button.classList.remove('pending');
+  button.dataset.markExpired = 'false';
+  button.classList.remove('pending', 'mark-hidden');
   button.classList.add('just-corrected');
   completedCorrections += 1;
   updateCorrectionCount();
+  syncMarkVisibility();
+  scheduleMarkFade(button, activeRun);
   setStatus(`Corrected “${button.dataset.original}” to “${button.dataset.corrected}”`);
   if (!await delay(230, activeRun)) return false;
   button.classList.remove('just-corrected');
   return true;
+}
+
+async function animateContextualReview(activeRun) {
+  if (activeRun !== runID || reducedMotion.matches) return false;
+  reviewPointer.hidden = false;
+  pointerAnimation = reviewPointer.animate([
+    { opacity: 0, transform: 'translate(74px, 54px)' },
+    { opacity: 1, transform: 'translate(0, 0)' }
+  ], {
+    duration: 650,
+    easing: 'cubic-bezier(.2,.8,.2,1)',
+    fill: 'forwards'
+  });
+  try {
+    await pointerAnimation.finished;
+  } catch {
+    return false;
+  }
+  if (activeRun !== runID) return false;
+
+  scriptedReview = true;
+  syncMarkVisibility();
+  setStatus('Review the sentence — every correction returns', true);
+  if (!await delay(1700, activeRun)) return false;
+
+  scriptedReview = false;
+  syncMarkVisibility();
+  pointerAnimation = reviewPointer.animate([
+    { opacity: 1, transform: 'translate(0, 0)' },
+    { opacity: 0, transform: 'translate(-22px, -15px)' }
+  ], {
+    duration: 260,
+    easing: 'ease-out',
+    fill: 'forwards'
+  });
+  try {
+    await pointerAnimation.finished;
+  } catch {
+    return false;
+  }
+  reviewPointer.hidden = true;
+  setStatus('The marks fade. The choices remain.', true);
+  return activeRun === runID;
 }
 
 async function playDemo() {
@@ -136,10 +244,49 @@ async function playDemo() {
   }
 
   demoCaret.hidden = true;
-  setStatus('Done — click a gray squiggle to see the original', true);
+  setStatus('Done — each correction stays marked for four seconds', true);
   if (!await delay(4200, activeRun)) return;
+  setStatus('A clean page. Move over the sentence to review changes.', true);
+  if (!await delay(700, activeRun)) return;
+  if (!await animateContextualReview(activeRun)) return;
+  if (!await delay(1000, activeRun)) return;
   if (!paused && activeRun === runID) playDemo();
 }
+
+function beginManualReview() {
+  window.clearTimeout(hoverExitTimer);
+  window.clearTimeout(hoverRevealTimer);
+  hoverRevealTimer = window.setTimeout(() => {
+    manualReview = true;
+    syncMarkVisibility();
+    if (completedCorrections > 0) {
+      setStatus('Reviewing this sentence — correction marks restored', true);
+    }
+  }, 100);
+}
+
+function endManualReview() {
+  window.clearTimeout(hoverRevealTimer);
+  window.clearTimeout(hoverExitTimer);
+  hoverExitTimer = window.setTimeout(() => {
+    manualReview = false;
+    syncMarkVisibility();
+    if (completedCorrections > 0 && allMarksHaveFaded()) {
+      setStatus('The marks fade. The choices remain.', true);
+    }
+  }, 250);
+}
+
+editorCopy.addEventListener('pointerenter', beginManualReview);
+editorCopy.addEventListener('pointerleave', endManualReview);
+editorCopy.addEventListener('focusin', () => {
+  manualReview = true;
+  syncMarkVisibility();
+  if (completedCorrections > 0) {
+    setStatus('Reviewing this sentence — correction marks restored', true);
+  }
+});
+editorCopy.addEventListener('focusout', endManualReview);
 
 correctionButtons.forEach((button) => {
   const popover = button.parentElement.querySelector('.correction-popover');
@@ -152,11 +299,13 @@ correctionButtons.forEach((button) => {
     closePopovers(button);
     popover.hidden = !willOpen;
     button.setAttribute('aria-expanded', String(willOpen));
+    syncMarkVisibility();
   });
 
   revert.addEventListener('click', () => {
     button.textContent = button.dataset.original;
     button.classList.add('restored');
+    button.classList.remove('mark-hidden');
     button.disabled = true;
     button.setAttribute('aria-expanded', 'false');
     popover.hidden = true;
@@ -169,7 +318,12 @@ correctionButtons.forEach((button) => {
 pauseButton.addEventListener('click', () => {
   setPaused(!paused);
   if (!paused && completedCorrections === correctionButtons.length) {
-    setStatus('Done — click a gray squiggle to see the original', true);
+    setStatus(
+      allMarksHaveFaded()
+        ? 'A clean page. Move over the sentence to review changes.'
+        : 'Corrections stay marked briefly, then fade.',
+      true
+    );
   } else if (!paused) {
     setStatus('Typing naturally…');
   }

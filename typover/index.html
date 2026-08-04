@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f1e8" media="(prefers-color-scheme: light)">
   <meta name="theme-color" content="#171714" media="(prefers-color-scheme: dark)">
-  <meta name="description" content="Typover is a macOS writing companion that quietly fixes clear mistakes, marks every change, and makes the original one click away.">
+  <meta name="description" content="Typover is a macOS writing companion that quietly fixes clear mistakes, briefly marks each change, and brings the original back within reach when you review the sentence.">
   <meta property="og:title" content="Typover — keep writing">
-  <meta property="og:description" content="Clear corrections, quietly applied. Every change stays visible and reversible.">
+  <meta property="og:description" content="Clear corrections, quietly applied. Marks fade, then return when you review the sentence.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="https://malpern.github.io/talk-topics/typover/assets/typover-icon.png">
   <title>Typover — Keep writing</title>
@@ -40,7 +40,7 @@
           <span>In development for macOS</span>
         </div>
         <h1>Keep writing.<br><em>Typover catches the obvious.</em></h1>
-        <p class="hero-lede">Typover quietly fixes clear spelling and grammar mistakes as you type—then leaves every change visible and one click away from what you originally wrote.</p>
+        <p class="hero-lede">Typover quietly fixes clear spelling and grammar mistakes as you type. Each change appears briefly, then returns when you review that sentence.</p>
         <div class="hero-actions">
           <a class="button button-primary" href="https://github.com/malpern/typover/issues/new?template=waitlist.yml">
             Join the waitlist
@@ -65,7 +65,7 @@
           </div>
           <div class="editor-surface">
             <p class="editor-kicker">A thought, uninterrupted</p>
-            <p class="editor-copy">
+            <p class="editor-copy" tabindex="0" aria-label="Corrected sentence. Hover or focus this sentence to reveal Typover correction marks.">
               <span data-demo-text="I want "></span><span class="correction-wrap">
                 <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false" aria-label="Correction: ot became to. Show options"></button>
                 <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
@@ -86,7 +86,10 @@
                 </span>
               </span><span data-demo-text="."></span><span class="demo-caret" aria-hidden="true"></span>
             </p>
-            <p class="visually-hidden" id="demo-description">Typover demonstrates typing “I want ot get my ieas out quikly,” correcting each mistake after a word boundary, and leaving a gray squiggle under each changed word.</p>
+            <svg class="demo-review-pointer" viewBox="0 0 28 34" aria-hidden="true" hidden>
+              <path d="M3 2.5v25.2l6.5-6.1 4.7 9.5 4.1-2-4.6-9.2h9.1L3 2.5Z" fill="currentColor" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
+            </svg>
+            <p class="visually-hidden" id="demo-description">Typover demonstrates typing “I want ot get my ieas out quikly,” correcting each mistake after a word boundary, briefly showing gray squiggles, fading them away, and restoring every mark when the sentence is reviewed.</p>
             <p class="editor-hint"><span class="demo-status-dot" aria-hidden="true"></span><span class="demo-status" aria-live="polite">Typing naturally…</span></p>
           </div>
           <footer class="window-footer">
@@ -101,7 +104,7 @@
       <div class="section-heading centered reveal">
         <span class="eyebrow">One typo, two experiences</span>
         <h2 id="difference-title">The correction shouldn’t cost the thought.</h2>
-        <p>Traditional spell check asks you to stop and repair the page. Typover handles the clear case now—and keeps the choice visible.</p>
+        <p>Traditional spell check asks you to stop and repair the page. Typover handles the clear case now—and keeps the choice close without permanently marking the page.</p>
       </div>
 
       <div class="interaction-compare">
@@ -147,8 +150,8 @@
           </div>
           <ol class="interaction-steps compact-steps">
             <li><span>1</span>Type the thought</li>
-            <li><span>2</span>See the quiet gray mark</li>
-            <li><span>3</span>Click only if you want the original back</li>
+            <li><span>2</span>See the quiet gray mark, then watch it fade</li>
+            <li><span>3</span>Review the sentence to bring every choice back</li>
           </ol>
           <p class="comparison-footnote">The correction is automatic. Your judgment is not.</p>
         </article>
@@ -174,7 +177,7 @@
           <article>
             <span class="step-state complete">Done</span>
             <h3>The interaction</h3>
-            <p>Automatic corrections, quiet gray marks, one-click Change Back, learning, local statistics, and a fully native editor.</p>
+            <p>Automatic corrections, contextual gray marks, one-click Change Back, learning, local statistics, and a fully native editor.</p>
           </article>
           <article>
             <span class="step-state active">Now</span>
@@ -211,7 +214,7 @@
           <span class="card-number">02</span>
           <div class="card-icon mark-icon" aria-hidden="true">w</div>
           <h3>See what changed</h3>
-          <p>A low-salience gray squiggle says, “I changed this for you,” without turning the page into an error report.</p>
+          <p>A low-salience gray squiggle appears briefly, then returns when you review the sentence—keeping the page calm and every change accountable.</p>
         </article>
         <article class="value-card reveal">
           <span class="card-number">03</span>

@@ -8,6 +8,8 @@ const correctionCount = document.querySelector('.correction-count');
 const demoCaret = document.querySelector('.demo-caret');
 const editorCopy = document.querySelector('.editor-copy');
 const reviewPointer = document.querySelector('.demo-review-pointer');
+const MARK_VISIBLE_MS = 1500;
+const COMPLETION_HOLD_MS = 1700;
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 let runID = 0;
@@ -152,7 +154,7 @@ function scheduleMarkFade(button, activeRun) {
     if (activeRun !== runID) return;
     button.dataset.markExpired = 'true';
     syncMarkVisibility();
-  }, 4000);
+  }, MARK_VISIBLE_MS);
   markFadeTimers.push(timer);
 }
 
@@ -244,8 +246,8 @@ async function playDemo() {
   }
 
   demoCaret.hidden = true;
-  setStatus('Done — each correction stays marked for four seconds', true);
-  if (!await delay(4200, activeRun)) return;
+  setStatus('Done — corrections stay marked briefly', true);
+  if (!await delay(COMPLETION_HOLD_MS, activeRun)) return;
   setStatus('A clean page. Move over the sentence to review changes.', true);
   if (!await delay(700, activeRun)) return;
   if (!await animateContextualReview(activeRun)) return;

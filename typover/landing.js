@@ -19,6 +19,9 @@ let manualReview = false;
 let scriptedReview = false;
 let hoverRevealTimer;
 let hoverExitTimer;
+let menuRevealTimer;
+let menuExitTimer;
+let userMenuButton;
 let markFadeTimers = [];
 let pointerAnimation;
 
@@ -47,8 +50,30 @@ function closePopovers(except) {
   correctionButtons.forEach((button) => {
     if (button === except) return;
     button.setAttribute('aria-expanded', 'false');
+    button.dataset.menuPinned = 'false';
     button.parentElement.querySelector('.correction-popover').hidden = true;
+    if (userMenuButton === button) userMenuButton = undefined;
   });
+  syncMarkVisibility();
+}
+
+function showCorrectionMenu(button, { userInitiated = false, pinned = false } = {}) {
+  if (button.classList.contains('pending') || button.classList.contains('restored')) return;
+  const popover = button.parentElement.querySelector('.correction-popover');
+  closePopovers(button);
+  popover.hidden = false;
+  button.dataset.menuPinned = String(pinned);
+  button.setAttribute('aria-expanded', 'true');
+  if (userInitiated) userMenuButton = button;
+  syncMarkVisibility();
+}
+
+function hideCorrectionMenu(button) {
+  const popover = button.parentElement.querySelector('.correction-popover');
+  popover.hidden = true;
+  button.dataset.menuPinned = 'false';
+  button.setAttribute('aria-expanded', 'false');
+  if (userMenuButton === button) userMenuButton = undefined;
   syncMarkVisibility();
 }
 
@@ -79,6 +104,8 @@ function setPaused(nextPaused) {
 function clearDemo() {
   closePopovers();
   clearMarkFadeTimers();
+  window.clearTimeout(menuRevealTimer);
+  window.clearTimeout(menuExitTimer);
   pointerAnimation?.cancel();
   reviewPointer.hidden = true;
   manualReview = false;
@@ -90,6 +117,7 @@ function clearDemo() {
     button.textContent = '';
     button.disabled = true;
     button.dataset.markExpired = 'false';
+    button.dataset.menuPinned = 'false';
     button.classList.remove('restored', 'just-corrected', 'mark-hidden');
     button.classList.add('pending');
     button.setAttribute('aria-expanded', 'false');
@@ -100,6 +128,7 @@ function clearDemo() {
 }
 
 function renderFinishedDemo() {
+  closePopovers();
   clearMarkFadeTimers();
   textSegments.forEach((segment) => {
     segment.textContent = segment.dataset.demoText;
@@ -108,6 +137,7 @@ function renderFinishedDemo() {
     button.textContent = button.dataset.corrected;
     button.disabled = false;
     button.dataset.markExpired = 'false';
+    button.dataset.menuPinned = 'false';
     button.classList.remove(
       'pending',
       'restored',
@@ -128,7 +158,7 @@ function rawDelay(milliseconds) {
 async function delay(milliseconds, activeRun) {
   let remaining = milliseconds;
   while (remaining > 0 && activeRun === runID) {
-    if (paused || document.hidden) {
+    if (paused || userMenuButton || document.hidden) {
       await rawDelay(80);
       continue;
     }
@@ -196,7 +226,14 @@ async function animateContextualReview(activeRun) {
   scriptedReview = true;
   syncMarkVisibility();
   setStatus('Review the sentence — every correction returns', true);
-  if (!await delay(1700, activeRun)) return false;
+  if (!await delay(700, activeRun)) return false;
+
+  const menuButton = correctionButtons[1];
+  showCorrectionMenu(menuButton);
+  setStatus('Hover a mark — Change Back stays one click away', true);
+  if (!await delay(1500, activeRun)) return false;
+  hideCorrectionMenu(menuButton);
+  if (!await delay(250, activeRun)) return false;
 
   scriptedReview = false;
   syncMarkVisibility();
@@ -288,32 +325,71 @@ editorCopy.addEventListener('focusin', () => {
     setStatus('Reviewing this sentence — correction marks restored', true);
   }
 });
-editorCopy.addEventListener('focusout', endManualReview);
+editorCopy.addEventListener('focusout', (event) => {
+  if (editorCopy.contains(event.relatedTarget)) return;
+  endManualReview();
+});
 
 correctionButtons.forEach((button) => {
-  const popover = button.parentElement.querySelector('.correction-popover');
+  const wrap = button.parentElement;
+  const popover = wrap.querySelector('.correction-popover');
   const revert = popover.querySelector('.revert-correction');
+
+  button.addEventListener('pointerenter', () => {
+    if (button.classList.contains('pending') || button.classList.contains('restored')) return;
+    window.clearTimeout(menuExitTimer);
+    window.clearTimeout(menuRevealTimer);
+    menuRevealTimer = window.setTimeout(() => {
+      showCorrectionMenu(button, { userInitiated: true });
+      setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
+    }, 120);
+  });
+
+  wrap.addEventListener('pointerleave', () => {
+    window.clearTimeout(menuRevealTimer);
+    window.clearTimeout(menuExitTimer);
+    menuExitTimer = window.setTimeout(() => {
+      if (button.dataset.menuPinned === 'true') return;
+      hideCorrectionMenu(button);
+      if (completedCorrections > 0 && allMarksHaveFaded()) {
+        setStatus('The marks fade. The choices remain.', true);
+      }
+    }, 240);
+  });
+
+  button.addEventListener('focus', () => {
+    if (button.classList.contains('pending') || button.classList.contains('restored')) return;
+    showCorrectionMenu(button, { userInitiated: true });
+    setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
+  });
+
+  wrap.addEventListener('focusout', (event) => {
+    if (wrap.contains(event.relatedTarget)) return;
+    if (button.dataset.menuPinned === 'true') return;
+    hideCorrectionMenu(button);
+  });
 
   button.addEventListener('click', () => {
     if (button.classList.contains('pending')) return;
-    setPaused(true);
-    const willOpen = popover.hidden;
-    closePopovers(button);
-    popover.hidden = !willOpen;
-    button.setAttribute('aria-expanded', String(willOpen));
-    syncMarkVisibility();
+    if (!popover.hidden && button.dataset.menuPinned === 'true') {
+      hideCorrectionMenu(button);
+      return;
+    }
+    showCorrectionMenu(button, { userInitiated: true, pinned: true });
+    setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
   });
 
   revert.addEventListener('click', () => {
+    hideCorrectionMenu(button);
     button.textContent = button.dataset.original;
     button.classList.add('restored');
     button.classList.remove('mark-hidden');
     button.disabled = true;
-    button.setAttribute('aria-expanded', 'false');
-    popover.hidden = true;
     completedCorrections = Math.max(0, completedCorrections - 1);
     updateCorrectionCount();
-    setStatus(`Changed “${button.dataset.corrected}” back to “${button.dataset.original}”`, true);
+    window.setTimeout(() => {
+      setStatus(`Changed “${button.dataset.corrected}” back to “${button.dataset.original}”`, true);
+    }, 0);
   });
 });
 

@@ -136,7 +136,7 @@ function renderFinishedDemo() {
   correctionButtons.forEach((button) => {
     button.textContent = button.dataset.corrected;
     button.disabled = false;
-    button.dataset.markExpired = 'false';
+    button.dataset.markExpired = 'true';
     button.dataset.menuPinned = 'false';
     button.classList.remove(
       'pending',
@@ -148,7 +148,8 @@ function renderFinishedDemo() {
   completedCorrections = correctionButtons.length;
   updateCorrectionCount();
   demoCaret.hidden = true;
-  setStatus('Three visible, reversible corrections', true);
+  syncMarkVisibility();
+  setStatus('A clean page. Focus the sentence to review changes.', true);
 }
 
 function rawDelay(milliseconds) {
@@ -200,7 +201,7 @@ async function applyCorrection(button, activeRun) {
   syncMarkVisibility();
   scheduleMarkFade(button, activeRun);
   setStatus(`Corrected “${button.dataset.original}” to “${button.dataset.corrected}”`);
-  if (!await delay(230, activeRun)) return false;
+  if (!await delay(180, activeRun)) return false;
   button.classList.remove('just-corrected');
   return true;
 }
@@ -225,7 +226,7 @@ async function animateContextualReview(activeRun) {
 
   scriptedReview = true;
   syncMarkVisibility();
-  setStatus('Review the sentence — every correction returns', true);
+  setStatus('Review nearby text — its corrections return', true);
   if (!await delay(700, activeRun)) return false;
 
   const menuButton = correctionButtons[1];
@@ -301,7 +302,7 @@ function beginManualReview() {
     if (completedCorrections > 0) {
       setStatus('Reviewing this sentence — correction marks restored', true);
     }
-  }, 100);
+  }, 220);
 }
 
 function endManualReview() {
@@ -313,7 +314,7 @@ function endManualReview() {
     if (completedCorrections > 0 && allMarksHaveFaded()) {
       setStatus('The marks fade. The choices remain.', true);
     }
-  }, 250);
+  }, 280);
 }
 
 editorCopy.addEventListener('pointerenter', beginManualReview);

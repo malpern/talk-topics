@@ -299,18 +299,35 @@ async function animateContextualReview(activeRun) {
   if (activeRun !== runID) return false;
 
   selectMenuItem(selectedItem);
-  setStatus('The option under the pointer is selected', true);
-  if (!await delay(900, activeRun)) return false;
+  setStatus('Hover previews the choice — “ideas” stays put', true);
+  if (!await delay(800, activeRun)) return false;
+
+  pointerAnimation = reviewPointer.animate([
+    { opacity: 1, transform: 'translate(-78px, 64px)' },
+    { opacity: 1, transform: 'translate(66px, 60px)' }
+  ], {
+    duration: 420,
+    easing: 'cubic-bezier(.4,0,.2,1)',
+    fill: 'forwards'
+  });
+  try {
+    await pointerAnimation.finished;
+  } catch {
+    return false;
+  }
+  if (activeRun !== runID) return false;
+
   hideCorrectionMenu(menuButton);
-  if (!await delay(250, activeRun)) return false;
+  setStatus('Move away — the menu closes without changing the text', true);
+  if (!await delay(320, activeRun)) return false;
 
   scriptedReview = false;
   syncMarkVisibility();
   pointerAnimation = reviewPointer.animate([
-    { opacity: 1, transform: 'translate(-78px, 64px)' },
-    { opacity: 0, transform: 'translate(-22px, -15px)' }
+    { opacity: 1, transform: 'translate(66px, 60px)' },
+    { opacity: 0, transform: 'translate(104px, 48px)' }
   ], {
-    duration: 260,
+    duration: 280,
     easing: 'ease-out',
     fill: 'forwards'
   });
@@ -320,7 +337,7 @@ async function animateContextualReview(activeRun) {
     return false;
   }
   reviewPointer.hidden = true;
-  setStatus('The marks fade. The choices remain.', true);
+  setStatus('The marks fade. “Ideas” remains.', true);
   return activeRun === runID;
 }
 

@@ -67,29 +67,42 @@
             <p class="editor-kicker">A thought, uninterrupted</p>
             <p class="editor-copy" tabindex="0" aria-label="Corrected sentence. Hover or focus this sentence to reveal Typover correction marks.">
               <span data-demo-text="I want "></span><span class="correction-wrap">
-                <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false" aria-label="Correction: ot became to. Show options"></button>
-                <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
-                  <small>Typover changed “ot”</small>
-                  <button class="revert-correction" type="button">Change back to “ot”</button>
+                <button class="correction" type="button" data-original="ot" data-corrected="to" aria-expanded="false" aria-haspopup="menu" aria-label="Correction: ot became to. Show options"></button>
+                <span class="correction-popover" role="menu" aria-label="Correction options for to" hidden>
+                  <button class="revert-correction correction-menu-item" role="menuitem" type="button">Revert to “ot”</button>
+                  <span class="correction-menu-separator" role="separator"></span>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="it">it</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="or">or</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="of">of</button>
+                  <span class="correction-menu-separator" role="separator"></span>
+                  <span class="correction-menu-item correction-source" role="menuitem" aria-disabled="true">Apple Spelling</span>
                 </span>
               </span><span data-demo-text=" get my "></span><span class="correction-wrap">
-                <button class="correction" type="button" data-original="ieas" data-corrected="ideas" aria-expanded="false" aria-label="Correction: ieas became ideas. Show options"></button>
-                <span class="correction-popover" role="dialog" aria-label="Correction details" hidden>
-                  <small>Typover changed “ieas”</small>
-                  <button class="revert-correction" type="button">Change back to “ieas”</button>
+                <button class="correction" type="button" data-original="ieas" data-corrected="ideas" aria-expanded="false" aria-haspopup="menu" aria-label="Correction: ieas became ideas. Show options"></button>
+                <span class="correction-popover" role="menu" aria-label="Correction options for ideas" hidden>
+                  <button class="revert-correction correction-menu-item" role="menuitem" type="button">Revert to “ieas”</button>
+                  <span class="correction-menu-separator" role="separator"></span>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="teas">teas</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="seas">seas</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="peas">peas</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="yeas">yeas</button>
+                  <button class="alternative-correction correction-menu-item" role="menuitem" type="button" data-alternative="iras">iras</button>
+                  <span class="correction-menu-separator" role="separator"></span>
+                  <span class="correction-menu-item correction-source" role="menuitem" aria-disabled="true">Apple Spelling</span>
                 </span>
               </span><span data-demo-text=" out "></span><span class="correction-wrap">
-                <button class="correction" type="button" data-original="quikly" data-corrected="quickly" aria-expanded="false" aria-label="Correction: quikly became quickly. Show options"></button>
-                <span class="correction-popover correction-popover-end" role="dialog" aria-label="Correction details" hidden>
-                  <small>Typover changed “quikly”</small>
-                  <button class="revert-correction" type="button">Change back to “quikly”</button>
+                <button class="correction" type="button" data-original="quikly" data-corrected="quickly" aria-expanded="false" aria-haspopup="menu" aria-label="Correction: quikly became quickly. Show options"></button>
+                <span class="correction-popover correction-popover-end" role="menu" aria-label="Correction options for quickly" hidden>
+                  <button class="revert-correction correction-menu-item" role="menuitem" type="button">Revert to “quikly”</button>
+                  <span class="correction-menu-separator" role="separator"></span>
+                  <span class="correction-menu-item correction-source" role="menuitem" aria-disabled="true">Apple Spelling</span>
                 </span>
               </span><span data-demo-text="."></span><span class="demo-caret" aria-hidden="true"></span>
             </p>
             <svg class="demo-review-pointer" viewBox="0 0 28 34" aria-hidden="true" hidden>
               <path d="M3 2.5v25.2l6.5-6.1 4.7 9.5 4.1-2-4.6-9.2h9.1L3 2.5Z" fill="currentColor" stroke="white" stroke-width="1.8" stroke-linejoin="round"/>
             </svg>
-            <p class="visually-hidden" id="demo-description">Typover demonstrates typing “I want ot get my ieas out quikly,” correcting each mistake after a word boundary, briefly showing gray squiggles, fading them away, restoring nearby marks after a deliberate review dwell, and revealing Change Back when a mark is hovered or focused.</p>
+            <p class="visually-hidden" id="demo-description">Typover demonstrates typing “I want ot get my ieas out quikly,” correcting each mistake after a word boundary, briefly showing gray squiggles, fading them away, restoring nearby marks after a deliberate review dwell, and revealing the native Revert menu when a mark is hovered or focused.</p>
             <p class="editor-hint"><span class="demo-status-dot" aria-hidden="true"></span><span class="demo-status" aria-live="polite">Typing naturally…</span></p>
           </div>
           <footer class="window-footer">

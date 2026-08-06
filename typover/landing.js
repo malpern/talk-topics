@@ -51,16 +51,36 @@ function closePopovers(except) {
     if (button === except) return;
     button.setAttribute('aria-expanded', 'false');
     button.dataset.menuPinned = 'false';
-    button.parentElement.querySelector('.correction-popover').hidden = true;
+    const popover = button.parentElement.querySelector('.correction-popover');
+    popover.hidden = true;
+    clearMenuSelection(popover);
     if (userMenuButton === button) userMenuButton = undefined;
   });
   syncMarkVisibility();
+}
+
+function clearMenuSelection(popover) {
+  popover.querySelectorAll('.correction-menu-item.is-selected').forEach((item) => {
+    item.classList.remove('is-selected');
+  });
+}
+
+function selectMenuItem(item) {
+  const popover = item.closest('.correction-popover');
+  clearMenuSelection(popover);
+  item.classList.add('is-selected');
+}
+
+function commitMenuSelection(item, action) {
+  selectMenuItem(item);
+  window.setTimeout(action, 90);
 }
 
 function showCorrectionMenu(button, { userInitiated = false, pinned = false } = {}) {
   if (button.classList.contains('pending') || button.classList.contains('restored')) return;
   const popover = button.parentElement.querySelector('.correction-popover');
   closePopovers(button);
+  clearMenuSelection(popover);
   popover.hidden = false;
   button.dataset.menuPinned = String(pinned);
   button.setAttribute('aria-expanded', 'true');
@@ -71,6 +91,7 @@ function showCorrectionMenu(button, { userInitiated = false, pinned = false } = 
 function hideCorrectionMenu(button) {
   const popover = button.parentElement.querySelector('.correction-popover');
   popover.hidden = true;
+  clearMenuSelection(popover);
   button.dataset.menuPinned = 'false';
   button.setAttribute('aria-expanded', 'false');
   if (userMenuButton === button) userMenuButton = undefined;
@@ -121,6 +142,18 @@ function clearDemo() {
     button.classList.remove('restored', 'just-corrected', 'mark-hidden');
     button.classList.add('pending');
     button.setAttribute('aria-expanded', 'false');
+    button.setAttribute(
+      'aria-label',
+      `Correction: ${button.dataset.original} became ${button.dataset.corrected}. Show options`
+    );
+    button.parentElement.querySelector('.correction-popover').setAttribute(
+      'aria-label',
+      `Correction options for ${button.dataset.corrected}`
+    );
+    button.parentElement.querySelectorAll('.alternative-correction').forEach((alternative) => {
+      alternative.textContent = alternative.dataset.defaultAlternative;
+      alternative.dataset.alternative = alternative.dataset.defaultAlternative;
+    });
   });
   editorCopy.classList.remove('contextual-review');
   demoCaret.hidden = false;
@@ -226,20 +259,55 @@ async function animateContextualReview(activeRun) {
 
   scriptedReview = true;
   syncMarkVisibility();
-  setStatus('Review nearby text — its corrections return', true);
-  if (!await delay(700, activeRun)) return false;
+  setStatus('Move over the sentence — quiet marks return', true);
+  if (!await delay(620, activeRun)) return false;
 
   const menuButton = correctionButtons[1];
+  pointerAnimation = reviewPointer.animate([
+    { opacity: 1, transform: 'translate(0, 0)' },
+    { opacity: 1, transform: 'translate(-90px, -18px)' }
+  ], {
+    duration: 360,
+    easing: 'cubic-bezier(.2,.8,.2,1)',
+    fill: 'forwards'
+  });
+  try {
+    await pointerAnimation.finished;
+  } catch {
+    return false;
+  }
+  if (activeRun !== runID) return false;
+
   showCorrectionMenu(menuButton);
-  setStatus('Hover a mark — Change Back stays one click away', true);
-  if (!await delay(1500, activeRun)) return false;
+  setStatus('Move onto a mark — its choices appear', true);
+  if (!await delay(420, activeRun)) return false;
+
+  const selectedItem = menuButton.parentElement.querySelector('.revert-correction');
+  pointerAnimation = reviewPointer.animate([
+    { opacity: 1, transform: 'translate(-90px, -18px)' },
+    { opacity: 1, transform: 'translate(-78px, 64px)' }
+  ], {
+    duration: 320,
+    easing: 'cubic-bezier(.2,.8,.2,1)',
+    fill: 'forwards'
+  });
+  try {
+    await pointerAnimation.finished;
+  } catch {
+    return false;
+  }
+  if (activeRun !== runID) return false;
+
+  selectMenuItem(selectedItem);
+  setStatus('The option under the pointer is selected', true);
+  if (!await delay(900, activeRun)) return false;
   hideCorrectionMenu(menuButton);
   if (!await delay(250, activeRun)) return false;
 
   scriptedReview = false;
   syncMarkVisibility();
   pointerAnimation = reviewPointer.animate([
-    { opacity: 1, transform: 'translate(0, 0)' },
+    { opacity: 1, transform: 'translate(-78px, 64px)' },
     { opacity: 0, transform: 'translate(-22px, -15px)' }
   ], {
     duration: 260,
@@ -335,6 +403,19 @@ correctionButtons.forEach((button) => {
   const wrap = button.parentElement;
   const popover = wrap.querySelector('.correction-popover');
   const revert = popover.querySelector('.revert-correction');
+  const alternatives = Array.from(popover.querySelectorAll('.alternative-correction'));
+  const menuItems = [revert, ...alternatives];
+  alternatives.forEach((alternative) => {
+    alternative.dataset.defaultAlternative = alternative.dataset.alternative;
+  });
+
+  menuItems.forEach((item) => {
+    item.addEventListener('pointerenter', () => selectMenuItem(item));
+    item.addEventListener('focus', () => selectMenuItem(item));
+    item.addEventListener('pointerdown', () => selectMenuItem(item));
+  });
+
+  popover.addEventListener('pointerleave', () => clearMenuSelection(popover));
 
   button.addEventListener('pointerenter', () => {
     if (button.classList.contains('pending') || button.classList.contains('restored')) return;
@@ -342,7 +423,7 @@ correctionButtons.forEach((button) => {
     window.clearTimeout(menuRevealTimer);
     menuRevealTimer = window.setTimeout(() => {
       showCorrectionMenu(button, { userInitiated: true });
-      setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
+      setStatus(`Review “${button.textContent}” — revert or choose another spelling`, true);
     }, 120);
   });
 
@@ -361,7 +442,7 @@ correctionButtons.forEach((button) => {
   button.addEventListener('focus', () => {
     if (button.classList.contains('pending') || button.classList.contains('restored')) return;
     showCorrectionMenu(button, { userInitiated: true });
-    setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
+    setStatus(`Review “${button.textContent}” — revert or choose another spelling`, true);
   });
 
   wrap.addEventListener('focusout', (event) => {
@@ -377,20 +458,44 @@ correctionButtons.forEach((button) => {
       return;
     }
     showCorrectionMenu(button, { userInitiated: true, pinned: true });
-    setStatus(`Review “${button.dataset.corrected}” — change it back if needed`, true);
+    setStatus(`Review “${button.textContent}” — revert or choose another spelling`, true);
   });
 
   revert.addEventListener('click', () => {
-    hideCorrectionMenu(button);
-    button.textContent = button.dataset.original;
-    button.classList.add('restored');
-    button.classList.remove('mark-hidden');
-    button.disabled = true;
-    completedCorrections = Math.max(0, completedCorrections - 1);
-    updateCorrectionCount();
-    window.setTimeout(() => {
-      setStatus(`Changed “${button.dataset.corrected}” back to “${button.dataset.original}”`, true);
-    }, 0);
+    commitMenuSelection(revert, () => {
+      const previousCorrection = button.textContent;
+      button.textContent = button.dataset.original;
+      button.classList.add('restored');
+      button.classList.remove('mark-hidden');
+      button.disabled = true;
+      button.setAttribute(
+        'aria-label',
+        `Original spelling restored: ${button.dataset.original}`
+      );
+      completedCorrections = Math.max(0, completedCorrections - 1);
+      updateCorrectionCount();
+      hideCorrectionMenu(button);
+      setStatus(`Changed “${previousCorrection}” back to “${button.dataset.original}”`, true);
+    });
+  });
+
+  alternatives.forEach((alternative) => {
+    alternative.addEventListener('click', () => {
+      commitMenuSelection(alternative, () => {
+        const previousCorrection = button.textContent;
+        const nextCorrection = alternative.dataset.alternative;
+        button.textContent = nextCorrection;
+        button.setAttribute(
+          'aria-label',
+          `Correction: ${button.dataset.original} became ${nextCorrection}. Show options`
+        );
+        popover.setAttribute('aria-label', `Correction options for ${nextCorrection}`);
+        alternative.textContent = previousCorrection;
+        alternative.dataset.alternative = previousCorrection;
+        hideCorrectionMenu(button);
+        setStatus(`Changed “${previousCorrection}” to “${nextCorrection}”`, true);
+      });
+    });
   });
 });
 

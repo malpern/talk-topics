@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The Secret That Never Touches Disk — Handing an API Key to an Agent</title>
+  <meta name="description" content="How to hand an API key to an AI agent without the value ever entering the transcript: a SecureField that pipes to sops over stdin, a no-value result file, and the two Python programs that stop a ciphertext merge from silently eating a key.">
+  <meta name="author" content="Micah Alpern">
+  <link rel="icon" type="image/png" href="../hackerdojo-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../shared/article.css">
+  <style>
+    :root {
+      --bg: #e8eeed;
+      --paper: #f9fcfb;
+      --ink: #101b1c;
+      --muted: #5e6f6e;
+      --accent: #0e7c6c;
+      --dark: #0b1618;
+      --rule: rgba(16, 27, 28, .17);
+      --warn: #d99413;
+      --danger: #d4553f;
+    }
+
+    code {
+      background: rgba(14, 124, 108, .1);
+      border-radius: 3px;
+      color: #0a5e52;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: .86em;
+      padding: .12em .32em;
+    }
+
+    /* ── hero art: the two lanes ─────────────────────────────────────────── */
+    .hero-art {
+      align-items: stretch;
+      background:
+        radial-gradient(circle at 82% 14%, rgba(77, 200, 176, .17), transparent 30%),
+        linear-gradient(150deg, #10302c, #07100f 74%);
+      color: #e8fff8;
+      min-height: 72vh;
+      padding: clamp(1.4rem, 3vw, 2.5rem);
+    }
+
+    .lanes { align-self: center; display: grid; gap: .9rem; max-width: 640px; width: 100%; }
+
+    .lane-head {
+      align-items: center;
+      border: 1px solid rgba(232, 255, 248, .2);
+      display: flex;
+      font-family: 'JetBrains Mono', monospace;
+      justify-content: space-between;
+      padding: .9rem 1rem;
+      text-transform: uppercase;
+    }
+    .lane-head strong { color: #63dcc2; font-size: .78rem; letter-spacing: .1em; }
+    .lane-head span { color: #8ba49f; font-size: .65rem; }
+
+    .lane {
+      border: 1px solid rgba(232, 255, 248, .2);
+      display: grid;
+      gap: .75rem;
+      grid-template-columns: 6.5rem 1fr;
+      padding: 1rem;
+    }
+    .lane-tag {
+      align-self: start;
+      font: .6rem/1.4 'JetBrains Mono', monospace;
+      letter-spacing: .09em;
+      padding: .4rem .5rem;
+      text-align: center;
+      text-transform: uppercase;
+    }
+    .lane.human .lane-tag { background: #63dcc2; color: #07100f; }
+    .lane.agent .lane-tag { background: rgba(232, 255, 248, .14); color: #cfe6e0; }
+
+    .hops { display: grid; gap: .4rem; }
+    .hop {
+      align-items: center;
+      background: rgba(255, 255, 255, .055);
+      display: grid;
+      font-family: 'JetBrains Mono', monospace;
+      gap: .7rem;
+      grid-template-columns: 1.2rem 1fr;
+      padding: .6rem .75rem;
+    }
+    .hop i { color: #63dcc2; font-size: .8rem; font-style: normal; }
+    .hop b { display: block; font-size: .72rem; font-weight: 700; }
+    .hop small { color: #8ba49f; display: block; font-size: .6rem; line-height: 1.5; }
+    .lane.agent .hop i { color: #8ba49f; }
+
+    .never {
+      border: 1px dashed rgba(212, 85, 63, .55);
+      color: #f2a795;
+      font: .64rem/1.6 'JetBrains Mono', monospace;
+      padding: .8rem .9rem;
+      text-transform: uppercase;
+    }
+    .never b { color: #ff9a80; display: block; letter-spacing: .1em; margin-bottom: .35rem; }
+
+    /* ── article-local components ────────────────────────────────────────── */
+    .code-card {
+      background: var(--dark);
+      color: #e9f7f3;
+      font: .82rem/1.75 'JetBrains Mono', monospace;
+      margin: 2.5rem 0;
+      overflow-x: auto;
+      padding: 1.5rem;
+      white-space: pre;
+    }
+    .code-card .prompt { color: #63dcc2; }
+    .code-card .comment { color: #7d938e; }
+    .code-card .bad { color: #f2a795; }
+    .code-card .good { color: #8ee6cd; }
+
+    .invariant {
+      border-left: 4px solid var(--accent);
+      color: var(--ink);
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 1.35rem;
+      font-weight: 700;
+      line-height: 1.45;
+      margin: 2.5rem 0;
+      padding: .4rem 0 .4rem 1.35rem;
+    }
+
+    .leak-table { border: 1px solid var(--rule); margin: 2rem 0 2.5rem; }
+    .leak-row {
+      border-bottom: 1px solid var(--rule);
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 11rem 1fr;
+      padding: 1.05rem 1.1rem;
+    }
+    .leak-row:last-child { border-bottom: 0; }
+    .leak-row b { color: var(--accent); font: .74rem/1.5 'JetBrains Mono', monospace; letter-spacing: .07em; text-transform: uppercase; }
+    .leak-row p { color: var(--muted); font: .92rem/1.6 'Inter', sans-serif; margin: 0; }
+    .leak-row p strong { color: var(--ink); }
+
+    .status-table { display: grid; gap: 1px; grid-template-columns: repeat(3, 1fr); margin: 1.5rem 0 2.25rem; }
+    .status-cell { background: var(--dark); color: #e9f7f3; min-height: 9rem; padding: 1.1rem; }
+    .status-cell small { color: #63dcc2; font: .64rem 'JetBrains Mono', monospace; letter-spacing: .08em; text-transform: uppercase; }
+    .status-cell b { display: block; font-size: .95rem; margin: .7rem 0 .35rem; }
+    .status-cell span { color: #9db4af; font: .76rem/1.5 'Inter', sans-serif; }
+    .status-cell.pending small { color: var(--warn); }
+
+    .shot { background: #fff; border: 1px solid var(--rule); margin: 1.5rem 0 2.25rem; padding: .55rem; }
+    .shot img { display: block; height: auto; width: 100%; }
+    .shot figcaption { color: var(--muted); font: .8rem/1.5 'Inter', sans-serif; padding: .8rem .55rem .35rem; }
+    .shot figcaption strong { color: var(--ink); }
+    .shot-pair { display: grid; gap: 1rem; grid-template-columns: 1fr 1fr; margin: 1.5rem 0 2.25rem; }
+    .shot-pair .shot { margin: 0; }
+
+    .stat-grid { display: grid; gap: .8rem; grid-template-columns: repeat(3, 1fr); margin: 1.5rem 0 2rem; }
+    .stat-card { background: var(--dark); color: #e9f7f3; min-height: 8.5rem; padding: 1.1rem; }
+    .stat-card strong { color: #63dcc2; display: block; font: 2.5rem/1 'Bebas Neue', sans-serif; }
+    .stat-card b { display: block; font-size: .78rem; margin: .6rem 0 .25rem; }
+    .stat-card span { color: #9db4af; font: .68rem/1.45 'JetBrains Mono', monospace; }
+
+    .failure-list { display: grid; gap: .85rem; margin: 1.5rem 0 2rem; }
+    .failure { border: 1px solid var(--rule); display: grid; gap: 1rem; grid-template-columns: 2rem 1fr; padding: 1rem 1.1rem; }
+    .failure > b { color: var(--danger); font: 1.7rem/1 'Bebas Neue', sans-serif; }
+    .failure h3 { font-size: .9rem; margin: 0 0 .3rem; }
+    .failure p { color: var(--muted); font: .84rem/1.55 'Inter', sans-serif; margin: 0; }
+
+    .risk-list { display: grid; gap: .85rem; margin: 1.5rem 0 2rem; }
+    .risk-row { border: 1px solid var(--rule); display: grid; gap: 1rem; grid-template-columns: 8rem 1fr; padding: 1rem 1.1rem; }
+    .risk-row h3 { font-size: .9rem; margin: 0 0 .3rem; }
+    .risk-row p { color: var(--muted); font: .84rem/1.55 'Inter', sans-serif; margin: 0; }
+    .risk-level { align-self: start; color: var(--paper); font: .68rem 'JetBrains Mono', monospace; letter-spacing: .08em; padding: .5rem .6rem; text-align: center; text-transform: uppercase; }
+    .risk-level.zero { background: var(--danger); }
+    .risk-level.low { background: #a9740d; }
+    .risk-level.moderate { background: var(--accent); }
+    .risk-level.accepted { background: #5c6b6a; }
+
+    @media (max-width: 760px) {
+      .lane { grid-template-columns: 1fr; }
+      .status-table, .stat-grid, .shot-pair { grid-template-columns: 1fr; }
+      .leak-row, .risk-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header class="masthead"><a href="../index.html">Talk Topics</a><span>Field Note 05 · Swift + Python + sops</span></header>
+
+  <section class="article-hero">
+    <div class="hero-copy">
+      <p class="kicker">Add Secret · agent-safe credential handoff</p>
+      <h1>The Secret That Never Touches Disk</h1>
+      <p class="lede">My agent needs an API key. I have it. The obvious move — paste it in the chat — is also the leak. So the agent drives the whole handoff and never sees the value.</p>
+      <p class="meta">Micah Alpern · Hacker Dojo<br>SwiftUI GUI · Python plumbing · sops + age</p>
+    </div>
+
+    <div class="hero-art" role="img" aria-label="Two lanes: the human lane carries the secret from a SecureField through sops stdin into ciphertext; the agent lane only launches the app and reads a result file with no value in it">
+      <div class="lanes">
+        <div class="lane-head"><strong>Add Secret · one value, two lanes</strong><span>ANTHROPIC_API_KEY</span></div>
+
+        <div class="lane human" aria-hidden="true">
+          <div class="lane-tag">Human lane<br>the value</div>
+          <div class="hops">
+            <div class="hop"><i>▸</i><span><b>SecureField</b><small>Typed into a native password field. Renders as dots.</small></span></div>
+            <div class="hop"><i>▸</i><span><b>sops · stdin</b><small>Piped to the process. Never an argument.</small></span></div>
+            <div class="hop"><i>▸</i><span><b>ENC[AES256_GCM,…]</b><small>Committed to a private repo as ciphertext.</small></span></div>
+          </div>
+        </div>
+
+        <div class="lane agent" aria-hidden="true">
+          <div class="lane-tag">Agent lane<br>no value</div>
+          <div class="hops">
+            <div class="hop"><i>·</i><span><b>open -W --key NAME</b><small>Launch, pre-fill the key name, block.</small></span></div>
+            <div class="hop"><i>·</i><span><b>result.json</b><small>status · key name · timestamp · per-step ok</small></span></div>
+          </div>
+        </div>
+
+        <div class="never" aria-hidden="true">
+          <b>Never crosses the line</b>
+          transcript · argv · ps · shell history · plaintext on disk
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="toc" aria-label="Article chapters">
+    <a href="#trap">01 · The trap</a>
+    <a href="#invert">02 · Invert the handoff</a>
+    <a href="#store">03 · Where it lands</a>
+    <a href="#protocol">04 · The agent protocol</a>
+    <a href="#merge">05 · The Python part</a>
+    <a href="#failures">06 · Failure diary</a>
+    <a href="#risk">07 · What this doesn't protect</a>
+    <a href="#steal">08 · Steal the pattern</a>
+  </nav>
+
+  <article>
+    <section class="chapter" id="trap">
+      <div class="chapter-no">01</div>
+      <div class="chapter-copy">
+        <p class="kicker">The trap</p>
+        <h2>“Just paste the key in chat” is a leak with a friendly face.</h2>
+        <p>Every agent workflow eventually hits the same wall. The agent is wiring up a new API, it needs a token, and only you can get one. The path of least resistance is to paste it into the conversation and let the agent take it from there.</p>
+        <p>That works. It also copies the secret into the one place designed to remember everything. A transcript is logged, summarized, replayed into the next context window, and shipped to a model provider. The key rides along in all of it.</p>
+        <p>The alternatives people reach for next are not better; they just fail somewhere less visible.</p>
+        <div class="leak-table">
+          <div class="leak-row"><b>In the prompt</b><p><strong>Captured in the transcript.</strong> Logs, summaries, provider-side retention, and every future turn that quotes it back.</p></div>
+          <div class="leak-row"><b>In argv</b><p><strong>Visible in <code>ps</code>.</strong> Any user on the box can read the full command line of a running process, and child processes inherit it.</p></div>
+          <div class="leak-row"><b>In the environment</b><p><strong>Lands in shell history.</strong> <code>export KEY=…</code> sits in <code>~/.zsh_history</code> in plaintext, essentially forever.</p></div>
+          <div class="leak-row"><b>In a scratch file</b><p><strong>Plaintext on disk.</strong> Backups, Spotlight indexes, and one absent-minded <code>git add .</code>.</p></div>
+        </div>
+        <p>The common thread is not carelessness. It is that in all four cases the secret became <em>a string some other program handled</em> on its way to storage — and every one of those programs keeps records.</p>
+        <div class="invariant">The problem is not that the agent is untrustworthy. It is that everything the agent touches is, by design, written down.</div>
+      </div>
+    </section>
+
+    <section class="chapter" id="invert">
+      <div class="chapter-no">02</div>
+      <div class="chapter-copy">
+        <p class="kicker">Invert the handoff</p>
+        <h2>Let the agent run the errand. Keep the value out of its hands.</h2>
+        <p>The fix is a split of labor, not a new crypto scheme. The agent is genuinely good at the boring parts: knowing <em>which</em> key is needed, launching something, waiting, reading an outcome, and continuing. The only step it must never perform is holding the value.</p>
+        <p>So the value gets a lane of its own. A human types it into a native macOS <code>SecureField</code>. It goes straight from that field into <code>sops</code> as standard input, and comes back out as ciphertext. It is never interpolated into a command, never written to a temp file, never returned to the caller.</p>
+        <div class="shot-pair">
+          <figure class="shot">
+            <img src="assets/app-input.png" alt="The Add Secret window: a monospaced key-name field pre-filled with ANTHROPIC_API_KEY, a masked secret field, a Sync to Mac mini toggle, and an Encrypt and Add button" width="1024" height="768">
+            <figcaption><strong>Input.</strong> The agent pre-filled the key name. The human supplies the one thing the agent must not see.</figcaption>
+          </figure>
+          <figure class="shot">
+            <img src="assets/app-success.png" alt="The Add Secret result view: a green checkmark, the key name, and a checklist showing encrypted, pushed to GitHub, and synced to two Mac mini accounts" width="1024" height="768">
+            <figcaption><strong>Done.</strong> The same per-step checklist the agent will read back as JSON — with no value in it.</figcaption>
+          </figure>
+        </div>
+        <p>The whole app is about 480 lines of SwiftUI, built by a single <code>swiftc</code> invocation — no Xcode project, no target settings, just <code>./build.sh</code> hand-assembling the bundle and symlinking it into <code>/Applications</code>. That mattered more than it sounds: a tool this small only survives if rebuilding it is a non-event.</p>
+        <p>The load-bearing line is unglamorous. It is the one that chooses stdin over an argument:</p>
+        <div class="code-card"><span class="comment">// decrypt → modify in memory → re-encrypt via stdin → write</span>
+<span class="bad">// NOT: run(SOPS, ["--set", "KEY=" + value])   ← value would be in argv, visible in ps</span>
+
+<span class="good">let</span> enc = run(SOPS, [<span class="prompt">"-e"</span>, <span class="prompt">"--input-type"</span>, <span class="prompt">"dotenv"</span>,
+                     <span class="prompt">"--output-type"</span>, <span class="prompt">"dotenv"</span>,
+                     <span class="prompt">"--age"</span>, AGE_PUB, <span class="prompt">"/dev/stdin"</span>],
+              stdin: plaintext)          <span class="comment">// ← the whole trick</span>
+
+<span class="good">try</span> enc.out.write(toFile: SECRETS, atomically: <span class="good">true</span>, encoding: .utf8)</div>
+        <p>Same idea in Python, if you want to try this without writing any Swift — <code>input=</code> is the safe channel, an f-string in the argument list is not:</p>
+        <div class="code-card"><span class="comment"># the leak</span>
+subprocess.run([<span class="bad">f"sops --set '{key}={value}' secrets.env"</span>], shell=<span class="bad">True</span>)
+
+<span class="comment"># the fix — the value is a pipe, not a word in a command line</span>
+enc = subprocess.run(
+    [<span class="prompt">"sops"</span>, <span class="prompt">"-e"</span>, <span class="prompt">"--input-type"</span>, <span class="prompt">"dotenv"</span>,
+     <span class="prompt">"--output-type"</span>, <span class="prompt">"dotenv"</span>, <span class="prompt">"--age"</span>, RECIPIENT, <span class="prompt">"/dev/stdin"</span>],
+    <span class="good">input</span>=plaintext, capture_output=<span class="good">True</span>, text=<span class="good">True</span>,
+)</div>
+        <div class="callout"><p><strong>The division of labor:</strong> the agent decides <em>that</em> a secret is needed and what to call it. A human decides <em>what</em> it is. Neither one has to trust the other with the part they shouldn't have.</p></div>
+      </div>
+    </section>
+
+    <section class="chapter" id="store">
+      <div class="chapter-no">03</div>
+      <div class="chapter-copy">
+        <p class="kicker">Where it lands</p>
+        <h2>Encrypted in git, with the key names left readable on purpose.</h2>
+        <p>The destination is <code>~/dotfiles/secrets.env</code> — a dotenv file committed to a private repo, encrypted with <a href="https://github.com/getsops/sops">sops</a> and <a href="https://github.com/FiloSottile/age">age</a>. sops encrypts the <em>values</em> and leaves the <em>keys</em> in the clear, which is what makes the file reviewable:</p>
+        <div class="code-card"><span class="comment"># ~/dotfiles/secrets.env — committed to git, encrypted at rest</span>
+ANTHROPIC_API_KEY=ENC[AES256_GCM,data:9Hk2…tA==,iv:5f…,tag:1c…,type:str]
+LINEAR_API_KEY_WORK=ENC[AES256_GCM,data:pQ7…vM==,iv:bd…,tag:9a…,type:str]
+FIGMA_TOKEN_PERSONAL=ENC[AES256_GCM,data:Lm0…xY==,iv:e1…,tag:77…,type:str]</div>
+        <p>You can read a diff and see <em>which</em> key changed without any value ever appearing. One age private key at <code>~/.config/sops/age/keys.txt</code> decrypts the whole file; it is chmod 600 and it is the one thing that is never committed. Clone the repo, drop the key in place, and the machine is provisioned.</p>
+        <div class="stat-grid" aria-label="Current state of the encrypted secrets file">
+          <div class="stat-card"><strong>74</strong><b>Keys in the file</b><span>Names readable · values ciphertext</span></div>
+          <div class="stat-card"><strong>3</strong><b>Machines in sync</b><span>Laptop + two Mac mini accounts</span></div>
+          <div class="stat-card"><strong>1</strong><b>Private key</b><span>Never committed · synced by hand</span></div>
+        </div>
+        <p>Each CLI wrapper then decrypts for itself, with no shell profile and no interactive unlock in the path:</p>
+        <div class="code-card"><span class="comment"># inside ~/.local/bin/lin, gmailq, notion, figma… each tool decrypts itself</span>
+KEY=$(sops -d ~/dotfiles/secrets.env | grep <span class="prompt">'^LINEAR_API_KEY_WORK='</span> | cut -d= -f2-)</div>
+        <p>The conspicuous absence here is the macOS Keychain. I tried it first and it cost me a weekend. The Keychain is fine when a human is logged in and looking at the screen; it fails in exactly the environments agents live in — non-interactive shells, <code>cron</code>, SSH, launchd jobs — and one flavor of failure silently <em>wipes</em> the stored credentials rather than reporting an error. A file on disk, guarded by permissions, is less clever and dramatically more reliable.</p>
+        <div class="invariant">Anything an agent depends on has to work in a shell with no human, no TTY, and no unlocked keychain. That constraint eliminates most of the “secure” options first.</div>
+      </div>
+    </section>
+
+    <section class="chapter" id="protocol">
+      <div class="chapter-no">04</div>
+      <div class="chapter-copy">
+        <p class="kicker">The agent protocol</p>
+        <h2>Block on the human. Then read a file that has no secret in it.</h2>
+        <p>The interface between agent and app is two commands. The first launches the GUI with the key name pre-filled and waits:</p>
+        <div class="code-card"><span class="prompt">$</span> open -W -n <span class="prompt">"/Applications/Add Secret.app"</span> --args --key ANTHROPIC_API_KEY</div>
+        <p><code>-W</code> is the important flag: it blocks until the window closes. The app is wired to quit when its last window closes, whether the human clicks <em>Done</em> or just hits ⌘W, so the call always returns. The agent parks on one blocking Bash call while a human does the one private part, then continues.</p>
+        <p>The second command reads the outcome:</p>
+        <div class="code-card"><span class="prompt">$</span> cat ~/.config/add-secret/result.json   <span class="comment"># dir 0700, file 0600</span>
+
+{
+  <span class="prompt">"status"</span>: <span class="good">"success"</span>,
+  <span class="prompt">"key"</span>: <span class="good">"ANTHROPIC_API_KEY"</span>,
+  <span class="prompt">"timestamp"</span>: <span class="good">"2026-06-23T14:02:11Z"</span>,
+  <span class="prompt">"steps"</span>: [
+    { <span class="prompt">"step"</span>: <span class="good">"Added ANTHROPIC_API_KEY (encrypted)"</span>, <span class="prompt">"ok"</span>: true },
+    { <span class="prompt">"step"</span>: <span class="good">"Pushed to GitHub"</span>,                 <span class="prompt">"ok"</span>: true },
+    { <span class="prompt">"step"</span>: <span class="good">"mini · clawd"</span>,                     <span class="prompt">"ok"</span>: true }
+  ]
+}</div>
+        <p>Key name, timestamp, and a per-step checklist. No value, by construction — the result writer is a separate function that never receives one.</p>
+        <p>The detail I like most is the third status. The app writes <code>pending</code> to the file the moment the window appears, <em>before</em> the human does anything:</p>
+        <div class="status-table">
+          <div class="status-cell pending"><small>Written at launch</small><b>pending</b><span>The human closed the window without finishing. Treat as cancelled — do not wait, do not assume.</span></div>
+          <div class="status-cell"><small>Written on completion</small><b>success</b><span>Encrypted, committed, pushed, and pulled onto the other machines. The key is live.</span></div>
+          <div class="status-cell"><small>Written on completion</small><b>failure</b><span>A specific step failed. <code>steps[]</code> says which one and why.</span></div>
+        </div>
+        <p>Without <code>pending</code>, a cancelled dialog is indistinguishable from a stale success from last Tuesday — and an agent that can't tell those apart will confidently proceed with a key that was never added. It cost one line at launch to make the difference legible.</p>
+        <div class="callout"><p><strong>The general rule:</strong> a tool an agent drives should report its outcome in a file the agent can read without parsing prose — and should distinguish “didn't happen” from “happened a while ago.”</p></div>
+        <p>On success the app also fans out: commit the ciphertext, push to GitHub, then <code>ssh</code> into both Mac mini accounts and <code>git pull --ff-only</code>. Each remote pull becomes its own line in <code>steps[]</code>, so a machine that was asleep shows up as a failed step rather than a silent gap.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="merge">
+      <div class="chapter-no">05</div>
+      <div class="chapter-copy">
+        <p class="kicker">The Python part</p>
+        <h2>Encrypting the file was the easy half. Merging it nearly ate a key.</h2>
+        <p>Here is the bug that turned a weekend toy into something with tests. sops re-nonces every value on every write. Change one key and <em>every line of the ciphertext changes</em>. Git has no line-level correspondence left to merge, so any two concurrent edits — laptop and Mac mini, ten minutes apart — arrive as a whole-file conflict.</p>
+        <p>And a whole-file conflict has an obvious, disastrous resolution: pick a side. Whichever side you pick, the other machine's newly-added key is gone. Worse, the deletion is invisible. The diff shows 45 changed lines either way, because the diff <em>always</em> shows 45 changed lines. There is nothing to notice.</p>
+        <div class="invariant">A ciphertext file cannot tell you what it lost. Any encrypted-secrets-in-git setup needs a merge story before it needs a second machine.</div>
+        <p>The answer is two small Python programs sitting under the Swift app — which is why this is a Python-meetup story wearing a Swift jacket.</p>
+        <p>The first is a <strong>git merge driver</strong> registered for that one path. Git hands it the ancestor, ours, theirs, and a path; it decrypts all three, merges <em>at the key level</em> on plaintext, and re-encrypts the result. Disjoint edits from two machines both survive, because they were never really in conflict — only their ciphertext was.</p>
+        <div class="code-card"><span class="comment"># ~/dotfiles/.gitattributes</span>
+secrets.env merge=sops
+
+<span class="comment"># bin/sops-merge-driver  %O ancestor  %A ours (result goes here)  %B theirs</span>
+ancestor, ours, theirs = decrypt(o), decrypt(a), decrypt(b)
+<span class="comment"># disjoint keys: keep both. same key on both sides: newest wall-clock wins.</span></div>
+        <p>Same-key collisions need a tiebreak, and the honest one is wall-clock time: the value typed most recently is the one the human meant. But git hands the driver two blobs and <em>no timestamps</em>. My first two attempts to recover a date were both wrong in instructive ways.</p>
+        <div class="failure-list">
+          <div class="failure"><b>01</b><div><h3>Reading <code>REBASE_HEAD</code> / <code>CHERRY_PICK_HEAD</code>.</h3><p>Git writes those refs only once an operation <em>stops</em>. During a clean driver run — the normal case — neither exists. The dating code silently fell through to a guess.</p></div></div>
+          <div class="failure"><b>02</b><div><h3>Guessing that “the side being applied” is newer.</h3><p>It isn't. A stale unpushed commit that sat on the laptop for three days beats a fresh value from the mini purely by virtue of being replayed — and then the sync fans the <em>older</em> secret out to a machine that was working fine.</p></div></div>
+        </div>
+        <p>The fix is to date <em>the content</em>, not the operation: hash each side's blob and ask git when that exact content first landed in any commit. That answer is identical under merge, rebase, cherry-pick, and revert, because it never asks what git is currently doing.</p>
+        <p>The second program is the belt to the merge driver's braces. <code>secrets-verify</code> compares the <em>key set</em> of the local file against <code>origin/main</code> and refuses a push that would drop a key the remote still has. Deleting a secret on purpose is a flag away; deleting one by accident is now impossible to do quietly.</p>
+        <div class="pipeline">
+          <div><b>Pull first</b><span>Refresh from origin <em>before</em> decrypting, so the rewrite starts from a current base.</span></div>
+          <div><b>Merge by key</b><span>The Python driver merges decrypted key/value pairs, not ciphertext lines.</span></div>
+          <div><b>Date the blob</b><span>Same-key collisions resolve by when that content first appeared, not by git's current mode.</span></div>
+          <div><b>Verify the set</b><span><code>secrets-verify</code> fails the push if any remote key went missing.</span></div>
+          <div><b>Rebase &amp; retry</b><span>A rejected push pulls, re-verifies, and pushes again rather than stranding the commit.</span></div>
+          <div><b>Report per step</b><span>Every stage lands in <code>result.json</code> as its own pass/fail line.</span></div>
+        </div>
+        <p>The app now does the first and last of those itself: it pulls before it decrypts, because the decrypt-modify-re-encrypt cycle rewrites the entire file and starting from a stale base is precisely how the other machine's key disappears. And a rejected push triggers a pull, a re-verify, and a retry — with the merge driver doing the actual reconciliation underneath.</p>
+        <div class="callout"><p><strong>Why it's Python:</strong> the GUI had to be native to get a real <code>SecureField</code>, but the correctness machinery is text processing, subprocess orchestration, and git plumbing. Two files, ~330 lines, no dependencies. That is a language choice that pays back the first time you have to reason about it at midnight.</p></div>
+      </div>
+    </section>
+
+    <section class="chapter" id="failures">
+      <div class="chapter-no">06</div>
+      <div class="chapter-copy">
+        <p class="kicker">Failure diary</p>
+        <h2>Everything sharp in this design is scar tissue.</h2>
+        <p>None of the safeguards above were designed in. Each one is the residue of something that broke, usually in a way that was quiet at the time.</p>
+        <div class="failure-list">
+          <div class="failure"><b>01</b><div><h3>The Keychain wiped the credentials.</h3><p>The first credential store was the macOS Keychain. In agent shells it failed to decrypt — and one failure mode cleared what it was holding. Every wrapper is file-backed now, and “no Keychain” is written down as policy rather than folklore.</p></div></div>
+          <div class="failure"><b>02</b><div><h3>A whole-file ciphertext conflict resolved by picking a side.</h3><p>The original failure. It is invisible in review, which is what makes it dangerous: the diff looks the same whether you kept both keys or destroyed one.</p></div></div>
+          <div class="failure"><b>03</b><div><h3>The driver's date lookup silently returned nothing.</h3><p><code>REBASE_HEAD</code> only exists once a rebase has stopped, so during a clean run the code fell through to a guess. Caught on 2026-07-25 — along with a cherry-pick that took the same fallback and kept the <em>older</em> value.</p></div></div>
+          <div class="failure"><b>04</b><div><h3>A stale local base overwrote a fresh remote key.</h3><p>Typing into the dialog takes thirty seconds; the other machine can push during them. Pulling before the decrypt closed the window, and the rebase-retry loop closed what was left of it.</p></div></div>
+          <div class="failure"><b>05</b><div><h3>An agent couldn't tell “cancelled” from “finished earlier.”</h3><p>Before the <code>pending</code> status was written at launch, a stale <code>success</code> from a previous run read as a fresh one. The agent proceeded with a key that had never been entered.</p></div></div>
+        </div>
+        <p>There is a pattern in that list. Four of the five were <em>silent</em> — the system reported success while doing the wrong thing. Almost all the engineering effort since went into converting silent wrong answers into loud ones.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="risk">
+      <div class="chapter-no">07</div>
+      <div class="chapter-copy">
+        <p class="kicker">The threat model</p>
+        <h2>This defends against the transcript. It does not defend against a hostile agent.</h2>
+        <p>Worth being precise about, because “the agent never sees the secret” is easy to over-read. The agent runs on my machine with my shell. It can run <code>sops -d</code>. If an agent were actively malicious, none of this would stop it.</p>
+        <p>What this design actually buys is that the secret never becomes <em>a value in a record that gets kept</em> — not in a transcript shipped to a provider, not in <code>ps</code>, not in shell history, not in a backup. That is the failure mode that happens by accident, on an ordinary Tuesday, to careful people. The deliberate-attacker case is a different problem with a different answer.</p>
+        <div class="risk-list">
+          <div class="risk-row"><div class="risk-level zero">Zero tolerance</div><div><h3>The value entering the transcript, argv, or plaintext on disk</h3><p>The reason the tool exists. <code>SecureField</code> → stdin → ciphertext, with no intermediate representation anything else can capture.</p></div></div>
+          <div class="risk-row"><div class="risk-level low">Low tolerance</div><div><h3>Losing a key to a merge</h3><p>Key-level merge driver, content-dated collision resolution, and a key-set guard that fails the push. Deletions must be explicit.</p></div></div>
+          <div class="risk-row"><div class="risk-level moderate">Moderate tolerance</div><div><h3>An unsynced machine or a failed push</h3><p>Loud and recoverable: it shows up as a failed step in <code>result.json</code>, and re-running fixes it.</p></div></div>
+          <div class="risk-row"><div class="risk-level accepted">Accepted for now</div><div><h3>The age key on disk, the ad-hoc signature, and a decrypting agent</h3><p>The private key is a chmod-600 file with no passphrase — that is what makes it work unattended, and it is the tradeoff. The app is ad-hoc signed, so nothing proves the <code>/Applications</code> bundle is mine. And any process running as me can decrypt the file. Known, not solved.</p></div></div>
+        </div>
+        <p>If I pushed further, the next steps are a hardware-backed age identity, a real Developer ID signature so the dialog is attestable, and per-tool scoping so a wrapper can only decrypt the keys it needs. None of those are hard; none of them are the current bottleneck.</p>
+      </div>
+    </section>
+
+    <section class="chapter" id="steal">
+      <div class="chapter-no">08</div>
+      <div class="chapter-copy">
+        <p class="kicker">Steal the pattern</p>
+        <h2>The shape matters more than any of the parts.</h2>
+        <p>Nothing here is specific to Swift, or to macOS, or even to secrets. It is a general answer to a question that keeps coming up as agents get more autonomous: <em>how do you let an agent complete a task that requires something the agent must not have?</em></p>
+        <p>The answer has four moving pieces, and you can build all of them in an afternoon in any language:</p>
+        <div class="pipeline">
+          <div><b>A narrow surface</b><span>One input the human fills, launched with everything else pre-filled by the agent.</span></div>
+          <div><b>A no-value channel</b><span>The sensitive data moves by pipe, never by argument, never through a temp file.</span></div>
+          <div><b>A blocking call</b><span>The agent waits on one command that always returns, however the human exits.</span></div>
+          <div><b>A machine-readable receipt</b><span>Structured outcome with no payload — and a state that means “nothing happened.”</span></div>
+        </div>
+        <p>In Python that is <code>getpass.getpass()</code> or a twenty-line Tkinter window, <code>subprocess.run(..., input=value)</code>, and <code>json.dump</code> to a 0600 file. The Swift app exists because I wanted a real <code>SecureField</code> and a Dock icon, not because the pattern needs a compiled language.</p>
+        <div class="status">
+          <div><h3>What the agent gained</h3><p>It can provision a brand-new API integration end to end, including the credential step, without a human doing anything but typing once.</p></div>
+          <div><h3>What the agent never got</h3><p>The value. Not in its context, not in its logs, not in any process it can inspect.</p></div>
+        </div>
+        <div class="callout"><p><strong>What I'd tell the meetup:</strong> the interesting question about agent safety usually isn't “can I trust the model?” It's “what does the workflow record, and who eventually reads that?” Design for the record, and most of the scary parts get boring.</p></div>
+        <p>Source: <a href="https://github.com/malpern/add-secret">github.com/malpern/add-secret</a> — <code>AddSecret.swift</code>, <code>build.sh</code>, <code>makeicon.swift</code>. The encrypted <code>secrets.env</code>, the merge driver, and the verifier live in a separate private dotfiles repo. Build it with <code>./build.sh</code>; there is no Xcode project to open.</p>
+      </div>
+    </section>
+  </article>
+
+  <footer class="endnote">
+    <h2>Secrets stay secrets.</h2>
+    <p>Let the agent run the errand. Give the value its own lane. Write down what happened, and nothing else.</p>
+  </footer>
+</body>
+</html>

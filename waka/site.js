@@ -29,17 +29,28 @@ for (const button of motionButtons) button.addEventListener('click', () => {
   try { localStorage.setItem('waka-guide-motion', paused ? 'paused' : 'running'); } catch {}
 });
 reduced.addEventListener('change', event => { paused = event.matches; setMotion(); });
-for (const scene of document.querySelectorAll('.arcade-scene')) {
-  let reset;
-  scene.querySelector('.power-button').addEventListener('click', () => {
-    clearTimeout(reset);
-    scene.classList.add('powered');
-    scene.querySelector('.maze-message').textContent = 'CHOMP!';
-    scene.querySelector('.arcade-caption').textContent = 'Plot twist: the ghosts are on the menu.';
-    reset = setTimeout(() => {
-      scene.classList.remove('powered');
-      scene.querySelector('.maze-message').textContent = 'READY!';
-      scene.querySelector('.arcade-caption').textContent = 'A little chase. A lot to learn.';
-    }, 5000);
-  });
+
+// Passive scroll updates only decorative transforms; reading content never shifts.
+let scrollFrame = 0;
+const trails = [...document.querySelectorAll('.scroll-chase')];
+const heroArt = document.querySelector('.cinematic-hero');
+function updateScrollArt() {
+  scrollFrame = 0;
+  if (paused) return;
+  const viewport = window.innerHeight;
+  for (const trail of trails) {
+    const rect = trail.getBoundingClientRect();
+    if (rect.bottom < 0 || rect.top > viewport) continue;
+    const progress = Math.max(0, Math.min(1, (viewport - rect.top) / viewport));
+    trail.style.setProperty('--travel', `${progress * Math.max(0, rect.width - 225)}px`);
+  }
+  if (heroArt) heroArt.style.setProperty('--parallax', `${Math.min(window.scrollY * .08, 40)}px`);
 }
+function scheduleScrollArt() {
+  if (!scrollFrame) scrollFrame = requestAnimationFrame(updateScrollArt);
+}
+window.addEventListener('scroll', scheduleScrollArt, {passive:true});
+window.addEventListener('resize', scheduleScrollArt);
+for (const button of motionButtons) button.addEventListener('click', scheduleScrollArt);
+reduced.addEventListener('change', scheduleScrollArt);
+scheduleScrollArt();

@@ -1,6 +1,6 @@
 ---
 name: waka-agent
-description: Build, test, or connect an image-only policy for Waka co-op using its JSONL gateway. Use when asked to create a Waka game-playing agent or connect a custom policy.
+description: Coach a browser Waka partner with recipes and trials, or build an image-only native policy using its JSONL gateway. Use when asked to create, tune, or connect a Waka game-playing agent.
 ---
 
 # Build a Waka partner
@@ -9,7 +9,23 @@ This skill helps a coding agent create a policy process. It does not turn a
 conversational model into a real-time controller. The native gateway feeds the
 policy images; the policy's running loop chooses directions.
 
-## Start with the interface
+## Browser coaching
+
+For “make my partner cautious/bold” or playing from a link, use the
+[browser coaching reference](references/browser-coaching.md). Configure a
+recipe and run bounded trials through available WebMCP tools. Compare results
+before claiming improvement; fixed-seed reruns of the same recipe are identical,
+not independent evidence. The policy makes fast decisions from images; the
+assistant designs and evaluates its preferences.
+
+If the assistant cannot call this tab's WebMCP tools, return a valid JSON recipe
+for the user to paste into the game. Do not claim to have run a trial unless you
+actually did. Starting a new game replaces current progress; trials preserve it.
+Browser local play does not establish native network fairness.
+
+## Native custom policies
+
+### Start with the interface
 
 Read [the protocol](references/agents.md) before implementing a policy. Use
 [the schema](references/protocol.schema.json) to validate message shapes and

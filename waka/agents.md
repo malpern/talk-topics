@@ -1,5 +1,8 @@
 # Waka pixel policy API — version 1
 
+For conversational browser coaching, open [the browser arcade](https://malpern.github.io/talk-topics/waka/play/) and read [the coaching interface](https://malpern.github.io/talk-topics/waka/play/webmcp.md). It supports validated recipes, bounded trials, and optional WebMCP. The native JSONL interface below remains available for custom policy code.
+
+
 Human guide: https://malpern.github.io/talk-topics/waka/human.html
 Agent guide: https://malpern.github.io/talk-topics/waka/agents.md
 Schema: https://malpern.github.io/talk-topics/waka/protocol.schema.json

@@ -1,19 +1,25 @@
-// A static illustration: the downloadable native app runs the Python agents.
-const canvas = document.querySelector('#arena-preview');
-if (canvas) {
-  const ctx = canvas.getContext('2d');
-  for (let y=0;y<55;y++) for(let x=0;x<81;x++) {
-    const wall = x===0 || x===80 || y===0 || y===54 || (y%4===0 && x%8>=2 && x%8<=6);
-    ctx.fillStyle=wall?'#274478':'#aaa891';
-    if(wall)ctx.fillRect(x*10+1,y*10+1,8,8);else {ctx.beginPath();ctx.arc(x*10+5,y*10+5,1,0,Math.PI*2);ctx.fill();}
-  }
-  const colors=['#ffe34c','#65dbf3','#ff7599','#b9a0ff','#77e3ac','#ffb467','#ef9cff','#a8d8ff','#d7eb71','#ff8a65','#86b9ff','#e7ccd6'];
-  const positions=[[9,5],[27,7],[53,5],[73,9],[71,27],[73,47],[55,49],[27,47],[7,49],[7,27],[27,27],[53,27]];
-  positions.forEach(([x,y],i)=>{ctx.fillStyle=colors[i];ctx.beginPath();ctx.arc(x*10+5,y*10+5,13,0,Math.PI*2);ctx.fill();ctx.fillStyle='#101624';ctx.font='bold 13px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(i+1,x*10+5,y*10+5);});
+// Static illustration from the actual authored maze. Python runs in the Mac app.
+const canvas=document.querySelector('#arena-preview');
+if(canvas && window.WAKA_MAZE){
+ const frame=window.WAKA_MAZE;
+ const ctx=canvas.getContext('2d'),t=12;
+ ctx.fillStyle='#03050c';ctx.fillRect(0,0,canvas.width,canvas.height);
+ ctx.strokeStyle='#224fff';ctx.lineWidth=1.3;
+ for(let y=0;y<frame.height;y++)for(let x=0;x<frame.width;x++){
+  const row=frame.grid[y];if(row[x]!=='#')continue;
+  const edge=(x1,y1,x2,y2)=>{ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();};
+  if(y>0&&frame.grid[y-1][x]!=='#')edge(x*t,y*t,(x+1)*t,y*t);
+  if(y+1<frame.height&&frame.grid[y+1][x]!=='#')edge(x*t,(y+1)*t,(x+1)*t,(y+1)*t);
+  if(x>0&&row[x-1]!=='#')edge(x*t,y*t,x*t,(y+1)*t);
+  if(x+1<frame.width&&row[x+1]!=='#')edge((x+1)*t,y*t,(x+1)*t,(y+1)*t);
+ }
+ ctx.fillStyle='#ffcca2';for(const [x,y] of frame.pellets){ctx.beginPath();ctx.arc((x+.5)*t,(y+.5)*t,1.1,0,Math.PI*2);ctx.fill();}
+ for(const p of frame.powerups){const [x,y]=p.position;ctx.fillStyle=p.kind==='predator'?'#ff324c':p.kind==='fruit'?'#ff5268':'#fff1ba';ctx.beginPath();ctx.arc((x+.5)*t,(y+.5)*t,3.5,0,Math.PI*2);ctx.fill();}
+ for(const a of frame.agents){const[x,y]=a.position;ctx.fillStyle='#'+a.color;ctx.beginPath();ctx.moveTo((x+.5)*t,(y+.5)*t);ctx.arc((x+.5)*t,(y+.5)*t,6,0.5,Math.PI*2-0.5);ctx.closePath();ctx.fill();}
+ for(const g of frame.ghosts){const[x,y]=g.position;ctx.fillStyle='#'+g.color;ctx.beginPath();ctx.arc((x+.5)*t,(y+.5)*t,5,Math.PI,0);ctx.lineTo((x+.5)*t+5,(y+.5)*t+5);ctx.lineTo((x+.5)*t-5,(y+.5)*t+5);ctx.closePath();ctx.fill();ctx.fillStyle='white';ctx.fillRect((x+.5)*t-3,(y+.5)*t-1,2,3);ctx.fillRect((x+.5)*t+1,(y+.5)*t-1,2,3);}
 }
 document.querySelectorAll('[data-copy]').forEach(button=>button.addEventListener('click',async()=>{
-  const code=document.getElementById(button.dataset.copy).innerText;
-  try{await navigator.clipboard.writeText(code);button.textContent='Copied';}
-  catch{const range=document.createRange();range.selectNodeContents(document.getElementById(button.dataset.copy));getSelection().removeAllRanges();getSelection().addRange(range);button.textContent='Selected — press Copy';}
-  setTimeout(()=>button.textContent='Copy code',2000);
+ const code=document.getElementById(button.dataset.copy).innerText;
+ try{await navigator.clipboard.writeText(code);button.textContent='Copied';}catch{const range=document.createRange();range.selectNodeContents(document.getElementById(button.dataset.copy));getSelection().removeAllRanges();getSelection().addRange(range);button.textContent='Selected — press Copy';}
+ setTimeout(()=>button.textContent='Copy code',2000);
 }));

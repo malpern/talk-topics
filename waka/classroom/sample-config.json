@@ -1,0 +1,23 @@
+{
+  "seed": 42,
+  "ticks": 1440,
+  "budget_ms": 100,
+  "vaults": true,
+  "portals": true,
+  "bounty": true,
+  "storms": true,
+  "agents": [
+    {"name": "My agent", "path": "starter_agent.py"},
+    {"name": "Explorer 1", "style": "explorer"},
+    {"name": "Cooperator 1", "style": "cooperator"},
+    {"name": "Hunter 1", "style": "hunter"},
+    {"name": "Cautious 1", "style": "cautious"},
+    {"name": "Wanderer 1", "style": "wanderer"},
+    {"name": "Forager 2", "style": "forager"},
+    {"name": "Explorer 2", "style": "explorer"},
+    {"name": "Cooperator 2", "style": "cooperator"},
+    {"name": "Hunter 2", "style": "hunter"},
+    {"name": "Cautious 2", "style": "cautious"},
+    {"name": "Wanderer 2", "style": "wanderer"}
+  ]
+}

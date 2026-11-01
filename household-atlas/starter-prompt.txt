@@ -6,6 +6,8 @@ Use the earliest history actually available. Tell me which years and records you
 
 Find up to five evidence-backed insights, choosing only what the data supports: how spending and order frequency changed, whether small orders add up, recurring products and categories, seasonal patterns, and recorded returns. Compare matching calendar periods. Explain classification uncertainty. Don’t infer life events or label a purchase wasteful from the order record alone.
 
+Where the records support it, add category deep dives: electronics and computing (equipment versus accessories, repeated products, returns) and books (topic shifts and continuity across print, ebooks and audio, audiobook purchase trends, credit use and separate membership costs). A purchase is not evidence of reading completion or waste.
+
 Build a visually compelling local website with interactive charts, searchable orders, comparisons, and a savings what-if tool. Show assumptions, tradeoffs, and the arithmetic behind savings estimates. Let me trace findings to the underlying records. Give the site a coherent visual identity, clear typography, thoughtful empty and error states, responsive layouts, and restrained microinteractions. Respect reduced-motion preferences; keep filters immediate and show loading only while real work is pending.
 
 Save the purchase data as CSV and JSON, along with source references, collection dates, and coverage notes, in a private local project for future analysis. Don’t purchase, cancel, return, message anyone, or publish my data.

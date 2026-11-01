@@ -2,6 +2,9 @@
 const screens={
  overview:{alt:'Synthetic Household Atlas overview with an annual spending chart, sample order totals, category exploration and DialKit controls.',caption:'A timeline gives the sample history shape. Change the years, shopping channel, or metric to look closer.'},
  compare:{alt:'Synthetic year comparison showing matched-period totals, order counts, averages and the split between frequency and average-order effects.',caption:'Matching calendar periods makes the comparison useful. The app separates frequency, average totals, and shopping channels.'},
+ electronics:{alt:'Synthetic electronics deep dive showing fictional accessories, repeat purchases, return evidence and a purchase timeline.',caption:'Look beyond the device. Trace the accessories around it, inspect exact repeats, and review return evidence without presuming waste.'},
+ books:{alt:'Synthetic book-topic heatmap comparing fictional interests across four eras and all print, Kindle and audio formats.',caption:'Which interests persist as the shelf changes? Compare topic shares across eras, then click through to the fictional titles behind the pattern.'},
+ audio:{alt:'Synthetic audiobook timeline showing physical audio and Audible purchases, peak year and a matched January–October comparison.',caption:'Audio has its own rhythm. Trace title purchases over time; keep cash amounts, credit redemptions and membership funding distinct.'},
  savings:{alt:'Synthetic savings studio with an illustrative savings amount, explicit percentage assumptions and subscription-pause controls.',caption:'Move a dial and inspect the arithmetic. Savings figures are hypothetical scenarios based entirely on the fictional sample.'}
 };
 let screenshotRequest=0;

@@ -4,12 +4,22 @@ const screens={
  compare:{alt:'Synthetic year comparison showing matched-period totals, order counts, averages and the split between frequency and average-order effects.',caption:'Matching calendar periods makes the comparison useful. The app separates frequency, average totals, and shopping channels.'},
  savings:{alt:'Synthetic savings studio with an illustrative savings amount, explicit percentage assumptions and subscription-pause controls.',caption:'Move a dial and inspect the arithmetic. Savings figures are hypothetical scenarios based entirely on the fictional sample.'}
 };
+let screenshotRequest=0;
 for(const button of document.querySelectorAll('[data-screen]'))button.addEventListener('click',()=>{
- const key=button.dataset.screen,screen=screens[key];
- for(const item of document.querySelectorAll('[data-screen]'))item.setAttribute('aria-pressed',String(item===button));
- const img=document.getElementById('app-screenshot');img.src=`assets/${key}.png`;img.alt=screen.alt;
- document.getElementById('screenshot-link').href=img.src;
- document.getElementById('screen-caption').textContent=screen.caption;
+ const request=++screenshotRequest,key=button.dataset.screen,screen=screens[key];
+ const img=document.getElementById('app-screenshot'),link=document.getElementById('screenshot-link'),status=document.getElementById('image-status');
+ if(img.getAttribute('src').endsWith(`assets/${key}.png`)){link.setAttribute('aria-busy','false');status.hidden=true;return;}
+ link.setAttribute('aria-busy','true');status.textContent='Loading preview…';status.hidden=false;
+ const next=new Image();
+ next.onload=()=>{if(request!==screenshotRequest)return;
+  for(const item of document.querySelectorAll('[data-screen]'))item.setAttribute('aria-pressed',String(item===button));
+  img.src=next.src;img.alt=screen.alt;link.href=next.src;
+  document.getElementById('screen-caption').textContent=screen.caption;
+  link.setAttribute('aria-busy','false');status.hidden=true;
+  if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches)img.animate([{opacity:.6},{opacity:1}],{duration:180,easing:'ease-out'});
+ };
+ next.onerror=()=>{if(request!==screenshotRequest)return;link.setAttribute('aria-busy','false');status.textContent='Preview could not load. Try the tab again, or open the working demo.';status.hidden=false;};
+ next.src=`assets/${key}.png`;
 });
 
 const copyButton=document.getElementById('copy-prompt');

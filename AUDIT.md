@@ -118,3 +118,11 @@ lifestyle scene is used. Meeting Memory and YARM screenshots use deterministic s
 - Reduced-motion fallbacks are present in the shared deck and article systems.
 - Calendar Puck’s hardware source link returns HTTP 200.
 - Hero and internal-section screenshots are in `audit/`.
+
+
+## 39 · Household Atlas — 2026-11-01
+
+- **Creative audit:** A custom editorial landing page uses the app’s forest-green and cream palette, a three-view screenshot gallery, a four-stage build narrative, and a diagram of the independent synthetic-data build. Images are actual browser captures of the working demo, not generated mockups.
+- **Content audit:** The page describes the ChatGPT/Codex-assisted work actually performed: browser collection, local Python normalization, calculation definitions, HTML/CSS/JavaScript implementation, DialKit controls, and verification. It distinguishes AI-assisted creation from the finished app’s ordinary browser runtime. No claim of measured household norms is made.
+- **Privacy audit:** Only the independent synthetic build is included. The public page and demo contain no private repository link, original order/product identifiers, source paths, or private household findings. Screenshots visibly label all data as synthetic. The compiled public demo matches the approved standalone artifact byte-for-byte.
+- **Validation:** Gallery selection and image loading, index navigation, desktop layout, and a real 390px phone viewport checked. Local href/src references and image alternative text verified. No horizontal document overflow at the phone viewport. Public files were checked against the complete private identifier set before publishing.

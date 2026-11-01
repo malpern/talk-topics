@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Household Atlas: turning shopping history into an interactive story with ChatGPT, Python, and DialKit. Explore a fully synthetic public demo.">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#173d32">
+<title>Household Atlas — A shopping history, a story to explore</title>
+<link rel="icon" href="../hackerdojo-logo.png">
+<link rel="stylesheet" href="style.css">
+<script src="page.js" defer></script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header"><div class="nav-wrap"><a class="wordmark" href="../"><span class="atlas-mark" aria-hidden="true">a↗</span><span>household <strong>atlas.</strong><small>A HACKER DOJO PROJECT</small></span></a><nav aria-label="Page navigation"><a href="#experience">The experience</a><a href="#process">Built with ChatGPT</a><a class="nav-demo" href="demo/">Try the demo <span aria-hidden="true">↗</span></a></nav></div></header>
+<main id="main">
+<section class="hero wrap">
+ <p class="eyebrow"><span class="live-dot"></span> PERSONAL ANALYTICS · PUBLIC DEMO</p>
+ <h1>A shopping history.<br><em>A story you can explore.</em></h1>
+ <div class="hero-bottom"><p class="lead">Household Atlas turns an Amazon order history into questions about habits, change, and everyday decisions. Built through a conversation with ChatGPT, from the first data questions to a working interactive app.</p><div class="hero-actions"><a class="button" href="demo/">Explore the synthetic demo <span aria-hidden="true">→</span></a><span class="small">No sign-in. No real household data.</span></div></div>
+</section>
+<section class="showcase wrap" id="experience" aria-labelledby="showcase-heading">
+ <div class="section-top"><div><p class="eyebrow">THE EXPERIENCE</p><h2 id="showcase-heading">Start with a story.<br>Follow the evidence.</h2></div><p class="section-note">These are real screenshots of the working app.<br>Every purchase and price shown is fictional.</p></div>
+ <div class="gallery-controls" role="group" aria-label="Choose an app screenshot"><button type="button" data-screen="overview" aria-pressed="true">01 · The long view</button><button type="button" data-screen="compare" aria-pressed="false">02 · What changed?</button><button type="button" data-screen="savings" aria-pressed="false">03 · What if?</button></div>
+ <figure class="app-frame"><div class="frame-bar"><span><i></i><i></i><i></i></span><span>HOUSEHOLD ATLAS</span><b>SYNTHETIC DATA</b></div><a id="screenshot-link" href="assets/overview.png" target="_blank" rel="noopener" aria-label="Open full-size screenshot"><img id="app-screenshot" src="assets/overview.png" width="1200" height="758" alt="Synthetic Household Atlas overview with an annual spending chart, sample order totals, category exploration and DialKit controls." fetchpriority="high"></a><figcaption id="screen-caption" aria-live="polite">A timeline gives the sample history shape. Change the years, shopping channel, or metric to look closer.</figcaption></figure>
+ <div class="question-grid"><article><span class="question-number">01</span><h3>What changed?</h3><p>Compare matching calendar periods. Separate more orders from larger average totals, and check whether the mix of shopping channels changed.</p></article><article><span class="question-number">02</span><h3>What keeps coming back?</h3><p>Explore seasonal patterns and repeat products, open the underlying orders, and keep a review list. Repetition is a question to investigate.</p></article><article><span class="question-number">03</span><h3>What could I change?</h3><p>Try a smaller discretionary budget or a subscription pause. See the assumptions and arithmetic behind every savings scenario.</p></article></div>
+</section>
+<section class="process-band" id="process"><div class="wrap">
+ <div class="section-top"><div><p class="eyebrow">BUILT WITH CHATGPT + CODEX</p><h2>A conversation became<br>a software project.</h2></div><p class="section-note">The human supplied the questions and constraints.<br>ChatGPT helped turn them into analysis and an interface.</p></div>
+ <div class="brief"><span class="brief-label">THE BRIEF, CONDENSED</span><blockquote>“Help me understand my shopping history. Find the trends, make the evidence explorable, and give me useful ways to think about saving.”</blockquote><p>A report grew into a website, then into a separate public demo.</p></div>
+ <ol class="build-story">
+  <li><span class="step">01</span><div><h3>Make the record trustworthy.</h3><p>Codex worked with the signed-in browser to capture order-history pages, then wrote Python scripts to normalize the records into CSV, JSON, and SQLite. Source references and capture metadata made it possible to trace an observation back to its evidence.</p><span class="artifact">PAGE CAPTURES → STRUCTURED LOCAL DATA</span></div></li>
+  <li><span class="step">02</span><div><h3>Ask what the numbers actually mean.</h3><p>We defined counts, displayed totals, refunds, and missing values before drawing conclusions. Matching calendar periods makes comparisons useful. Refunds remain separate from displayed totals; a repeated purchase does not automatically mean waste.</p><span class="artifact">DEFINITIONS → CALCULATIONS → CHECKS</span></div></li>
+  <li><span class="step">03</span><div><h3>Turn findings into something explorable.</h3><p>ChatGPT helped shape the narrative and visuals. Codex implemented the app in HTML, CSS, and JavaScript, with Python producing a self-contained build. <a href="https://www.dialkit.dev/" target="_blank" rel="noreferrer">DialKit</a> supplies the interactive controls for years, channels, and savings assumptions.</p><span class="artifact">STORY → CHARTS → INTERACTIVE QUESTIONS</span></div></li>
+  <li><span class="step">04</span><div><h3>Iterate against what is on screen.</h3><p>We refined the design toward findings the records could support. Browser checks exercised comparisons, drilldowns, review flags, and exports. Automated checks covered calculation rules and the separation between the private app and its synthetic public edition.</p><span class="artifact">RENDER → INSPECT → REVISE → VERIFY</span></div></li>
+ </ol>
+ <div class="runtime-note"><span aria-hidden="true">↗</span><p><strong>AI helped build the project.</strong> Exploring the finished demo runs ordinary browser code. It makes no AI requests and needs no API key.</p></div>
+</div></section>
+<section class="wrap privacy-section" id="privacy">
+ <div class="section-top"><div><p class="eyebrow">A PUBLIC DEMO WITH ITS OWN DATA</p><h2>The sample is fictional<br>all the way down.</h2></div><p class="section-note">Share the experience while keeping<br>the original household record private.</p></div>
+ <div class="boundary" aria-label="The public demo is built from an independent fictional catalog and generator. The private dataset is not an input."><div class="boundary-input"><span class="eyebrow">INDEPENDENT INPUT</span><h3>Fictional catalog<br>+ fixed random seed</h3><p>Invented dates, prices,<br>products and returns.</p></div><span class="boundary-arrow" aria-hidden="true">→</span><div class="boundary-output"><span class="eyebrow">SHAREABLE OUTPUT</span><h3>A standalone<br>synthetic app</h3><p>Charts, details, exports,<br>and scenario tools.</p></div><div class="boundary-private"><span class="boundary-lock" aria-hidden="true">◇</span><strong>Private household data</strong><span>Not an input to this build.</span></div></div>
+ <div class="privacy-copy"><p>The demo is generated independently. It is not a scaled, shuffled, or renamed version of an actual household. Its annual shopping budget and patterns are illustrative, not a measured average for any population.</p><p>The public file contains no original orders, identifiers, source paths, personal findings, or private-mode switch. Its exports are labeled synthetic. The project’s source repository remains private.</p></div>
+</section>
+<section class="wrap lessons-section"><p class="eyebrow">WHAT THE PROJECT TAUGHT US</p><div class="lessons"><h2>A good question needs<br>a defensible answer.</h2><div><p><strong>Definitions are part of the product.</strong> “Spend” can mean an order total, merchandise value, or money actually paid. The interface needs to say which one it knows.</p><p><strong>Context changes the story.</strong> A larger total can come from higher order frequency, bigger baskets, or a different shopping mix. The explorer lets you separate those possibilities.</p><p><strong>Privacy is a build boundary.</strong> A separate synthetic artifact makes public demonstrations possible without hiding real records behind a display toggle.</p></div></div></section>
+<section class="closing"><div class="wrap"><p class="eyebrow">YOUR TURN TO EXPLORE</p><h2>Change a year.<br>Follow a pattern.<br><em>Try a different assumption.</em></h2><a class="button light" href="demo/">Open the synthetic demo <span aria-hidden="true">→</span></a><a class="download" href="demo/index.html" download="household-atlas-public-demo.html">Download the standalone HTML ↓</a><p class="small">The downloadable demo works offline. All displayed data is fictional.</p></div></section>
+</main>
+<footer class="wrap"><a href="../">← Back to Hacker Dojo talk topics</a><span>Household Atlas · November 2026</span></footer>
+</body>
+</html>

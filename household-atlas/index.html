@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Household Atlas: turning shopping history into an interactive story with ChatGPT, Python, and DialKit. Explore a fully synthetic public demo.">
+<meta name="description" content="Understand how your Amazon habits change, what you buy again, and where you could save. Explore a fictional demo and copy a prompt to investigate your own history.">
 <meta name="robots" content="noindex, nofollow">
 <meta name="theme-color" content="#173d32">
 <title>Household Atlas — A shopping history, a story to explore</title>
@@ -13,21 +13,57 @@
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
-<header class="site-header"><div class="nav-wrap"><a class="wordmark" href="../"><span class="atlas-mark" aria-hidden="true">a↗</span><span>household <strong>atlas.</strong><small>A HACKER DOJO PROJECT</small></span></a><nav aria-label="Page navigation"><a href="#experience">The experience</a><a href="#process">Built with ChatGPT</a><a class="nav-demo" href="demo/">Try the demo <span aria-hidden="true">↗</span></a></nav></div></header>
+<header class="site-header"><div class="nav-wrap"><a class="wordmark" href="../"><span class="atlas-mark" aria-hidden="true">a↗</span><span>household <strong>atlas.</strong><small>A HACKER DOJO PROJECT</small></span></a><nav aria-label="Page navigation"><a href="#questions">What you can learn</a><a href="#try-it">Try it yourself</a><a class="nav-demo" href="demo/">Try the demo <span aria-hidden="true">↗</span></a></nav></div></header>
 <main id="main">
 <section class="hero wrap">
  <p class="eyebrow"><span class="live-dot"></span> PERSONAL ANALYTICS · PUBLIC DEMO</p>
- <h1>A shopping history.<br><em>A story you can explore.</em></h1>
- <div class="hero-bottom"><p class="lead">Household Atlas turns an Amazon order history into questions about habits, change, and everyday decisions. Built through a conversation with ChatGPT, from the first data questions to a working interactive app.</p><div class="hero-actions"><a class="button" href="demo/">Explore the synthetic demo <span aria-hidden="true">→</span></a><span class="small">No sign-in. No real household data.</span></div></div>
+ <h1>Years of shopping.<br><em>What do they tell you?</em></h1>
+ <div class="hero-bottom"><p class="lead">The occasional big purchase. The little things that keep arriving. The habits you barely notice. Household Atlas turns an Amazon order history into a visual story you can question—and use to decide what deserves your money.</p><div class="hero-actions"><a class="button" href="demo/">Explore the fictional household <span aria-hidden="true">→</span></a><a class="text-link" href="#try-it">Try it with your own history ↓</a><span class="small">No sign-in. No real household data.</span></div></div>
+ <div class="value-line"><span>A long view of your habits</span><span>Evidence you can explore</span><span>Savings you can reason about</span></div>
+</section>
+<section class="questions-section wrap" id="questions" aria-labelledby="questions-heading">
+ <div class="section-top"><div><p class="eyebrow">FROM ORDER HISTORY TO USEFUL QUESTIONS</p><h2 id="questions-heading">You remember the purchases.<br>Can you see the pattern?</h2></div><p class="section-note">A way to decide what to look at next.<br>No judgment about what you should value.</p></div>
+ <div class="question-list">
+  <article><span class="question-number">01 / THE CHANGE</span><h3>Am I spending more—or just shopping differently?</h3><p>Compare the same months across years. Separate more orders from larger average orders and a changing mix of purchases.</p><p class="question-payoff">Find the driver before choosing a fix.</p></article>
+  <article><span class="question-number">02 / THE SMALL STUFF</span><h3>Do the little orders add up to something big?</h3><p>Look at order sizes and frequency alongside the occasional large purchase. See which deserves more of your attention.</p><p class="question-payoff">Put your effort where it can matter.</p></article>
+  <article><span class="question-number">03 / THE REPEATS</span><h3>What do I keep buying without noticing?</h3><p>Surface recurring products and categories. Replenishing a staple may be useful; another replacement may deserve a closer look.</p><p class="question-payoff">Decide which repeats deserve a closer look.</p></article>
+  <article><span class="question-number">04 / THE RETURNS</span><h3>Which purchases send me back to the return counter?</h3><p>Inspect recorded returns and refund evidence. Look for products worth reviewing, while keeping missing refund information visible.</p><p class="question-payoff">Spot friction as well as spending.</p></article>
+  <article><span class="question-number">05 / THE RHYTHM</span><h3>Is there a season to my shopping?</h3><p>Explore busy months, quieter stretches, and category shifts. The record can reveal timing; you supply the reasons behind it.</p><p class="question-payoff">Plan for the peaks you can anticipate.</p></article>
+  <article><span class="question-number">06 / THE NEXT STEP</span><h3>What could I save without giving up what I value?</h3><p>Try a smaller discretionary budget or a subscription pause. Change the assumptions and see how much the scenario would change.</p><p class="question-payoff">Make a deliberate tradeoff, with numbers.</p></article>
+ </div>
+ <p class="evidence-note">An order history shows what was ordered and what the record says. It cannot tell you whether an item was loved, needed, or wasted. Those are your judgments to make.</p>
 </section>
 <section class="showcase wrap" id="experience" aria-labelledby="showcase-heading">
  <div class="section-top"><div><p class="eyebrow">THE EXPERIENCE</p><h2 id="showcase-heading">Start with a story.<br>Follow the evidence.</h2></div><p class="section-note">These are real screenshots of the working app.<br>Every purchase and price shown is fictional.</p></div>
  <div class="gallery-controls" role="group" aria-label="Choose an app screenshot"><button type="button" data-screen="overview" aria-pressed="true">01 · The long view</button><button type="button" data-screen="compare" aria-pressed="false">02 · What changed?</button><button type="button" data-screen="savings" aria-pressed="false">03 · What if?</button></div>
  <figure class="app-frame"><div class="frame-bar"><span><i></i><i></i><i></i></span><span>HOUSEHOLD ATLAS</span><b>SYNTHETIC DATA</b></div><a id="screenshot-link" href="assets/overview.png" target="_blank" rel="noopener" aria-label="Open full-size screenshot"><img id="app-screenshot" src="assets/overview.png" width="1200" height="758" alt="Synthetic Household Atlas overview with an annual spending chart, sample order totals, category exploration and DialKit controls." fetchpriority="high"></a><figcaption id="screen-caption" aria-live="polite">A timeline gives the sample history shape. Change the years, shopping channel, or metric to look closer.</figcaption></figure>
- <div class="question-grid"><article><span class="question-number">01</span><h3>What changed?</h3><p>Compare matching calendar periods. Separate more orders from larger average totals, and check whether the mix of shopping channels changed.</p></article><article><span class="question-number">02</span><h3>What keeps coming back?</h3><p>Explore seasonal patterns and repeat products, open the underlying orders, and keep a review list. Repetition is a question to investigate.</p></article><article><span class="question-number">03</span><h3>What could I change?</h3><p>Try a smaller discretionary budget or a subscription pause. See the assumptions and arithmetic behind every savings scenario.</p></article></div>
+
 </section>
+<section class="try-section" id="try-it" aria-labelledby="try-heading"><div class="wrap">
+ <div class="section-top"><div><p class="eyebrow">TRY IT WITH YOUR OWN HISTORY</p><h2 id="try-heading">Your history.<br>Your questions.<br><em>A starting prompt.</em></h2></div><p class="try-intro">You don’t need this project’s source code to start. Give a capable AI agent a clear brief, access to your own records, and a standard for what counts as a useful answer.</p></div>
+ <div class="start-layout"><aside class="preparation"><p class="eyebrow">BEFORE YOU PASTE</p><ol>
+ <li><strong>Choose an agent with the right tools.</strong><span>It needs browser access and the ability to create files on your computer. A chat without those tools cannot carry out this workflow.</span></li>
+ <li><strong>Connect your signed-in Chrome tab.</strong><span>Open Amazon’s Orders page. Verify the agent can read that tab through its supported browser connection. Handle login and any verification yourself.</span></li>
+ <li><strong>Decide what belongs in the story.</strong><span>Your orders or the household’s? Choose a private local folder. Collection may take time, and some history or refund details may be unavailable.</span></li>
+ <li><strong>No browser connection? Bring an export.</strong><span>Use your own Amazon account-data export as the input instead, and ask the agent to inspect its coverage before analyzing it.</span></li>
+ </ol><p class="preparation-note">Check your AI tool’s data controls before giving it access. Saving the output locally does not mean the AI service processes your records offline.</p></aside>
+ <div class="prompt-card"><div class="prompt-top"><span>THE STARTING PROMPT</span><button type="button" id="copy-prompt">Copy prompt <span aria-hidden="true">↗</span></button></div><pre id="starter-prompt" tabindex="0">I’m signed into Amazon in Chrome. Help me understand my shopping habits and create a private, interactive report from my order history.
+
+First, verify that you can read my signed-in Orders tab and save files locally. If you cannot, explain what access I need to enable or how to proceed with an Amazon data export. Ask whether to include just my orders or the whole household.
+
+Use the earliest history actually available. Tell me which years and records you captured, what is missing, and what each measure means. Keep displayed order totals, known refunds, and money actually paid distinct. Never treat a missing value as zero or invent data to fill a gap.
+
+Find five evidence-backed insights: how spending and order frequency changed, whether small orders add up, recurring products and categories, seasonal patterns, and recorded returns. Compare matching calendar periods. Explain classification uncertainty. Don’t infer life events or label a purchase wasteful from the order record alone.
+
+Build a visually compelling local website with interactive charts, searchable orders, comparisons, and a savings what-if tool. Show assumptions, tradeoffs, and the arithmetic behind savings estimates. Let me trace findings to the underlying records.
+
+Save the purchase data as CSV and JSON, along with source references, collection dates, and coverage notes, in a private local project for future analysis. Don’t purchase, cancel, return, message anyone, or publish my data.
+
+If I later ask for a public demo, generate an independent fictional household. Do not reuse my names, products, prices, dates, totals, or behavioral patterns—even scaled or renamed.</pre><div class="prompt-bottom"><a href="starter-prompt.txt" download>Download as text ↓</a><span id="copy-status" role="status" aria-live="polite">Adapt the scope to your own household.</span></div></div></div>
+ <div class="followups"><div><p class="eyebrow">KEEP THE CONVERSATION GOING</p><h3>The best follow-up<br>is a sharper question.</h3></div><ul><li>“Did this year’s increase come from more orders or bigger purchases?”</li><li>“Which three changes could make the biggest difference? Show the tradeoffs.”</li><li>“Which repeated purchases deserve a review—and what can’t the data tell us?”</li></ul></div>
+</div></section>
 <section class="process-band" id="process"><div class="wrap">
- <div class="section-top"><div><p class="eyebrow">BUILT WITH CHATGPT + CODEX</p><h2>A conversation became<br>a software project.</h2></div><p class="section-note">The human supplied the questions and constraints.<br>ChatGPT helped turn them into analysis and an interface.</p></div>
+ <div class="section-top"><div><p class="eyebrow">THE BUILD NOTES · FOR THE TECHNICALLY CURIOUS</p><h2>A conversation became<br>a software project.</h2></div><p class="section-note">Built through a conversation with ChatGPT and Codex.<br>Here is how questions became an explorable record.</p></div>
  <div class="brief"><span class="brief-label">THE BRIEF, CONDENSED</span><blockquote>“Help me understand my shopping history. Find the trends, make the evidence explorable, and give me useful ways to think about saving.”</blockquote><p>A report grew into a website, then into a separate public demo.</p></div>
  <ol class="build-story">
   <li><span class="step">01</span><div><h3>Make the record trustworthy.</h3><p>Codex worked with the signed-in browser to capture order-history pages, then wrote Python scripts to normalize the records into CSV, JSON, and SQLite. Source references and capture metadata made it possible to trace an observation back to its evidence.</p><span class="artifact">PAGE CAPTURES → STRUCTURED LOCAL DATA</span></div></li>

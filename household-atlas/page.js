@@ -11,3 +11,19 @@ for(const button of document.querySelectorAll('[data-screen]'))button.addEventLi
  document.getElementById('screenshot-link').href=img.src;
  document.getElementById('screen-caption').textContent=screen.caption;
 });
+
+const copyButton=document.getElementById('copy-prompt');
+copyButton.addEventListener('click',async()=>{
+ const prompt=document.getElementById('starter-prompt');
+ const status=document.getElementById('copy-status');
+ try{
+  await navigator.clipboard.writeText(prompt.textContent);
+  status.textContent='Copied. Paste into your browser-capable agent.';
+  copyButton.textContent='Copy again ↗';
+ }catch{
+  const range=document.createRange();range.selectNodeContents(prompt);
+  const selection=window.getSelection();selection.removeAllRanges();selection.addRange(range);
+  prompt.focus();
+  status.textContent='Copy unavailable. Select and copy the prompt, or download the text file.';
+ }
+});

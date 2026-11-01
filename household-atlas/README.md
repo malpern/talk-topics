@@ -1,8 +1,9 @@
 # Household Atlas public showcase
 
-A landing page and standalone synthetic demo for the Hacker Dojo talk index. The page describes the ChatGPT/Codex-assisted workflow, includes three actual screenshots of synthetic app views, and links only to the public demo. The application source repository is private and intentionally not linked.
+A landing page and standalone synthetic demo for the Hacker Dojo talk index. The page leads with six practical questions about shopping habits and decisions, includes three actual screenshots of synthetic app views, and offers a copyable starting prompt with browser/file-access prerequisites. The ChatGPT/Codex-assisted build story follows the viewer-facing content. The application source repository is private and intentionally not linked.
 
 - `index.html`, `style.css`, `page.js`: public case study and screenshot gallery.
+- `starter-prompt.txt`: downloadable agent-independent brief, identical to the page’s copyable prompt. Copying falls back to selecting text if clipboard access is denied.
 - `assets/`: actual 1200×758 browser captures of the synthetic overview, comparison, and savings views. No real household data is shown.
 - `demo/index.html`: self-contained synthetic app, including the DialKit MIT license. No private dataset or account connection.
 - `demo/DIALKIT-LICENSE.txt`: standalone license copy.

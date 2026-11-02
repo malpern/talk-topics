@@ -27,3 +27,9 @@ The public demo now includes electronics and computing (accessory mix, exact rep
 The landing page introduces the questions behind each category, links directly to `demo/#electronics` and `demo/#books`, and adds three gallery views. The starting prompt and its download now include these optional category analyses. No private repository link is published.
 
 Current validation: 28 Node checks and 12 Python checks, public build with private reads denied, 13,360 unique private-record fingerprint checks against public text, byte-identical public artifact, exact prompt/download agreement, and local link/asset checks. Browser QA reconciled accessory, book-topic and audio drilldowns, exercised synthetic JSON export and topic controls, verified all gallery variants, and checked 390px layouts without document overflow.
+
+## Annual topic area chart — November 1, 2026
+
+The Books view now has overlapping translucent area series for each topic across print, Kindle and audio. Switch between annual title-appearance counts and shares, toggle individual topics, inspect a year by hover or keyboard slider, or open the equivalent data table. Hiding a topic preserves the all-title denominator. Empty-year shares are unknown, and the partial 2026 period is explicitly marked. Purchases are evidence of buying interest, not completed reading.
+
+Validation: 31 Node checks and 12 Python checks passed, including independent public generation and private-data fingerprint checks. Browser QA covered counts/shares, hidden-topic denominators, clearing/restoring series, keyboard year selection, empty-year gaps, and 390px layout. The gallery screenshot is captured from the synthetic build.

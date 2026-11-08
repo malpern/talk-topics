@@ -1,0 +1,345 @@
+{
+  "analysis": {
+    "channels": [
+      {
+        "id": "claude_subscription",
+        "name": "Claude \u00b7 subscription",
+        "color": "#b799d1",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "claude_api",
+        "name": "Claude \u00b7 API",
+        "color": "#8155a2",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "claude_unknown",
+        "name": "Claude \u00b7 route unverified",
+        "color": "#cdbbdb",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_subscription",
+        "name": "OpenAI \u00b7 subscription",
+        "color": "#609bc0",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_api",
+        "name": "OpenAI \u00b7 API",
+        "color": "#346780",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_unknown",
+        "name": "OpenAI \u00b7 route unverified",
+        "color": "#a9c6d7",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "local",
+        "name": "Local models",
+        "color": "#95b46b",
+        "tokens": 879,
+        "output": 14,
+        "records": 1,
+        "measured": 1
+      },
+      {
+        "id": "other",
+        "name": "Other / provider unknown",
+        "color": "#c3bab0",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      }
+    ],
+    "previous_channels": [
+      {
+        "id": "claude_subscription",
+        "name": "Claude \u00b7 subscription",
+        "color": "#b799d1",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "claude_api",
+        "name": "Claude \u00b7 API",
+        "color": "#8155a2",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "claude_unknown",
+        "name": "Claude \u00b7 route unverified",
+        "color": "#cdbbdb",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_subscription",
+        "name": "OpenAI \u00b7 subscription",
+        "color": "#609bc0",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_api",
+        "name": "OpenAI \u00b7 API",
+        "color": "#346780",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "openai_unknown",
+        "name": "OpenAI \u00b7 route unverified",
+        "color": "#a9c6d7",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "local",
+        "name": "Local models",
+        "color": "#95b46b",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      },
+      {
+        "id": "other",
+        "name": "Other / provider unknown",
+        "color": "#c3bab0",
+        "tokens": 0,
+        "output": 0,
+        "records": 0,
+        "measured": 0
+      }
+    ],
+    "trend": [
+      {
+        "date": "2026-11-08",
+        "records": 1,
+        "channels": [
+          {
+            "id": "claude_subscription",
+            "name": "Claude \u00b7 subscription",
+            "color": "#b799d1",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "claude_api",
+            "name": "Claude \u00b7 API",
+            "color": "#8155a2",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "claude_unknown",
+            "name": "Claude \u00b7 route unverified",
+            "color": "#cdbbdb",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_subscription",
+            "name": "OpenAI \u00b7 subscription",
+            "color": "#609bc0",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_api",
+            "name": "OpenAI \u00b7 API",
+            "color": "#346780",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_unknown",
+            "name": "OpenAI \u00b7 route unverified",
+            "color": "#a9c6d7",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "local",
+            "name": "Local models",
+            "color": "#95b46b",
+            "tokens": 879,
+            "output": 14,
+            "records": 1,
+            "measured": 1
+          },
+          {
+            "id": "other",
+            "name": "Other / provider unknown",
+            "color": "#c3bab0",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          }
+        ]
+      }
+    ],
+    "opportunities": [
+      {
+        "task": "Morning briefing: local shadow run",
+        "tokens": 879,
+        "records": 1,
+        "coverage": 1,
+        "action": "Review existing local evidence",
+        "stage": "Tested \u00b7 required evidence missing",
+        "why": "Required weather evidence was missing. Local output remains a shadow comparison, not a production replacement.",
+        "channels": [
+          {
+            "id": "claude_subscription",
+            "name": "Claude \u00b7 subscription",
+            "color": "#b799d1",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "claude_api",
+            "name": "Claude \u00b7 API",
+            "color": "#8155a2",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "claude_unknown",
+            "name": "Claude \u00b7 route unverified",
+            "color": "#cdbbdb",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_subscription",
+            "name": "OpenAI \u00b7 subscription",
+            "color": "#609bc0",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_api",
+            "name": "OpenAI \u00b7 API",
+            "color": "#346780",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "openai_unknown",
+            "name": "OpenAI \u00b7 route unverified",
+            "color": "#a9c6d7",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          },
+          {
+            "id": "local",
+            "name": "Local models",
+            "color": "#95b46b",
+            "tokens": 879,
+            "output": 14,
+            "records": 1,
+            "measured": 1
+          },
+          {
+            "id": "other",
+            "name": "Other / provider unknown",
+            "color": "#c3bab0",
+            "tokens": 0,
+            "output": 0,
+            "records": 0,
+            "measured": 0
+          }
+        ],
+        "next": "Repair the missing weather-evidence path, then rerun a matched comparison against reviewed expectations before considering production use."
+      }
+    ],
+    "unverified_records": 0,
+    "window": {
+      "start": 1794124800.0,
+      "end": 1794211199.0,
+      "previous_start": 1794038401.0,
+      "previous_end": 1794124800.0,
+      "first_observed": 1794124800.0
+    },
+    "coverage_note": "Only one approved local run is published. Other workloads, cloud usage and earlier periods are not represented. No account-wide shares, migration savings or historical trends can be inferred from this sample."
+  },
+  "days": 1,
+  "view": "automation",
+  "records": 1,
+  "measured": 1,
+  "tokens": 879,
+  "scope_note": "One approved frozen real run",
+  "collection": {},
+  "tasks": [
+    {
+      "name": "Morning briefing: local shadow run",
+      "tokens": 879,
+      "output": 14,
+      "records": 1,
+      "measured": 1,
+      "errors": 0
+    }
+  ],
+  "events": []
+}

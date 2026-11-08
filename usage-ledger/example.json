@@ -1,0 +1,13 @@
+{
+  "title": "Morning briefing: local shadow run",
+  "date": "2026-11-08",
+  "model": "keyboard-local:current",
+  "input_tokens": 865,
+  "output_tokens": 14,
+  "model_seconds": 9.48,
+  "workflow_seconds": 48.0,
+  "status": "Completed; not promoted",
+  "quality_finding": "Required weather evidence was missing. Local output remains a shadow comparison, not a production replacement.",
+  "billing": "Local compute",
+  "privacy": "Frozen real-run metadata. Prompts, output text, email, calendar details, account information and live connections are omitted."
+}

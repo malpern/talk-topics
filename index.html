@@ -171,8 +171,12 @@
     font-weight: 400;
     font-size: 1.05rem;
     color: var(--muted);
-    margin-top: 0.35em;
+    /* The blurb lives inside .title, so reset the headline's tight leading. */
+    line-height: 1.55;
+    margin-top: 0.75rem;
+    max-width: 62ch;
     letter-spacing: 0;
+    text-wrap: pretty;
   }
 
   ol.topics .meta {
@@ -247,6 +251,16 @@
   </p>
 
   <ol class="topics">
+    <li>
+      <a href="https://claude.ai/artifact/5qcmY8pHmvFZDr6JYzaEAS" target="_blank" rel="noopener noreferrer">
+        <span class="num">45</span>
+        <span class="title">
+          Indoor Shoes! — A Doorway Warning for House-Only Hokas
+          <span class="blurb">An engineering investigation into warning before indoor-only shoes cross the front-door threshold: passive UHF RFID against cameras, BLE, UWB and retail EAS, animated detection logic, failure cases, costs and a staged test plan.</span>
+        </span>
+        <span class="meta">Animated slide deck · HTML + SVG + JavaScript</span>
+      </a>
+    </li>
     <li>
       <a href="https://keyboard-book.malpern.chatgpt.site/" target="_blank" rel="noopener noreferrer">
         <span class="num">44</span>
